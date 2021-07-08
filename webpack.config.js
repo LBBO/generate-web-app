@@ -1,8 +1,9 @@
 const path = require('path')
 const webpack = require('webpack')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 module.exports = {
-  entry: './index.ts',
+  entry: './src/index.ts',
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
@@ -17,7 +18,9 @@ module.exports = {
     ],
   },
   plugins: [
-    new webpack.BannerPlugin({ banner: '#!/usr/bin/env node', raw: true })
+    new webpack.ProgressPlugin(),
+    new CleanWebpackPlugin(),
+    new webpack.BannerPlugin({ banner: '#!/usr/bin/env node', raw: true }),
   ],
   resolve: {
     extensions: ['.ts', '.js'],
