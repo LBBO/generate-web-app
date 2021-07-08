@@ -13,6 +13,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "prettier": "prettier -w src",
+    "lint": "eslint src",
     "prepublishOnly": "npm run build:prod",
     "prepare": "husky install"
   },
@@ -29,7 +30,12 @@
   "homepage": "https://github.com/LBBO/generate-web-app#readme",
   "devDependencies": {
     "@types/jest": "^26.0.24",
+    "@typescript-eslint/eslint-plugin": "^4.28.2",
+    "@typescript-eslint/parser": "^4.28.2",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "eslint": "^7.30.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
     "husky": "^7.0.1",
     "jest": "^27.0.6",
     "lint-staged": "^11.0.0",
@@ -42,6 +48,10 @@
     "webpack-cli": "^4.7.2"
   },
   "lint-staged": {
-    "*.{js,ts,json,css,md}": "prettier --write"
+    "*.{js,ts,json,css,md}": "prettier --write",
+    "*.{js,ts}": [
+      "eslint --fix",
+      "git add"
+    ]
   }
 }
