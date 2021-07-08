@@ -2,8 +2,10 @@
   "name": "generate-web-app",
   "version": "1.0.0",
   "description": "",
-  "bin": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "bin": {
+    "generate-web-app": "./dist/index.js"
+  },
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build:dev": "webpack --mode development",
     "build:prod": "webpack  --mode production",
