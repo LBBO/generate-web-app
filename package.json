@@ -2,8 +2,12 @@
   "name": "generate-web-app",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "bin": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build:dev": "webpack --mode development",
+    "build:prod": "webpack  --mode production",
+    "watch": "webpack --watch  --mode development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,5 +20,11 @@
   "bugs": {
     "url": "https://github.com/LBBO/generate-web-app/issues"
   },
-  "homepage": "https://github.com/LBBO/generate-web-app#readme"
+  "homepage": "https://github.com/LBBO/generate-web-app#readme",
+  "devDependencies": {
+    "ts-loader": "^9.2.3",
+    "typescript": "^4.3.5",
+    "webpack": "^5.43.0",
+    "webpack-cli": "^4.7.2"
+  }
 }
