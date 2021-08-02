@@ -14,11 +14,11 @@ import { Answers, DistinctQuestion } from 'inquirer'
 import { Extension } from '../Extension'
 import { selectExtensions } from './SelectExtensions'
 
-async function getExtensionOptions(
+export const getExtensionOptions = async (
   chosenExtensions: Array<Extension>,
   answers$: Observable<Answers>,
   prompts$: Subject<DistinctQuestion>,
-) {
+): Promise<[Extension, Record<string, unknown> | undefined][]> => {
   const extensionsWithOptions: Array<
     [Extension, Record<string, unknown> | undefined]
   > = []
@@ -68,24 +68,26 @@ export const performUserDialog = async (
   answers$: Observable<Answers>,
   extensions: Array<Extension>,
 ): Promise<Array<[Extension, Record<string, unknown> | undefined]>> => {
-  const chosenExtensions = await selectExtensions(
-    prompts$,
-    answers$,
-    extensions,
-  )
+  try {
+    const chosenExtensions = await selectExtensions(
+      prompts$,
+      answers$,
+      extensions,
+    )
 
-  const extensionsWithOptions = await getExtensionOptions(
-    chosenExtensions,
-    answers$,
-    prompts$,
-  )
+    const extensionsWithOptions = await getExtensionOptions(
+      chosenExtensions,
+      answers$,
+      prompts$,
+    )
 
-  prompts$.complete()
+    prompts$.complete()
 
-  return extensionsWithOptions
-
-  // choose all extensions
-  // choose extensions options
-  // install
-  // post-installation information
+    return extensionsWithOptions
+  } catch (e) {
+    // In case of an error, this uncompleted observable would keep the process
+    // running
+    prompts$.complete()
+    throw e
+  }
 }

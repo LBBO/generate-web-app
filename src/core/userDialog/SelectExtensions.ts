@@ -1,6 +1,7 @@
 import { Extension } from '../Extension'
-import { map, Observable, Subject, take } from 'rxjs'
+import { Observable, pluck, Subject, take } from 'rxjs'
 import { Answers, CheckboxQuestion, DistinctQuestion } from 'inquirer'
+import chalk from 'chalk'
 
 export const selectExtensions = (
   prompts$: Subject<DistinctQuestion>,
@@ -10,33 +11,19 @@ export const selectExtensions = (
   prompts$.next({
     type: 'checkbox',
     name: 'chosenExtensions',
+    message: 'What libraries / tools would you like to use in your project?',
     choices: extensions.map((extension) => {
       return {
-        name: extension.name,
-        key: extension,
-        line: `${extension.description} Documentation: ${extension.linkToDocumentation}`,
+        name: `${chalk.bold(extension.name)} - ${
+          extension.description
+        } More info: ${chalk.underline(
+          extension.linkToDocumentation.toString(),
+        )}`,
+        value: extension,
+        short: extension.name,
       }
     }),
   } as CheckboxQuestion)
 
-  return answers$
-    .pipe(
-      take(1),
-      map(({ answer: chosenExtensionNames }) => {
-        return chosenExtensionNames.map((extensionName: string) => {
-          const chosenExtension = extensions.find(
-            (extension) => extension.name === extensionName,
-          )
-
-          if (chosenExtension) {
-            return chosenExtension
-          } else {
-            throw new Error(
-              `No extension named "${extensionName}" could be found. This should not have happened.`,
-            )
-          }
-        })
-      }),
-    )
-    .toPromise()
+  return answers$.pipe(take(1), pluck('answer')).toPromise()
 }
