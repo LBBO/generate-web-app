@@ -6,6 +6,10 @@ export enum ExtensionCategory {
   FRONTEND_FRAMEWORK,
 }
 
+export type AdditionalInformationForExtensions = {
+  chosenExtensions: Array<Extension>
+}
+
 export type Extension<
   ExtensionOptions extends Record<string, unknown> = Record<string, unknown>,
 > = {
@@ -18,9 +22,17 @@ export type Extension<
   exclusiveTo?: Array<Extension>
 
   promptOptions?: (
-    prompts$: Subject<DistinctQuestion<Answers>>,
+    prompts$: Subject<DistinctQuestion>,
     answers$: Observable<Answers>,
   ) => Observable<ExtensionOptions>
 
-  run: () => void
+  run: (
+    options: ExtensionOptions | undefined,
+    otherInformation: AdditionalInformationForExtensions,
+  ) => Promise<void>
+
+  printUsefulInformation?: (
+    options: ExtensionOptions | undefined,
+    otherInformation: AdditionalInformationForExtensions,
+  ) => void
 }

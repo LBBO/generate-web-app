@@ -8,7 +8,7 @@ export const ReactExtension: Extension = {
   exclusiveTo: [],
   category: ExtensionCategory.FRONTEND_FRAMEWORK,
 
-  run: () => {
+  run: async () => {
     console.log('running react extension')
   },
 }

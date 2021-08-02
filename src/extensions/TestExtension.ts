@@ -16,8 +16,8 @@ export const TestExtension: Extension<TestExtensionOptions> = {
     'This extension is only used for testing! Please remove from actual builds.',
   category: ExtensionCategory.ONLY_FOR_TESTING,
   linkToDocumentation: new URL('https://michaelkuckuk.com'),
-  run: () => {
-    console.log('Running test extension')
+  run: async (options) => {
+    console.log('Running test extension', options)
   },
   promptOptions: (prompts$, answers$) => {
     prompts$.next({
