@@ -1,11 +1,14 @@
 import { Extension, ExtensionCategory } from '../core/Extension'
-import { map, Observable } from 'rxjs'
+import { Observable, reduce } from 'rxjs'
 
 export type TestExtensionOptions = {
   pineappleOnPizza: boolean
+  otherIngredients: string[]
 }
 
-type Answers = { name: 'pineappleOnPizza'; answer: boolean }
+type Answers =
+  | { name: 'pineappleOnPizza'; answer: boolean }
+  | { name: 'otherIngredients'; answer: string[] }
 
 export const TestExtension: Extension<TestExtensionOptions> = {
   name: 'Test extension',
@@ -43,10 +46,19 @@ export const TestExtension: Extension<TestExtensionOptions> = {
     prompts$.complete()
 
     return (answers$ as Observable<Answers>).pipe(
-      // tap((answer) => console.log('answer', answer)),
-      map(({ answer }) => ({
-        pineappleOnPizza: answer,
-      })),
+      reduce((acc, answerObject) => {
+        const copy = { ...acc }
+
+        switch (answerObject.name) {
+          case 'pineappleOnPizza':
+            copy.pineappleOnPizza = answerObject.answer
+            break
+          case 'otherIngredients':
+            copy.otherIngredients = answerObject.answer
+        }
+
+        return copy
+      }, {} as TestExtensionOptions),
     )
   },
 }
