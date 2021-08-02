@@ -13,6 +13,7 @@ import {
 import { Answers, DistinctQuestion } from 'inquirer'
 import { Extension } from '../Extension'
 import { selectExtensions } from './SelectExtensions'
+import chalk from 'chalk'
 
 export const getExtensionOptions = async (
   chosenExtensions: Array<Extension>,
@@ -53,9 +54,15 @@ export const getExtensionOptions = async (
     // Forward questions to actual prompts observable
     customPrompts$.subscribe(prompts$)
 
-    const chosenOptions = await extension
-      .promptOptions?.(customPrompts$, customAnswers$)
-      .toPromise()
+    let chosenOptions: Record<string, unknown> | undefined
+
+    if (extension.promptOptions) {
+      console.log(chalk.bold.underline(extension.name))
+      chosenOptions = await extension
+        .promptOptions(customPrompts$, customAnswers$)
+        .toPromise()
+      console.log()
+    }
 
     extensionsWithOptions.push([extension, chosenOptions])
   }
@@ -74,6 +81,9 @@ export const performUserDialog = async (
       answers$,
       extensions,
     )
+
+    // Create empty line before asking about extension options
+    console.log()
 
     const extensionsWithOptions = await getExtensionOptions(
       chosenExtensions,

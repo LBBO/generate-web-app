@@ -29,7 +29,7 @@ const run = async () => {
 
   console.log()
   console.log(
-    chalk.bold('Thank you for answering those questions!'),
+    chalk.bold(`Alright, we're good to go!`),
     'Starting installation process...',
   )
   console.log()
