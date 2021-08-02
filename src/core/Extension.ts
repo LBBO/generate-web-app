@@ -1,4 +1,4 @@
-import { Subject } from 'rxjs'
+import { Observable, Subject } from 'rxjs'
 import { Answers, DistinctQuestion } from 'inquirer'
 
 export enum ExtensionCategory {
@@ -10,9 +10,16 @@ export type Extension<
 > = {
   name: string
   description: string
+  linkToDocumentation: URL
   category: ExtensionCategory
 
-  promptOptions?: (prompts: Subject<DistinctQuestion<Answers>>) => void
+  dependsOn?: Array<Extension>
+  exclusiveTo?: Array<Extension>
+
+  promptOptions?: (
+    prompts$: Subject<DistinctQuestion<Answers>>,
+    answers$: Observable<Answers>,
+  ) => Observable<ExtensionOptions>
 
   run: () => void
 }
