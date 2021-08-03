@@ -2,14 +2,15 @@
 import { Extension } from './core/Extension'
 import { Subject } from 'rxjs'
 import inquirer, { DistinctQuestion } from 'inquirer'
-import { TestExtension } from './extensions/TestExtension'
 import { performSanityChecksOnExtensions } from './core/SanityChecks'
 import { performUserDialog } from './core/userDialog/PerformUserDialog'
 import { ReactExtension } from './extensions/ReactExtension'
 import chalk from 'chalk'
+import { TypeScriptExtension } from './extensions/TypeScriptExtension'
 
 const extensions: Array<Extension> = [
-  TestExtension,
+  // TestExtension,
+  TypeScriptExtension,
   ReactExtension,
 ] as Array<Extension>
 

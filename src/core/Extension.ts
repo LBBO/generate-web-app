@@ -3,6 +3,7 @@ import { Answers, DistinctQuestion } from 'inquirer'
 
 export enum ExtensionCategory {
   ONLY_FOR_TESTING,
+  JAVASCRIPT_FLAVOR,
   FRONTEND_FRAMEWORK,
 }
 
