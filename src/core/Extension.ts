@@ -1,5 +1,6 @@
 import { Observable, Subject } from 'rxjs'
 import { Answers, DistinctQuestion } from 'inquirer'
+import { ProjectMetaData } from './userDialog/PerformUserDialog'
 
 export enum ExtensionCategory {
   ONLY_FOR_TESTING,
@@ -8,6 +9,7 @@ export enum ExtensionCategory {
 }
 
 export type AdditionalInformationForExtensions = {
+  projectMetadata: ProjectMetaData
   chosenExtensions: Array<Extension>
 }
 

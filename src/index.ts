@@ -21,7 +21,7 @@ const prompts$ = new Subject<DistinctQuestion>()
 const answers$ = inquirer.prompt(prompts$).ui.process
 
 const run = async () => {
-  const extensionsWithOptions = await performUserDialog(
+  const { extensionsWithOptions, projectMetadata } = await performUserDialog(
     prompts$,
     answers$,
     extensions,
@@ -40,6 +40,7 @@ const run = async () => {
   for (const [extension, options] of extensionsWithOptions) {
     console.log(chalk.inverse.whiteBright(`Installing ${extension.name}`))
     await extension.run(options, {
+      projectMetadata,
       chosenExtensions,
     })
     console.log()
@@ -49,6 +50,7 @@ const run = async () => {
   // Print additional useful information
   for (const [extension, options] of extensionsWithOptions) {
     extension.printUsefulInformation?.(options, {
+      projectMetadata,
       chosenExtensions,
     })
   }

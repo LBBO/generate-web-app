@@ -12,7 +12,10 @@ export const ReactExtension: Extension = {
 
   run: (options, otherInformation) => {
     return new Promise((resolve, reject) => {
-      const npxArgs = ['create-react-app', 'test']
+      const npxArgs = [
+        'create-react-app',
+        otherInformation.projectMetadata.name,
+      ]
 
       if (otherInformation.chosenExtensions.includes(TypeScriptExtension)) {
         npxArgs.push('--template', 'typescript')
