@@ -7,6 +7,9 @@ import { Answers, DistinctQuestion } from 'inquirer'
 
 describe('performUserDialog', () => {
   it('should complete prompts$ even if one of the submethods fails', async () => {
+    jest.spyOn(PerformUserDialog, 'promptMetadata').mockResolvedValue({
+      name: '',
+    })
     const getExtensionOptionsSpy = jest.spyOn(
       PerformUserDialog,
       'getExtensionOptions',
