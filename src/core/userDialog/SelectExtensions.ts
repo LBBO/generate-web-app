@@ -3,6 +3,7 @@ import { Observable, pluck, Subject, take } from 'rxjs'
 import { Answers, CheckboxQuestion, DistinctQuestion } from 'inquirer'
 import chalk from 'chalk'
 import { checkDependencies } from '../DependencyChecks'
+import { checkExclusivities } from '../ExclusivityChecks'
 
 export const selectExtensions = (
   prompts$: Subject<DistinctQuestion>,
@@ -36,8 +37,12 @@ export const selectExtensions = (
       chosenExtensions: Array<Extension>,
     ): boolean | string | Promise<boolean | string> {
       const dependenciesAreValid = checkDependencies(chosenExtensions)
+      const exclusivitiesAreValid = checkExclusivities(chosenExtensions)
+
       if (!dependenciesAreValid.isValidConfiguration) {
         return dependenciesAreValid.errorMessages[0]
+      } else if (!exclusivitiesAreValid.isValidConfiguration) {
+        return exclusivitiesAreValid.errorMessages[0]
       } else {
         return true
       }
