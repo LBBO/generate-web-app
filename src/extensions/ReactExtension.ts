@@ -1,6 +1,6 @@
 import { Extension, ExtensionCategory } from '../core/Extension'
 import { spawn } from 'child_process'
-import { TypeScriptExtension } from './TypeScriptExtension'
+import { getTypeScriptExtension } from './TypeScriptExtension'
 
 export const ReactExtension: Extension = {
   name: 'React',
@@ -17,7 +17,7 @@ export const ReactExtension: Extension = {
         otherInformation.projectMetadata.name,
       ]
 
-      if (otherInformation.chosenExtensions.includes(TypeScriptExtension)) {
+      if (getTypeScriptExtension(otherInformation.chosenExtensions)) {
         npxArgs.push('--template', 'typescript')
       }
 

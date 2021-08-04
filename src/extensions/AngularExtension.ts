@@ -1,22 +1,17 @@
+import { Extension, ExtensionCategory } from '../core/Extension'
 import {
-  Extension,
-  ExtensionCategory,
-  ExtensionWithOptions,
-} from '../core/Extension'
-import { TypeScriptExtension } from './TypeScriptExtension'
+  getTypeScriptExtension,
+  TypeScriptExtension,
+} from './TypeScriptExtension'
 import { ReactExtension } from './ReactExtension'
 import { spawn } from 'child_process'
 import * as path from 'path'
 import { reduce } from 'rxjs'
 
 export type AngularExtensionOptions = {
-  useTypeScriptStrictMode: boolean
   useRouting: boolean
   cssPreProcessor: 'css' | 'scss' | 'sass' | 'less'
 }
-
-export type AngularExtensionWithOptions =
-  ExtensionWithOptions<AngularExtensionOptions>
 
 export const AngularExtension: Extension = {
   name: 'Angular',
@@ -27,12 +22,6 @@ export const AngularExtension: Extension = {
   dependsOn: [TypeScriptExtension],
   exclusiveTo: [ReactExtension],
   promptOptions: (prompts$, answers$) => {
-    prompts$.next({
-      name: 'typescriptStrictMode',
-      type: 'confirm',
-      message: 'Would you like to enable the TypeScript strict mode?',
-      default: true,
-    })
     prompts$.next({
       name: 'cssPreProcessor',
       type: 'list',
@@ -76,9 +65,6 @@ export const AngularExtension: Extension = {
           const copy = { ...acc }
 
           switch (answerObject.name) {
-            case 'typescriptStrictMode':
-              copy.useTypeScriptStrictMode = answerObject.answer
-              break
             case 'cssPreProcessor':
               copy.cssPreProcessor = answerObject.answer
               break
@@ -90,7 +76,6 @@ export const AngularExtension: Extension = {
           return copy
         },
         {
-          useTypeScriptStrictMode: true,
           cssPreProcessor: 'css',
           useRouting: false,
         } as AngularExtensionOptions,
@@ -115,7 +100,10 @@ export const AngularExtension: Extension = {
         options.cssPreProcessor,
       ]
 
-      if (options.useTypeScriptStrictMode) {
+      if (
+        getTypeScriptExtension(otherInformation.chosenExtensions)?.options
+          ?.enableStrictMode
+      ) {
         nodeArgs.push('--strict')
       }
       if (options.useRouting) {
