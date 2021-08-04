@@ -1,9 +1,11 @@
 import * as SanityChecks from './SanityChecks'
 import {
   ensureAllExtensionsHaveUniqueNames,
+  ensureDependantsAreNotExclusiveToEachOther,
   performSanityChecksOnExtensions,
 } from './SanityChecks'
 import { allExtensions } from '../extensions/allExtensions'
+import { generateMockExtension } from '../extensions/MockExtension'
 
 describe('All extensions', () => {
   it('should pass all sanity checks', () => {
@@ -19,9 +21,9 @@ describe('ensureAllExtensionsHaveUniqueNames', () => {
   it('should not throw an error when called with extensions with all unique names', () => {
     expect(() =>
       ensureAllExtensionsHaveUniqueNames([
-        { name: 'foo' },
-        { name: 'bar' },
-        { name: 'baz' },
+        generateMockExtension({ name: 'foo' }),
+        generateMockExtension({ name: 'bar' }),
+        generateMockExtension({ name: 'baz' }),
       ]),
     ).not.toThrow()
   })
@@ -29,10 +31,64 @@ describe('ensureAllExtensionsHaveUniqueNames', () => {
   it('should not throw an error when called with extensions with all unique names', () => {
     expect(() =>
       ensureAllExtensionsHaveUniqueNames([
-        { name: 'foo' },
-        { name: 'bar' },
-        { name: 'baz' },
-        { name: 'foo' },
+        generateMockExtension({ name: 'foo' }),
+        generateMockExtension({ name: 'bar' }),
+        generateMockExtension({ name: 'baz' }),
+        generateMockExtension({ name: 'foo' }),
+      ]),
+    ).toThrow()
+  })
+})
+
+describe('ensureDependantsAreNotExclusiveToEachOther', () => {
+  const extensionA = generateMockExtension({ name: 'Extension A' })
+  const extensionB = generateMockExtension({ name: 'Extension B' })
+  const extensionC = generateMockExtension({ name: 'Extension C' })
+
+  it('should allow an empty list of extensions', () => {
+    expect(() => ensureDependantsAreNotExclusiveToEachOther([])).not.toThrow()
+  })
+
+  it('should allow a list of non-depending and non-exclusive extensions', () => {
+    expect(() =>
+      ensureDependantsAreNotExclusiveToEachOther([
+        extensionA,
+        extensionB,
+        extensionC,
+      ]),
+    ).not.toThrow()
+  })
+
+  it('should not allow an extension to both depend and be exclusive to another extension', () => {
+    const dependantOnAndExclusiveToA = generateMockExtension({
+      name: 'Dependant on and exclusive to A',
+      dependsOn: [extensionA],
+      exclusiveTo: [extensionA],
+    })
+
+    expect(() =>
+      ensureDependantsAreNotExclusiveToEachOther([
+        extensionA,
+        dependantOnAndExclusiveToA,
+      ]),
+    ).toThrow()
+  })
+
+  it('should not allow an extension to have dependencies that are exclusive to each other', () => {
+    const exclusiveToA = generateMockExtension({
+      name: 'Exclusive to A',
+      exclusiveTo: [extensionA],
+    })
+    const dependsOnMutuallyExclusiveExtensions = generateMockExtension({
+      name: 'Depends on A and an extension that is exclusive to A',
+      dependsOn: [extensionA, exclusiveToA],
+    })
+
+    expect(() =>
+      ensureDependantsAreNotExclusiveToEachOther([
+        extensionA,
+        exclusiveToA,
+        dependsOnMutuallyExclusiveExtensions,
       ]),
     ).toThrow()
   })
@@ -41,6 +97,17 @@ describe('ensureAllExtensionsHaveUniqueNames', () => {
 describe('performSanityChecksOnExtensions', () => {
   it('should call ensureAllExtensionsHaveUniqueNames', () => {
     const spy = jest.spyOn(SanityChecks, 'ensureAllExtensionsHaveUniqueNames')
+
+    performSanityChecksOnExtensions([])
+
+    expect(spy).toHaveBeenCalled()
+  })
+
+  it('should call ensureDependantsAreNotExclusiveToEachOther', () => {
+    const spy = jest.spyOn(
+      SanityChecks,
+      'ensureDependantsAreNotExclusiveToEachOther',
+    )
 
     performSanityChecksOnExtensions([])
 
