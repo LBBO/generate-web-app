@@ -1,7 +1,7 @@
 // Use this subtype of Extension to allow for easier testing
-type ExtensionLike = {
-  name: string
-}
+import { Extension } from './Extension'
+
+type ExtensionLike = Pick<Extension, 'name' | 'dependsOn' | 'exclusiveTo'>
 
 export const ensureAllExtensionsHaveUniqueNames = (
   extensions: Array<ExtensionLike>,

@@ -3,6 +3,13 @@ import {
   ensureAllExtensionsHaveUniqueNames,
   performSanityChecksOnExtensions,
 } from './SanityChecks'
+import { allExtensions } from '../extensions/allExtensions'
+
+describe('All extensions', () => {
+  it('should pass all sanity checks', () => {
+    expect(() => performSanityChecksOnExtensions(allExtensions)).not.toThrow()
+  })
+})
 
 describe('ensureAllExtensionsHaveUniqueNames', () => {
   it('should not throw an error when called without any extensions', () => {
