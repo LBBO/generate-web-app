@@ -14,12 +14,20 @@ export const selectExtensions = (
     name: 'chosenExtensions',
     message: 'What libraries / tools would you like to use in your project?',
     choices: extensions.map((extension) => {
+      let name = `${chalk.bold(extension.name)} - ${
+        extension.description
+      } More info: ${chalk.underline(extension.linkToDocumentation.toString())}`
+
+      if (extension.dependsOn) {
+        name += ` - ${chalk.italic.red(
+          `Depends on: ${extension.dependsOn
+            ?.map((dep) => dep.name)
+            .join(', ')}`,
+        )}`
+      }
+
       return {
-        name: `${chalk.bold(extension.name)} - ${
-          extension.description
-        } More info: ${chalk.underline(
-          extension.linkToDocumentation.toString(),
-        )}`,
+        name,
         value: extension,
         short: extension.name,
       }
