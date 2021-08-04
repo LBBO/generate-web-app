@@ -6,7 +6,7 @@ export const ReactExtension: Extension = {
   name: 'React',
   description: 'A JavaScript library for building user interfaces.',
   linkToDocumentation: new URL('https://reactjs.org/'),
-  // Angular and Vue!
+  // Exclusiveness to Angular is declared in Angular plugin
   exclusiveTo: [],
   category: ExtensionCategory.FRONTEND_FRAMEWORK,
 

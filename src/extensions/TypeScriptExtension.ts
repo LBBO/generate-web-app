@@ -1,5 +1,4 @@
 import { Extension, ExtensionCategory } from '../core/Extension'
-import { ReactExtension } from './ReactExtension'
 
 export const TypeScriptExtension: Extension = {
   name: 'TypeScript',
@@ -8,7 +7,13 @@ export const TypeScriptExtension: Extension = {
   linkToDocumentation: new URL('https://www.typescriptlang.org/'),
   category: ExtensionCategory.JAVASCRIPT_FLAVOR,
   canBeSkipped: (options, otherInformation) => {
-    return otherInformation.chosenExtensions.includes(ReactExtension)
+    const chosenExtensionNames = otherInformation.chosenExtensions.map(
+      (extension) => extension.name,
+    )
+    return (
+      chosenExtensionNames.includes('React') ||
+      chosenExtensionNames.includes('Angular')
+    )
   },
   run(): Promise<void> {
     return Promise.resolve(undefined)
