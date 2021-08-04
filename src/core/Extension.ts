@@ -13,9 +13,7 @@ export type AdditionalInformationForExtensions = {
   chosenExtensions: Array<Extension>
 }
 
-export type Extension<
-  ExtensionOptions extends Record<string, unknown> = Record<string, unknown>,
-> = {
+export type Extension = {
   name: string
   description: string
   linkToDocumentation: URL
@@ -27,19 +25,24 @@ export type Extension<
   promptOptions?: (
     prompts$: Subject<DistinctQuestion>,
     answers$: Observable<Answers>,
-  ) => Observable<ExtensionOptions>
+  ) => Observable<Record<string, unknown>>
 
   canBeSkipped?: (
-    options: ExtensionOptions | undefined,
+    options: Record<string, unknown> | undefined,
     otherInformation: AdditionalInformationForExtensions,
   ) => boolean
   run: (
-    options: ExtensionOptions | undefined,
+    options: Record<string, unknown> | undefined,
     otherInformation: AdditionalInformationForExtensions,
   ) => Promise<void>
 
   printUsefulInformation?: (
-    options: ExtensionOptions | undefined,
+    options: Record<string, unknown> | undefined,
     otherInformation: AdditionalInformationForExtensions,
   ) => void
 }
+
+export type ExtensionWithOptions<Options extends Record<string, unknown>> =
+  Extension & {
+    options: Options
+  }
