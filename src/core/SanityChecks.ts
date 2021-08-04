@@ -43,9 +43,28 @@ export const ensureDependantsAreNotExclusiveToEachOther = (
   })
 }
 
+export const ensureAllDependenciesAndExclusivitiesAreDefined = (
+  extensions: Array<Extension>,
+): void => {
+  extensions.forEach((extension) => {
+    if (
+      (extension.dependsOn as Array<unknown> | undefined)?.includes(undefined)
+    ) {
+      throw new Error(`${extension.name} has an undefined dependency!`)
+    }
+
+    if (
+      (extension.exclusiveTo as Array<unknown> | undefined)?.includes(undefined)
+    ) {
+      throw new Error(`${extension.name} has an undefined exclusivity!`)
+    }
+  })
+}
+
 export const performSanityChecksOnExtensions = (
   extensions: Array<Extension>,
 ): void => {
+  ensureAllDependenciesAndExclusivitiesAreDefined(extensions)
   ensureAllExtensionsHaveUniqueNames(extensions)
   ensureDependantsAreNotExclusiveToEachOther(extensions)
 }
