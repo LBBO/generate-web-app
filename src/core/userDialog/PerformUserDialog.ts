@@ -6,8 +6,10 @@ import {
   merge,
   Observable,
   of,
+  reduce,
   ReplaySubject,
   Subject,
+  take,
   takeWhile,
 } from 'rxjs'
 import { Answers, DistinctQuestion } from 'inquirer'
@@ -70,12 +72,55 @@ export const getExtensionOptions = async (
   return extensionsWithOptions
 }
 
+export type ProjectMetaData = {
+  name: string
+}
+
+export const promptMetadata = async (
+  prompts$: Subject<DistinctQuestion>,
+  answers$: Observable<Answers>,
+): Promise<ProjectMetaData | undefined> => {
+  const questions: Array<DistinctQuestion> = [
+    {
+      name: 'name',
+      type: 'input',
+      message: 'What should your project be called?',
+    },
+  ]
+
+  questions.forEach((question) => prompts$.next(question))
+
+  return answers$
+    .pipe(
+      take(questions.length),
+      reduce((acc, answer) => {
+        const copy = { ...acc }
+
+        if (answer.name === 'name') {
+          copy.name = answer.answer
+        }
+
+        return copy
+      }, {} as ProjectMetaData),
+    )
+    .toPromise()
+}
+
 export const performUserDialog = async (
   prompts$: Subject<DistinctQuestion>,
   answers$: Observable<Answers>,
   extensions: Array<Extension>,
-): Promise<Array<[Extension, Record<string, unknown> | undefined]>> => {
+): Promise<{
+  extensionsWithOptions: Array<[Extension, Record<string, unknown> | undefined]>
+  projectMetadata: ProjectMetaData
+}> => {
   try {
+    const projectMetadata = await promptMetadata(prompts$, answers$)
+
+    if (!projectMetadata) {
+      throw new Error('Project metadata could not be computed.')
+    }
+
     const chosenExtensions = await selectExtensions(
       prompts$,
       answers$,
@@ -93,7 +138,7 @@ export const performUserDialog = async (
 
     prompts$.complete()
 
-    return extensionsWithOptions
+    return { extensionsWithOptions, projectMetadata }
   } catch (e) {
     // In case of an error, this uncompleted observable would keep the process
     // running

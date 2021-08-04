@@ -1,4 +1,6 @@
 import { Extension, ExtensionCategory } from '../core/Extension'
+import { spawn } from 'child_process'
+import { TypeScriptExtension } from './TypeScriptExtension'
 
 export const ReactExtension: Extension = {
   name: 'React',
@@ -8,7 +10,30 @@ export const ReactExtension: Extension = {
   exclusiveTo: [],
   category: ExtensionCategory.FRONTEND_FRAMEWORK,
 
-  run: async () => {
-    console.log('running react extension')
+  run: (options, otherInformation) => {
+    return new Promise((resolve, reject) => {
+      const npxArgs = [
+        'create-react-app',
+        otherInformation.projectMetadata.name,
+      ]
+
+      if (otherInformation.chosenExtensions.includes(TypeScriptExtension)) {
+        npxArgs.push('--template', 'typescript')
+      }
+
+      const child_process = spawn('npx', npxArgs, {
+        stdio: 'inherit',
+      })
+
+      child_process.on('close', (statusCode) => {
+        console.log(`CRA finished with code ${statusCode}`)
+
+        if (statusCode === 0) {
+          resolve()
+        } else {
+          reject()
+        }
+      })
+    })
   },
 }

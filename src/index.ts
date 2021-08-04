@@ -2,14 +2,15 @@
 import { Extension } from './core/Extension'
 import { Subject } from 'rxjs'
 import inquirer, { DistinctQuestion } from 'inquirer'
-import { TestExtension } from './extensions/TestExtension'
 import { performSanityChecksOnExtensions } from './core/SanityChecks'
 import { performUserDialog } from './core/userDialog/PerformUserDialog'
 import { ReactExtension } from './extensions/ReactExtension'
 import chalk from 'chalk'
+import { TypeScriptExtension } from './extensions/TypeScriptExtension'
 
 const extensions: Array<Extension> = [
-  TestExtension,
+  // TestExtension,
+  TypeScriptExtension,
   ReactExtension,
 ] as Array<Extension>
 
@@ -20,7 +21,7 @@ const prompts$ = new Subject<DistinctQuestion>()
 const answers$ = inquirer.prompt(prompts$).ui.process
 
 const run = async () => {
-  const extensionsWithOptions = await performUserDialog(
+  const { extensionsWithOptions, projectMetadata } = await performUserDialog(
     prompts$,
     answers$,
     extensions,
@@ -39,6 +40,7 @@ const run = async () => {
   for (const [extension, options] of extensionsWithOptions) {
     console.log(chalk.inverse.whiteBright(`Installing ${extension.name}`))
     await extension.run(options, {
+      projectMetadata,
       chosenExtensions,
     })
     console.log()
@@ -48,6 +50,7 @@ const run = async () => {
   // Print additional useful information
   for (const [extension, options] of extensionsWithOptions) {
     extension.printUsefulInformation?.(options, {
+      projectMetadata,
       chosenExtensions,
     })
   }
