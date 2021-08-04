@@ -29,6 +29,10 @@ export type Extension<
     answers$: Observable<Answers>,
   ) => Observable<ExtensionOptions>
 
+  canBeSkipped?: (
+    options: ExtensionOptions | undefined,
+    otherInformation: AdditionalInformationForExtensions,
+  ) => boolean
   run: (
     options: ExtensionOptions | undefined,
     otherInformation: AdditionalInformationForExtensions,

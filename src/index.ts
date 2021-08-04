@@ -15,6 +15,7 @@ const run = async () => {
     allExtensions,
   )
   const chosenExtensions = extensionsWithOptions.map(([extension]) => extension)
+  const projectInformation = { projectMetadata, chosenExtensions }
 
   console.log()
   console.log(
@@ -26,21 +27,18 @@ const run = async () => {
 
   // Install extensions
   for (const [extension, options] of extensionsWithOptions) {
-    console.log(chalk.inverse.whiteBright(`Installing ${extension.name}`))
-    await extension.run(options, {
-      projectMetadata,
-      chosenExtensions,
-    })
-    console.log()
-    console.log()
+    // Only run extension if there is no canBeSkipped method or it cannot be skipped
+    if (!extension?.canBeSkipped?.(options, projectInformation)) {
+      console.log(chalk.inverse.whiteBright(`Installing ${extension.name}`))
+      await extension.run(options, projectInformation)
+      console.log()
+      console.log()
+    }
   }
 
   // Print additional useful information
   for (const [extension, options] of extensionsWithOptions) {
-    extension.printUsefulInformation?.(options, {
-      projectMetadata,
-      chosenExtensions,
-    })
+    extension.printUsefulInformation?.(options, projectInformation)
   }
 }
 
