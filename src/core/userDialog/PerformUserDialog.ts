@@ -21,10 +21,8 @@ export const getExtensionOptions = async (
   chosenExtensions: Array<Extension>,
   answers$: Observable<Answers>,
   prompts$: Subject<DistinctQuestion>,
-): Promise<[Extension, Record<string, unknown> | undefined][]> => {
-  const extensionsWithOptions: Array<
-    [Extension, Record<string, unknown> | undefined]
-  > = []
+): Promise<Array<Extension>> => {
+  const extensionsWithOptions: Array<Extension> = []
 
   for (const extension of chosenExtensions) {
     // Create new observable just for this extension's questions
@@ -66,7 +64,10 @@ export const getExtensionOptions = async (
       console.log()
     }
 
-    extensionsWithOptions.push([extension, chosenOptions])
+    const extensionWithOptions = extension
+    extensionWithOptions.options = chosenOptions
+
+    extensionsWithOptions.push(extensionWithOptions)
   }
 
   return extensionsWithOptions
@@ -111,7 +112,7 @@ export const performUserDialog = async (
   answers$: Observable<Answers>,
   extensions: Array<Extension>,
 ): Promise<{
-  extensionsWithOptions: Array<[Extension, Record<string, unknown> | undefined]>
+  extensionsWithOptions: Array<Extension>
   projectMetadata: ProjectMetaData
 }> => {
   try {

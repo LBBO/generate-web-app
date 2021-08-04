@@ -27,6 +27,9 @@ export type Extension = {
     answers$: Observable<Answers>,
   ) => Observable<Record<string, unknown>>
 
+  // Actually TypescriptExtensionOptions, but TypeScript can't understand that...
+  options?: Record<string, unknown>
+
   canBeSkipped?: (
     options: Record<string, unknown> | undefined,
     otherInformation: AdditionalInformationForExtensions,
@@ -42,7 +45,8 @@ export type Extension = {
   ) => void
 }
 
-export type ExtensionWithOptions<Options extends Record<string, unknown>> =
-  Extension & {
-    options: Options
-  }
+export type ExtensionWithSpecificOptions<
+  Options extends Record<string, unknown>,
+> = Omit<Extension, 'options'> & {
+  options: Options
+}
