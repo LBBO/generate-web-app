@@ -7,6 +7,7 @@ import { ReactExtension } from './ReactExtension'
 import { spawn } from 'child_process'
 import * as path from 'path'
 import { reduce } from 'rxjs'
+import { PackageManager } from '../core/userDialog/ChoosePackageManager'
 
 export type AngularExtensionOptions = {
   useRouting: boolean
@@ -106,8 +107,21 @@ export const AngularExtension: Extension = {
       ) {
         nodeArgs.push('--strict')
       }
+
       if (options.useRouting) {
         nodeArgs.push('--routing')
+      }
+
+      if (
+        otherInformation.projectMetadata.chosenPackageManager ===
+        PackageManager.NPM
+      ) {
+        nodeArgs.push('--package-manager', 'npm')
+      } else if (
+        otherInformation.projectMetadata.chosenPackageManager ===
+        PackageManager.YARN
+      ) {
+        nodeArgs.push('--package-manager', 'yarn')
       }
 
       const childProcess = spawn('node', nodeArgs, { stdio: 'inherit' })
