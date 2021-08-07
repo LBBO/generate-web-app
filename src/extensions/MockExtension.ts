@@ -1,10 +1,8 @@
 import { Extension, ExtensionCategory } from '../core/Extension'
 
-export const generateMockExtension = <
-  T extends Record<string, unknown> = Record<string, unknown>,
->(
-  overrides: Partial<Extension<T>> = {},
-): Extension<T> => {
+export const generateMockExtension = (
+  overrides: Partial<Extension> = {},
+): Extension => {
   return {
     name: 'Mock extension',
     description:

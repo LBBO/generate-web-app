@@ -20,7 +20,7 @@ describe('performUserDialog', () => {
     let prompts$ = new Subject<DistinctQuestion>()
     prompts$.subscribe(undefined, undefined, onCompletedSpy)
     const answers$ = new Subject<Answers>()
-    const extensions: Extension<Record<string, unknown>>[] = []
+    const extensions: Extension[] = []
 
     getExtensionOptionsSpy.mockImplementationOnce(() =>
       Promise.reject(new Error('Error in getExtensionOptions spy')),

@@ -1,5 +1,6 @@
 import * as SanityChecks from './SanityChecks'
 import {
+  ensureAllDependenciesAndExclusivitiesAreDefined,
   ensureAllExtensionsHaveUniqueNames,
   ensureDependantsAreNotExclusiveToEachOther,
   performSanityChecksOnExtensions,
@@ -94,6 +95,56 @@ describe('ensureDependantsAreNotExclusiveToEachOther', () => {
   })
 })
 
+describe('ensureAllDependenciesAndExclusivitiesAreDefined', () => {
+  it('should accept an extension without dependencies or exclusivities', () => {
+    expect(() =>
+      ensureAllDependenciesAndExclusivitiesAreDefined([
+        generateMockExtension(),
+      ]),
+    ).not.toThrow()
+  })
+
+  it('should accept an extension with only defined dependencies', () => {
+    const a = generateMockExtension()
+    const b = generateMockExtension({
+      dependsOn: [a],
+    })
+    expect(() =>
+      ensureAllDependenciesAndExclusivitiesAreDefined([a, b]),
+    ).not.toThrow()
+  })
+
+  it('should accept an extension with only defined exclusivities', () => {
+    const a = generateMockExtension()
+    const b = generateMockExtension({
+      exclusiveTo: [a],
+    })
+    expect(() =>
+      ensureAllDependenciesAndExclusivitiesAreDefined([a, b]),
+    ).not.toThrow()
+  })
+
+  it('should NOT accept an extension with undefined defined exclusivities', () => {
+    const a = generateMockExtension({
+      // Typescript error expected!
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      exclusiveTo: [undefined],
+    })
+    expect(() => ensureAllDependenciesAndExclusivitiesAreDefined([a])).toThrow()
+  })
+
+  it('should NOT accept an extension with undefined defined dependencies', () => {
+    const a = generateMockExtension({
+      // Typescript error expected!
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      dependsOn: [undefined],
+    })
+    expect(() => ensureAllDependenciesAndExclusivitiesAreDefined([a])).toThrow()
+  })
+})
+
 describe('performSanityChecksOnExtensions', () => {
   it('should call ensureAllExtensionsHaveUniqueNames', () => {
     const spy = jest.spyOn(SanityChecks, 'ensureAllExtensionsHaveUniqueNames')
@@ -107,6 +158,17 @@ describe('performSanityChecksOnExtensions', () => {
     const spy = jest.spyOn(
       SanityChecks,
       'ensureDependantsAreNotExclusiveToEachOther',
+    )
+
+    performSanityChecksOnExtensions([])
+
+    expect(spy).toHaveBeenCalled()
+  })
+
+  it('should call ensureAllDependenciesAndExclusivitiesAreDefined', () => {
+    const spy = jest.spyOn(
+      SanityChecks,
+      'ensureAllDependenciesAndExclusivitiesAreDefined',
     )
 
     performSanityChecksOnExtensions([])

@@ -10,7 +10,7 @@ type Answers =
   | { name: 'pineappleOnPizza'; answer: boolean }
   | { name: 'otherIngredients'; answer: string[] }
 
-export const TestExtension: Extension<TestExtensionOptions> = {
+export const TestExtension: Extension = {
   name: 'Test extension',
   description:
     'This extension is only used for testing! Please remove from actual builds.',

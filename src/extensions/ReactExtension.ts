@@ -1,12 +1,12 @@
 import { Extension, ExtensionCategory } from '../core/Extension'
 import { spawn } from 'child_process'
-import { TypeScriptExtension } from './TypeScriptExtension'
+import { getTypeScriptExtension } from './TypeScriptExtension'
 
 export const ReactExtension: Extension = {
   name: 'React',
   description: 'A JavaScript library for building user interfaces.',
   linkToDocumentation: new URL('https://reactjs.org/'),
-  // Angular and Vue!
+  // Exclusiveness to Angular is declared in Angular plugin
   exclusiveTo: [],
   category: ExtensionCategory.FRONTEND_FRAMEWORK,
 
@@ -17,7 +17,7 @@ export const ReactExtension: Extension = {
         otherInformation.projectMetadata.name,
       ]
 
-      if (otherInformation.chosenExtensions.includes(TypeScriptExtension)) {
+      if (getTypeScriptExtension(otherInformation.chosenExtensions)) {
         npxArgs.push('--template', 'typescript')
       }
 
