@@ -20,7 +20,7 @@ import {
   isNpmInstalled,
   isYarnInstalled,
   PackageManager,
-} from './ChoosePackageManager'
+} from '../PackageManagers'
 
 export const getExtensionOptions = async (
   chosenExtensions: Array<Extension>,

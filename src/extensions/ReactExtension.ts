@@ -1,7 +1,7 @@
 import { Extension, ExtensionCategory } from '../core/Extension'
 import { spawn } from 'child_process'
 import { getTypeScriptExtension } from './TypeScriptExtension'
-import { PackageManager } from '../core/userDialog/ChoosePackageManager'
+import { PackageManager } from '../core/PackageManagers'
 
 export const ReactExtension: Extension = {
   name: 'React',

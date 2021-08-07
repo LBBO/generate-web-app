@@ -3,7 +3,7 @@ import { TypeScriptExtension } from './TypeScriptExtension'
 import { ProjectMetaData } from '../core/userDialog/PerformUserDialog'
 import { AngularExtension } from './AngularExtension'
 import { generateMockExtension } from './MockExtension'
-import { PackageManager } from '../core/userDialog/ChoosePackageManager'
+import { PackageManager } from '../core/PackageManagers'
 
 describe('canBeSkipped', () => {
   const projectMetadata: ProjectMetaData = {

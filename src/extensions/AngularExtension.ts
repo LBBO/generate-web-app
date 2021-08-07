@@ -7,7 +7,7 @@ import { ReactExtension } from './ReactExtension'
 import { spawn } from 'child_process'
 import * as path from 'path'
 import { reduce } from 'rxjs'
-import { PackageManager } from '../core/userDialog/ChoosePackageManager'
+import { PackageManager } from '../core/PackageManagers'
 
 export type AngularExtensionOptions = {
   useRouting: boolean
