@@ -61,12 +61,12 @@ export const choosePackageManager = (
         'Multiple package managers were detected. Which would you like to use?',
       choices: [
         {
-          name: 'npm - https://docs.npmjs.com/about-npm',
+          name: 'NPM - The default package manager that ships with Node.js. More info: https://docs.npmjs.com/about-npm',
           value: 'npm',
-          short: 'npm',
+          short: 'NPM',
         },
         {
-          name: 'Yarn - https://yarnpkg.com/',
+          name: 'Yarn - An alternative package manager that aims to be safer and more reliable. More info: https://yarnpkg.com/',
           value: 'yarn',
           short: 'Yarn',
         },
