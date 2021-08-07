@@ -1,6 +1,8 @@
 import * as PerformUserDialog from './PerformUserDialog'
 import { performUserDialog } from './PerformUserDialog'
 import * as SelectExtensions from './SelectExtensions'
+import * as ChoosePackageManager from './ChoosePackageManager'
+import { PackageManager } from './ChoosePackageManager'
 import { Subject } from 'rxjs'
 import { Extension } from '../Extension'
 import { Answers, DistinctQuestion } from 'inquirer'
@@ -15,6 +17,10 @@ describe('performUserDialog', () => {
       'getExtensionOptions',
     )
     const selectExtensionsSpy = jest.spyOn(SelectExtensions, 'selectExtensions')
+    const choosePackageManagerSpy = jest.spyOn(
+      ChoosePackageManager,
+      'choosePackageManager',
+    )
     const onCompletedSpy = jest.fn()
 
     let prompts$ = new Subject<DistinctQuestion>()
@@ -26,6 +32,9 @@ describe('performUserDialog', () => {
       Promise.reject(new Error('Error in getExtensionOptions spy')),
     )
     selectExtensionsSpy.mockImplementationOnce(() => Promise.resolve([]))
+    choosePackageManagerSpy.mockImplementationOnce(() =>
+      Promise.resolve(PackageManager.NPM),
+    )
 
     expect(onCompletedSpy).not.toHaveBeenCalled()
 
@@ -45,6 +54,9 @@ describe('performUserDialog', () => {
     getExtensionOptionsSpy.mockImplementationOnce(() => Promise.resolve([]))
     selectExtensionsSpy.mockImplementationOnce(() =>
       Promise.reject(new Error('Error in selectExtensionsSpy spy')),
+    )
+    choosePackageManagerSpy.mockImplementationOnce(() =>
+      Promise.resolve(PackageManager.NPM),
     )
 
     expect(onCompletedSpy).not.toHaveBeenCalled()

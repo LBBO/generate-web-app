@@ -16,6 +16,7 @@ import { Answers, DistinctQuestion } from 'inquirer'
 import { Extension } from '../Extension'
 import { selectExtensions } from './SelectExtensions'
 import chalk from 'chalk'
+import { choosePackageManager, PackageManager } from './ChoosePackageManager'
 
 export const getExtensionOptions = async (
   chosenExtensions: Array<Extension>,
@@ -75,12 +76,13 @@ export const getExtensionOptions = async (
 
 export type ProjectMetaData = {
   name: string
+  chosenPackageManager: PackageManager
 }
 
 export const promptMetadata = async (
   prompts$: Subject<DistinctQuestion>,
   answers$: Observable<Answers>,
-): Promise<ProjectMetaData | undefined> => {
+): Promise<Omit<ProjectMetaData, 'chosenPackageManager'> | undefined> => {
   const questions: Array<DistinctQuestion> = [
     {
       name: 'name',
@@ -117,6 +119,7 @@ export const performUserDialog = async (
 }> => {
   try {
     const projectMetadata = await promptMetadata(prompts$, answers$)
+    const chosenPackageManager = await choosePackageManager(prompts$, answers$)
 
     if (!projectMetadata) {
       throw new Error('Project metadata could not be computed.')
@@ -139,7 +142,13 @@ export const performUserDialog = async (
 
     prompts$.complete()
 
-    return { extensionsWithOptions, projectMetadata }
+    return {
+      extensionsWithOptions,
+      projectMetadata: {
+        ...projectMetadata,
+        chosenPackageManager,
+      },
+    }
   } catch (e) {
     // In case of an error, this uncompleted observable would keep the process
     // running
