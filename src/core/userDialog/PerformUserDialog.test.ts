@@ -149,46 +149,38 @@ describe('promptMetadata', () => {
 })
 
 describe('performUserDialog', () => {
-  it('should complete prompts$ even if one of the submethods fails', async () => {
-    jest.spyOn(PerformUserDialog, 'promptMetadata').mockResolvedValue({
-      name: '',
-      chosenPackageManager: PackageManager.NPM,
-    })
-    const getExtensionOptionsSpy = jest.spyOn(
+  let promptMetaDataSpy: jest.SpyInstance
+  let getExtensionOptionsSpy: jest.SpyInstance
+  let selectExtensionsSpy: jest.SpyInstance
+
+  beforeEach(() => {
+    promptMetaDataSpy = jest
+      .spyOn(PerformUserDialog, 'promptMetadata')
+      .mockResolvedValue({
+        name: 'some-package-name',
+        chosenPackageManager: PackageManager.NPM,
+      })
+    getExtensionOptionsSpy = jest.spyOn(
       PerformUserDialog,
       'getExtensionOptions',
     )
-    const selectExtensionsSpy = jest.spyOn(SelectExtensions, 'selectExtensions')
+    selectExtensionsSpy = jest
+      .spyOn(SelectExtensions, 'selectExtensions')
+      .mockResolvedValue([] as Array<Extension>)
+  })
+
+  it('should complete prompts$ even if one of the submethods fails', async () => {
     const onCompletedSpy = jest.fn()
 
-    let prompts$ = new Subject<DistinctQuestion>()
-    prompts$.subscribe(undefined, undefined, onCompletedSpy)
+    const prompts$ = new Subject<DistinctQuestion>()
+    prompts$.subscribe({
+      complete: onCompletedSpy,
+    })
     const answers$ = new Subject<Answers>()
     const extensions: Extension[] = []
 
     getExtensionOptionsSpy.mockImplementationOnce(() =>
       Promise.reject(new Error('Error in getExtensionOptions spy')),
-    )
-    selectExtensionsSpy.mockImplementationOnce(() => Promise.resolve([]))
-
-    expect(onCompletedSpy).not.toHaveBeenCalled()
-
-    try {
-      await performUserDialog(prompts$, answers$, extensions)
-    } catch (e) {
-      // Error expected!
-    }
-
-    expect(onCompletedSpy).toHaveBeenCalled()
-
-    // Reset prompts$
-    onCompletedSpy.mockReset()
-    prompts$ = new Subject<DistinctQuestion>()
-    prompts$.subscribe(undefined, undefined, onCompletedSpy)
-
-    getExtensionOptionsSpy.mockImplementationOnce(() => Promise.resolve([]))
-    selectExtensionsSpy.mockImplementationOnce(() =>
-      Promise.reject(new Error('Error in selectExtensionsSpy spy')),
     )
 
     expect(onCompletedSpy).not.toHaveBeenCalled()

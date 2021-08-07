@@ -2,6 +2,7 @@ import {
   combineLatest,
   count,
   distinctUntilChanged,
+  lastValueFrom,
   map,
   merge,
   Observable,
@@ -43,7 +44,7 @@ export const getExtensionOptions = async (
     // before the count is completed otherwise.
     const usableCount$ = merge(of(null), actualCount$)
 
-    const customAnswers$ = combineLatest(answers$, usableCount$).pipe(
+    const customAnswers$ = combineLatest([answers$, usableCount$]).pipe(
       distinctUntilChanged(([answerA], [answerB]) => answerA === answerB),
       takeWhile((answerAndPromptCount, index) => {
         const count = answerAndPromptCount[1]
@@ -63,9 +64,9 @@ export const getExtensionOptions = async (
 
     if (extension.promptOptions) {
       console.log(chalk.bold.underline(extension.name))
-      chosenOptions = await extension
-        .promptOptions(customPrompts$, customAnswers$)
-        .toPromise()
+      chosenOptions = await lastValueFrom(
+        extension.promptOptions(customPrompts$, customAnswers$),
+      )
       console.log()
     }
 
