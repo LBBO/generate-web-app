@@ -16,7 +16,11 @@ import { Answers, DistinctQuestion } from 'inquirer'
 import { Extension } from '../Extension'
 import { selectExtensions } from './SelectExtensions'
 import chalk from 'chalk'
-import { choosePackageManager, PackageManager } from './ChoosePackageManager'
+import {
+  isNpmInstalled,
+  isYarnInstalled,
+  PackageManager,
+} from './ChoosePackageManager'
 
 export const getExtensionOptions = async (
   chosenExtensions: Array<Extension>,
@@ -79,19 +83,80 @@ export type ProjectMetaData = {
   chosenPackageManager: PackageManager
 }
 
+function getDefaultMetadata(npmIsInstalled: boolean, yarnIsInstalled: boolean) {
+  const defaultMetaData = {} as ProjectMetaData
+
+  if (npmIsInstalled && !yarnIsInstalled) {
+    console.info(
+      chalk.gray(
+        'Only detected one installed package manager (npm). This will be used by default for installing your' +
+          ' dependencies.',
+      ),
+    )
+    defaultMetaData.chosenPackageManager = PackageManager.NPM
+  } else if (yarnIsInstalled && !npmIsInstalled) {
+    console.info(
+      chalk.gray(
+        'Only detected one installed package manager (yarn). This will be used by default for installing your' +
+          ' dependencies.',
+      ),
+    )
+    defaultMetaData.chosenPackageManager = PackageManager.YARN
+  }
+  return defaultMetaData
+}
+
 export const promptMetadata = async (
   prompts$: Subject<DistinctQuestion>,
   answers$: Observable<Answers>,
-): Promise<Omit<ProjectMetaData, 'chosenPackageManager'> | undefined> => {
+): Promise<ProjectMetaData | undefined> => {
+  const npmIsInstalled = isNpmInstalled()
+  const yarnIsInstalled = isYarnInstalled()
+
+  if (!npmIsInstalled && !yarnIsInstalled) {
+    throw new Error(
+      'No known Node.js package manager (npm or yarn) could be found.',
+    )
+  }
+
+  const notInstalledMessage = chalk.bold.red(' NOT INSTALLED! ') + '-'
+
   const questions: Array<DistinctQuestion> = [
     {
       name: 'name',
       type: 'input',
       message: 'What should your project be called?',
     },
+    {
+      type: 'list',
+      name: 'packageManager',
+      message:
+        'Multiple package managers were detected. Which would you like to use?',
+      choices: [
+        {
+          name: `NPM -${
+            npmIsInstalled ? '' : notInstalledMessage
+          } The default package manager that ships with Node.js. More info: https://docs.npmjs.com/about-npm`,
+          value: 'npm',
+          short: 'NPM',
+          disabled: !npmIsInstalled,
+        },
+        {
+          name: `Yarn -${
+            yarnIsInstalled ? '' : notInstalledMessage
+          } An alternative package manager that aims to be safer and more reliable. More info: https://yarnpkg.com/`,
+          value: 'yarn',
+          short: 'Yarn',
+          disabled: !yarnIsInstalled,
+        },
+      ],
+      default: 'npm',
+    },
   ]
 
   questions.forEach((question) => prompts$.next(question))
+
+  const defaultMetaData = getDefaultMetadata(npmIsInstalled, yarnIsInstalled)
 
   return answers$
     .pipe(
@@ -99,12 +164,17 @@ export const promptMetadata = async (
       reduce((acc, answer) => {
         const copy = { ...acc }
 
-        if (answer.name === 'name') {
-          copy.name = answer.answer
+        switch (answer.name) {
+          case 'name':
+            copy.name = answer.answer
+            break
+          case 'packageManager':
+            copy.chosenPackageManager = answer.answer
+            break
         }
 
         return copy
-      }, {} as ProjectMetaData),
+      }, defaultMetaData),
     )
     .toPromise()
 }
@@ -119,7 +189,6 @@ export const performUserDialog = async (
 }> => {
   try {
     const projectMetadata = await promptMetadata(prompts$, answers$)
-    const chosenPackageManager = await choosePackageManager(prompts$, answers$)
 
     if (!projectMetadata) {
       throw new Error('Project metadata could not be computed.')
@@ -144,10 +213,7 @@ export const performUserDialog = async (
 
     return {
       extensionsWithOptions,
-      projectMetadata: {
-        ...projectMetadata,
-        chosenPackageManager,
-      },
+      projectMetadata,
     }
   } catch (e) {
     // In case of an error, this uncompleted observable would keep the process

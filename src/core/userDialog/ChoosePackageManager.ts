@@ -1,7 +1,4 @@
 import { execSync } from 'child_process'
-import { Observable, pluck, Subject, take, tap } from 'rxjs'
-import { Answers, DistinctQuestion } from 'inquirer'
-import chalk from 'chalk'
 
 export enum PackageManager {
   NPM = 'npm',
@@ -23,57 +20,5 @@ export const isYarnInstalled = (): boolean => {
     return true
   } catch (e) {
     return false
-  }
-}
-
-export const choosePackageManager = (
-  prompt$: Subject<DistinctQuestion>,
-  answers$: Observable<Answers>,
-): Promise<PackageManager> => {
-  const npmIsInstalled = isNpmInstalled()
-  const yarnIsInstalled = isYarnInstalled()
-
-  if (!npmIsInstalled && !yarnIsInstalled) {
-    throw new Error(
-      'No known Node.js package manager (npm or yarn) could be found.',
-    )
-  } else if (npmIsInstalled && !yarnIsInstalled) {
-    console.info(
-      chalk.gray(
-        'Only detected one installed package manager (npm). This will be used by default for installing your' +
-          ' dependencies.',
-      ),
-    )
-    return Promise.resolve(PackageManager.NPM)
-  } else if (yarnIsInstalled && !npmIsInstalled) {
-    console.info(
-      chalk.gray(
-        'Only detected one installed package manager (yarn). This will be used by default for installing your' +
-          ' dependencies.',
-      ),
-    )
-    return Promise.resolve(PackageManager.YARN)
-  } else {
-    prompt$.next({
-      type: 'list',
-      name: 'packageManager',
-      message:
-        'Multiple package managers were detected. Which would you like to use?',
-      choices: [
-        {
-          name: 'NPM - The default package manager that ships with Node.js. More info: https://docs.npmjs.com/about-npm',
-          value: 'npm',
-          short: 'NPM',
-        },
-        {
-          name: 'Yarn - An alternative package manager that aims to be safer and more reliable. More info: https://yarnpkg.com/',
-          value: 'yarn',
-          short: 'Yarn',
-        },
-      ],
-      default: 'npm',
-    })
-
-    return answers$.pipe(take(1), pluck('answer'), tap(console.log)).toPromise()
   }
 }
