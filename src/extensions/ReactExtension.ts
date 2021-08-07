@@ -1,6 +1,7 @@
 import { Extension, ExtensionCategory } from '../core/Extension'
 import { spawn } from 'child_process'
 import { getTypeScriptExtension } from './TypeScriptExtension'
+import { PackageManager } from '../core/PackageManagers'
 
 export const ReactExtension: Extension = {
   name: 'React',
@@ -19,6 +20,16 @@ export const ReactExtension: Extension = {
 
       if (getTypeScriptExtension(otherInformation.chosenExtensions)) {
         npxArgs.push('--template', 'typescript')
+      }
+
+      // If yarn is installed, CRA uses it unless --use-npm is set.
+      // Thus, if the user chose Yarn as their package manager,
+      // no extra action is required.
+      if (
+        otherInformation.projectMetadata.chosenPackageManager ===
+        PackageManager.NPM
+      ) {
+        npxArgs.push('--use-npm')
       }
 
       const child_process = spawn('npx', npxArgs, {
