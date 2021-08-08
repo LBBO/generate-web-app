@@ -4,11 +4,13 @@ export type PackageManagerStrategy = {
       string | { name: string; isDevDependency?: boolean; version?: string }
     >,
   ) => Promise<void>
-  checkInstalledStatus: (
-    packageName: string,
-  ) => Promise<
-    | { isInstalled: false }
-    | { isInstalled: true; isDevDependency: boolean; version: string }
+  checkDependencyStatus: (packageName: string) => Promise<
+    | { isSomeTypeOfDependency: false }
+    | {
+        isSomeTypeOfDependency: true
+        isDevDependency: boolean
+        version: string
+      }
   >
 }
 
