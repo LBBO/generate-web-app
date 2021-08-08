@@ -6,6 +6,7 @@ export enum ExtensionCategory {
   ONLY_FOR_TESTING,
   JAVASCRIPT_FLAVOR,
   FRONTEND_FRAMEWORK,
+  CSS_PREPROCESSOR,
 }
 
 export type AdditionalInformationForExtensions = {
