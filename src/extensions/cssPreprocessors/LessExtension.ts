@@ -11,7 +11,7 @@ export type LessExtensionOptions = Record<string, never>
 export const LessExtension: Extension = {
   name: 'Less',
   description:
-    'Close to a superset of CSS, but with additional features and syntax.',
+    'Similarly to SCSS, superset of CSS with additional features and syntax.',
   linkToDocumentation: new URL('https://lesscss.org/'),
   category: ExtensionCategory.CSS_PREPROCESSOR,
   // Exclusivity to all other CSS preprocessors will be added in CssPreprocessors.ts
