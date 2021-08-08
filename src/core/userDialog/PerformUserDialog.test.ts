@@ -1,11 +1,16 @@
 import * as PerformUserDialog from './PerformUserDialog'
-import { performUserDialog, promptMetadata } from './PerformUserDialog'
+import {
+  getExtensionOptions,
+  performUserDialog,
+  promptMetadata,
+} from './PerformUserDialog'
 import * as SelectExtensions from './SelectExtensions'
 import * as ChoosePackageManager from '../PackageManagers'
 import { PackageManager } from '../PackageManagers'
-import { filter, Subject } from 'rxjs'
+import { count, filter, Observable, Subject } from 'rxjs'
 import { Extension } from '../Extension'
 import { Answers, DistinctQuestion, ListQuestion } from 'inquirer'
+import { generateMockExtension } from '../../extensions/MockExtension'
 import Choice = require('inquirer/lib/objects/choice')
 
 describe('promptMetadata', () => {
@@ -146,6 +151,45 @@ describe('promptMetadata', () => {
       expect(promptMetadata(prompt$, answers$)).rejects.toBeInstanceOf(Error)
     })
   })
+})
+
+describe('getExtensionOptions', () => {
+  let prompts$: Subject<DistinctQuestion>
+  let answers$: Subject<Answers>
+
+  beforeEach(() => {
+    prompts$ = new Subject()
+    answers$ = new Subject()
+  })
+
+  it(
+    'should forward the EXACT amount of answers to the extension as questions were asked and then complete' +
+      ' immediately',
+    (done) => {
+      const numberOfAskedQuestions = 3
+      const extension = generateMockExtension({
+        promptOptions: (prompts$, customAnswers$) => {
+          for (let i = 0; i < numberOfAskedQuestions; i++) {
+            prompts$.next({})
+          }
+          prompts$.complete()
+
+          customAnswers$.pipe(count()).subscribe((count) => {
+            expect(count).toBe(numberOfAskedQuestions)
+            done()
+          })
+
+          return new Observable()
+        },
+      })
+
+      getExtensionOptions([extension], answers$, prompts$)
+
+      for (let i = 0; i < numberOfAskedQuestions; i++) {
+        answers$.next({ name: 'AWESOME TEST QUESTION', answer: i })
+      }
+    },
+  )
 })
 
 describe('performUserDialog', () => {
