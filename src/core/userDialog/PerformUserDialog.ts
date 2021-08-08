@@ -98,6 +98,7 @@ export const getExtensionOptions = async (
 
 export type ProjectMetaData = {
   name: string
+  rootDirectory: string
   chosenPackageManager: PackageManagerNames
   packageManagerStrategy: PackageManagerStrategy
 }
@@ -186,6 +187,7 @@ export const promptMetadata = async (
         switch (answer.name) {
           case 'name':
             copy.name = answer.answer
+            copy.rootDirectory = path.join(process.cwd(), answer.answer)
             break
           case 'packageManager':
             copy.chosenPackageManager = answer.answer

@@ -3,19 +3,13 @@ import {
   getTypeScriptExtension,
   TypeScriptExtension,
 } from './TypeScriptExtension'
-import { ProjectMetaData } from '../core/userDialog/PerformUserDialog'
 import { AngularExtension } from './AngularExtension'
 import { generateMockExtension } from './MockExtension'
-import { PackageManagerNames } from '../core/packageManagers/PackageManagerStrategy'
-import { generateMockPackageManagerStrategy } from '../core/packageManagers/MockPackageManagerStrategy'
 import { allExtensions } from './allExtensions'
+import { generateMockProjectMetadata } from './MockOtherExtensionInformation'
 
 describe('canBeSkipped', () => {
-  const projectMetadata: ProjectMetaData = {
-    name: '',
-    chosenPackageManager: PackageManagerNames.NPM,
-    packageManagerStrategy: generateMockPackageManagerStrategy(),
-  }
+  const projectMetadata = generateMockProjectMetadata()
 
   it('will return true if chosenExtension includes ReactExtension', () => {
     const chosenExtensions = [ReactExtension, TypeScriptExtension]

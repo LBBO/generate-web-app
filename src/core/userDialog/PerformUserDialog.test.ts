@@ -11,7 +11,7 @@ import { Extension } from '../Extension'
 import { Answers, DistinctQuestion, ListQuestion } from 'inquirer'
 import { generateMockExtension } from '../../extensions/MockExtension'
 import { PackageManagerNames } from '../packageManagers/PackageManagerStrategy'
-import { generateMockPackageManagerStrategy } from '../packageManagers/MockPackageManagerStrategy'
+import { generateMockProjectMetadata } from '../../extensions/MockOtherExtensionInformation'
 import Choice = require('inquirer/lib/objects/choice')
 
 describe('promptMetadata', () => {
@@ -205,11 +205,7 @@ describe('performUserDialog', () => {
   beforeEach(() => {
     promptMetaDataSpy = jest
       .spyOn(PerformUserDialog, 'promptMetadata')
-      .mockResolvedValue({
-        name: 'some-package-name',
-        chosenPackageManager: PackageManagerNames.NPM,
-        packageManagerStrategy: generateMockPackageManagerStrategy(),
-      })
+      .mockResolvedValue(generateMockProjectMetadata())
     getExtensionOptionsSpy = jest.spyOn(
       PerformUserDialog,
       'getExtensionOptions',

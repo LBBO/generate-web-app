@@ -4,6 +4,7 @@ import { generateMockPackageManagerStrategy } from '../core/packageManagers/Mock
 import { PackageManagerNames } from '../core/packageManagers/PackageManagerStrategy'
 import { generateMockExtension } from './MockExtension'
 import { OverrideProperties } from '../types/UtilityTypes'
+import path from 'path'
 
 export const generateMockProjectMetadata = (
   // Override should be ProjectMetaData, but the packageManagerStrategy value
@@ -20,6 +21,7 @@ export const generateMockProjectMetadata = (
   >,
 ): ProjectMetaData => ({
   name: override?.name ?? 'mock-project-name',
+  rootDirectory: path.join(__dirname, '..', '..', 'mock-project-target'),
   packageManagerStrategy: generateMockPackageManagerStrategy(
     override?.packageManagerStrategy,
   ),
