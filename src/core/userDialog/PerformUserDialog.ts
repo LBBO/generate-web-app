@@ -21,7 +21,13 @@ import {
   isNpmInstalled,
   isYarnInstalled,
 } from '../packageManagers/PackageManagerDetectors'
-import { PackageManagerNames } from '../packageManagers/PackageManagerStrategy'
+import {
+  PackageManagerNames,
+  PackageManagerStrategy,
+} from '../packageManagers/PackageManagerStrategy'
+import * as path from 'path'
+import { generateNpmPackageManagerStrategy } from '../packageManagers/NpmPackageManagerStrategy'
+import { generateYarnPackageManagerStrategy } from '../packageManagers/YarnPackageManagerStrategy'
 
 export const getExtensionOptions = async (
   chosenExtensions: Array<Extension>,
@@ -93,10 +99,11 @@ export const getExtensionOptions = async (
 export type ProjectMetaData = {
   name: string
   chosenPackageManager: PackageManagerNames
+  packageManagerStrategy: PackageManagerStrategy
 }
 
 function getDefaultMetadata(npmIsInstalled: boolean, yarnIsInstalled: boolean) {
-  const defaultMetaData = {} as ProjectMetaData
+  const defaultMetaData = {} as Omit<ProjectMetaData, 'packageManagerStrategy'>
 
   if (npmIsInstalled && !yarnIsInstalled) {
     console.info(
@@ -188,7 +195,18 @@ export const promptMetadata = async (
         return copy
       }, defaultMetaData),
     ),
-  )
+  ).then((incompleteMetadata) => {
+    const rootDirectory = path.join(process.cwd(), incompleteMetadata.name)
+    const packageManagerStrategy =
+      incompleteMetadata.chosenPackageManager === PackageManagerNames.NPM
+        ? generateNpmPackageManagerStrategy(rootDirectory)
+        : generateYarnPackageManagerStrategy(rootDirectory)
+
+    return {
+      ...incompleteMetadata,
+      packageManagerStrategy,
+    }
+  })
 }
 
 export const performUserDialog = async (
