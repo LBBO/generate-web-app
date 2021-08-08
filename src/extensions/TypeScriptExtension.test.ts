@@ -3,12 +3,14 @@ import { TypeScriptExtension } from './TypeScriptExtension'
 import { ProjectMetaData } from '../core/userDialog/PerformUserDialog'
 import { AngularExtension } from './AngularExtension'
 import { generateMockExtension } from './MockExtension'
-import { PackageManager } from '../core/PackageManagers'
+import { PackageManagerNames } from '../core/packageManagers/PackageManagerStrategy'
+import { generateMockPackageManagerStrategy } from '../core/packageManagers/MockPackageManagerStrategy'
 
 describe('canBeSkipped', () => {
   const projectMetadata: ProjectMetaData = {
     name: '',
-    chosenPackageManager: PackageManager.NPM,
+    chosenPackageManager: PackageManagerNames.NPM,
+    packageManagerStrategy: generateMockPackageManagerStrategy(),
   }
 
   it('will return true if chosenExtension includes ReactExtension', () => {

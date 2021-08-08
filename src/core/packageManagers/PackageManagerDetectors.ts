@@ -1,10 +1,5 @@
 import { execSync } from 'child_process'
 
-export enum PackageManager {
-  NPM = 'npm',
-  YARN = 'yarn',
-}
-
 export const isNpmInstalled = (): boolean => {
   try {
     execSync('npm -v', { stdio: 'ignore' })

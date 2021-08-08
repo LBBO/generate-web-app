@@ -5,18 +5,19 @@ import {
   promptMetadata,
 } from './PerformUserDialog'
 import * as SelectExtensions from './SelectExtensions'
-import * as ChoosePackageManager from '../PackageManagers'
-import { PackageManager } from '../PackageManagers'
+import * as ChoosePackageManager from '../packageManagers/PackageManagerDetectors'
 import { count, filter, Observable, Subject } from 'rxjs'
 import { Extension } from '../Extension'
 import { Answers, DistinctQuestion, ListQuestion } from 'inquirer'
 import { generateMockExtension } from '../../extensions/MockExtension'
+import { PackageManagerNames } from '../packageManagers/PackageManagerStrategy'
+import { generateMockPackageManagerStrategy } from '../packageManagers/MockPackageManagerStrategy'
 import Choice = require('inquirer/lib/objects/choice')
 
 describe('promptMetadata', () => {
   const respondToAllMetaDataQuestions = (answers$: Subject<Answers>): void => {
     answers$.next({ name: 'name', answer: 'some package name' })
-    answers$.next({ name: 'packageManager', answer: PackageManager.NPM })
+    answers$.next({ name: 'packageManager', answer: PackageManagerNames.NPM })
   }
 
   const respondToAllQuestionsExcept = (
@@ -127,7 +128,7 @@ describe('promptMetadata', () => {
       answers$.next({ name: 'packageManager', answer: 'npm' })
 
       metadataPromise.then((metaData) => {
-        expect(metaData?.chosenPackageManager).toBe(PackageManager.NPM)
+        expect(metaData?.chosenPackageManager).toBe(PackageManagerNames.NPM)
         done()
       })
     })
@@ -139,7 +140,7 @@ describe('promptMetadata', () => {
       answers$.next({ name: 'packageManager', answer: 'yarn' })
 
       metadataPromise.then((metaData) => {
-        expect(metaData?.chosenPackageManager).toBe(PackageManager.YARN)
+        expect(metaData?.chosenPackageManager).toBe(PackageManagerNames.YARN)
         done()
       })
     })
@@ -202,7 +203,8 @@ describe('performUserDialog', () => {
       .spyOn(PerformUserDialog, 'promptMetadata')
       .mockResolvedValue({
         name: 'some-package-name',
-        chosenPackageManager: PackageManager.NPM,
+        chosenPackageManager: PackageManagerNames.NPM,
+        packageManagerStrategy: generateMockPackageManagerStrategy(),
       })
     getExtensionOptionsSpy = jest.spyOn(
       PerformUserDialog,

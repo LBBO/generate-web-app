@@ -1,7 +1,7 @@
 import { Extension, ExtensionCategory } from '../core/Extension'
 import { spawn } from 'child_process'
 import { getTypeScriptExtension } from './TypeScriptExtension'
-import { PackageManager } from '../core/PackageManagers'
+import { PackageManagerNames } from '../core/packageManagers/PackageManagerStrategy'
 
 export const ReactExtension: Extension = {
   name: 'React',
@@ -27,7 +27,7 @@ export const ReactExtension: Extension = {
       // no extra action is required.
       if (
         otherInformation.projectMetadata.chosenPackageManager ===
-        PackageManager.NPM
+        PackageManagerNames.NPM
       ) {
         npxArgs.push('--use-npm')
       }
