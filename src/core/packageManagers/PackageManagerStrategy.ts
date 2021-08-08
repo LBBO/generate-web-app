@@ -11,3 +11,8 @@ export type PackageManagerStrategy = {
     | { isInstalled: true; isDevDependency: boolean; version: string }
   >
 }
+
+export enum PackageManagerNames {
+  NPM = 'npm',
+  YARN = 'yarn',
+}

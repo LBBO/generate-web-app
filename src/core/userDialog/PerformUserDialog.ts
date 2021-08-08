@@ -20,8 +20,8 @@ import chalk from 'chalk'
 import {
   isNpmInstalled,
   isYarnInstalled,
-  PackageManager,
-} from '../PackageManagers'
+} from '../packageManagers/PackageManagerDetectors'
+import { PackageManagerNames } from '../packageManagers/PackageManagerStrategy'
 
 export const getExtensionOptions = async (
   chosenExtensions: Array<Extension>,
@@ -92,7 +92,7 @@ export const getExtensionOptions = async (
 
 export type ProjectMetaData = {
   name: string
-  chosenPackageManager: PackageManager
+  chosenPackageManager: PackageManagerNames
 }
 
 function getDefaultMetadata(npmIsInstalled: boolean, yarnIsInstalled: boolean) {
@@ -105,7 +105,7 @@ function getDefaultMetadata(npmIsInstalled: boolean, yarnIsInstalled: boolean) {
           ' dependencies.',
       ),
     )
-    defaultMetaData.chosenPackageManager = PackageManager.NPM
+    defaultMetaData.chosenPackageManager = PackageManagerNames.NPM
   } else if (yarnIsInstalled && !npmIsInstalled) {
     console.info(
       chalk.gray(
@@ -113,7 +113,7 @@ function getDefaultMetadata(npmIsInstalled: boolean, yarnIsInstalled: boolean) {
           ' dependencies.',
       ),
     )
-    defaultMetaData.chosenPackageManager = PackageManager.YARN
+    defaultMetaData.chosenPackageManager = PackageManagerNames.YARN
   }
   return defaultMetaData
 }

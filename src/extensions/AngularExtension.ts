@@ -7,7 +7,7 @@ import { ReactExtension } from './ReactExtension'
 import { spawn } from 'child_process'
 import * as path from 'path'
 import { reduce } from 'rxjs'
-import { PackageManager } from '../core/PackageManagers'
+import { PackageManagerNames } from '../core/packageManagers/PackageManagerStrategy'
 
 export type AngularExtensionOptions = {
   useRouting: boolean
@@ -114,12 +114,12 @@ export const AngularExtension: Extension = {
 
       if (
         otherInformation.projectMetadata.chosenPackageManager ===
-        PackageManager.NPM
+        PackageManagerNames.NPM
       ) {
         nodeArgs.push('--package-manager', 'npm')
       } else if (
         otherInformation.projectMetadata.chosenPackageManager ===
-        PackageManager.YARN
+        PackageManagerNames.YARN
       ) {
         nodeArgs.push('--package-manager', 'yarn')
       }
