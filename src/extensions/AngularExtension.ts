@@ -1,4 +1,8 @@
-import { Extension, ExtensionCategory } from '../core/Extension'
+import {
+  Extension,
+  ExtensionCategory,
+  ExtensionWithSpecificOptions,
+} from '../core/Extension'
 import {
   getTypeScriptExtension,
   TypeScriptExtension,
@@ -138,3 +142,10 @@ export const AngularExtension: Extension = {
     })
   },
 }
+
+export const getAngularExtension = (
+  extensions: Array<Extension>,
+): ExtensionWithSpecificOptions<AngularExtensionOptions> | undefined =>
+  extensions.find((extension) => extension.name === 'Angular') as
+    | ExtensionWithSpecificOptions<AngularExtensionOptions>
+    | undefined
