@@ -12,10 +12,12 @@ import { spawn } from 'child_process'
 import * as path from 'path'
 import { reduce } from 'rxjs'
 import { PackageManagerNames } from '../core/packageManagers/PackageManagerStrategy'
+import { getScssExtension } from './cssPreprocessors/ScssExtension'
+import { getSassExtension } from './cssPreprocessors/SassExtension'
+import { getLessExtension } from './cssPreprocessors/LessExtension'
 
 export type AngularExtensionOptions = {
   useRouting: boolean
-  cssPreProcessor: 'css' | 'scss' | 'sass' | 'less'
 }
 
 export const AngularExtension: Extension = {
@@ -27,34 +29,6 @@ export const AngularExtension: Extension = {
   dependsOn: [TypeScriptExtension],
   exclusiveTo: [ReactExtension],
   promptOptions: (prompts$, answers$) => {
-    prompts$.next({
-      name: 'cssPreProcessor',
-      type: 'list',
-      message: 'Which stylesheet format would you like to use?',
-      choices: [
-        {
-          name: 'CSS',
-          short: 'CSS',
-          value: 'css',
-        },
-        {
-          name: 'SCSS - https://sass-lang.com/documentation/syntax#scss',
-          short: 'SCSS',
-          value: 'scss',
-        },
-        {
-          name: 'Sass - https://sass-lang.com/documentation/syntax#the-indented-syntax',
-          short: 'Sass',
-          value: 'sass',
-        },
-        {
-          name: 'Less - https://lesscss.org/',
-          short: 'Less',
-          value: 'less',
-        },
-      ],
-      default: 'CSS',
-    })
     prompts$.next({
       name: 'useRouter',
       type: 'confirm',
@@ -70,9 +44,6 @@ export const AngularExtension: Extension = {
           const copy = { ...acc }
 
           switch (answerObject.name) {
-            case 'cssPreProcessor':
-              copy.cssPreProcessor = answerObject.answer
-              break
             case 'useRouter':
               copy.useRouting = answerObject.answer
               break
@@ -98,11 +69,10 @@ export const AngularExtension: Extension = {
 
       const nodeArgs = [
         path.join(__dirname, '../../node_modules/@angular/cli/bin/ng'),
-        '--',
         'new',
         otherInformation.projectMetadata.name,
-        '--style',
-        options.cssPreProcessor,
+        // Disable interactive prompts since this CLI already asks all necessary questions
+        '--defaults',
       ]
 
       if (
@@ -110,6 +80,17 @@ export const AngularExtension: Extension = {
           ?.enableStrictMode
       ) {
         nodeArgs.push('--strict')
+      }
+
+      nodeArgs.push('--style')
+      if (getScssExtension(otherInformation.chosenExtensions)) {
+        nodeArgs.push('scss')
+      } else if (getSassExtension(otherInformation.chosenExtensions)) {
+        nodeArgs.push('sass')
+      } else if (getLessExtension(otherInformation.chosenExtensions)) {
+        nodeArgs.push('less')
+      } else {
+        nodeArgs.push('css')
       }
 
       if (options.useRouting) {
