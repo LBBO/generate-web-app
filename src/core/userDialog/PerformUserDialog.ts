@@ -1,7 +1,7 @@
 import {
-  combineLatest,
   count,
   distinctUntilChanged,
+  lastValueFrom,
   map,
   merge,
   Observable,
@@ -11,6 +11,7 @@ import {
   Subject,
   take,
   takeWhile,
+  withLatestFrom,
 } from 'rxjs'
 import { Answers, DistinctQuestion } from 'inquirer'
 import { Extension } from '../Extension'
@@ -36,36 +37,44 @@ export const getExtensionOptions = async (
     // ReplaySubject causes the latest value to be re-emitted to all new subscribers.
     // This is needed, because merge seems to subscribe after the actualCount$ has completed.
     const actualCount$ = new ReplaySubject<number>()
-    customPrompts$.pipe(count()).subscribe(actualCount$)
+    const countSubscription = customPrompts$
+      .pipe(count())
+      .subscribe(actualCount$)
 
     // Emits exactly two values: null and the amount of questions emitted to customPrompts$.
     // The initial null is needed because combineLatest wouldn't emit and values
     // before the count is completed otherwise.
-    const usableCount$ = merge(of(null), actualCount$)
+    const countWithInitialNull = merge(of(null), actualCount$)
 
-    const customAnswers$ = combineLatest(answers$, usableCount$).pipe(
+    const customAnswers$ = answers$.pipe(
+      withLatestFrom(countWithInitialNull),
       distinctUntilChanged(([answerA], [answerB]) => answerA === answerB),
       takeWhile((answerAndPromptCount, index) => {
         const count = answerAndPromptCount[1]
 
         // Count isn't in yet --> let all answers through
         // Count is in --> only emit as many answers as there are questions
-        return count === null || index < count
-      }),
+        // takeWhile also emits last value that returns false (due to inclusive param = true),
+        // so return false on last allowed value!
+        return count === null || index < count - 1
+      }, true),
       // Get rid of the count in the emitted values
       map(([value]) => value),
     )
 
-    // Forward questions to actual prompts observable
-    customPrompts$.subscribe(prompts$)
+    // Forward questions to actual prompts observable,
+    // but don't forward complete as actual prompts aren't necessarily done yet
+    const questionsForwardingSubscription = customPrompts$.subscribe({
+      next: prompts$.next.bind(prompts$),
+    })
 
     let chosenOptions: Record<string, unknown> | undefined
 
     if (extension.promptOptions) {
       console.log(chalk.bold.underline(extension.name))
-      chosenOptions = await extension
-        .promptOptions(customPrompts$, customAnswers$)
-        .toPromise()
+      chosenOptions = await lastValueFrom(
+        extension.promptOptions(customPrompts$, customAnswers$),
+      )
       console.log()
     }
 
@@ -73,6 +82,9 @@ export const getExtensionOptions = async (
     extensionWithOptions.options = chosenOptions
 
     extensionsWithOptions.push(extensionWithOptions)
+
+    countSubscription.unsubscribe()
+    questionsForwardingSubscription.unsubscribe()
   }
 
   return extensionsWithOptions
@@ -158,8 +170,8 @@ export const promptMetadata = async (
 
   const defaultMetaData = getDefaultMetadata(npmIsInstalled, yarnIsInstalled)
 
-  return answers$
-    .pipe(
+  return lastValueFrom(
+    answers$.pipe(
       take(questions.length),
       reduce((acc, answer) => {
         const copy = { ...acc }
@@ -175,8 +187,8 @@ export const promptMetadata = async (
 
         return copy
       }, defaultMetaData),
-    )
-    .toPromise()
+    ),
+  )
 }
 
 export const performUserDialog = async (

@@ -1,5 +1,5 @@
 import { Extension } from '../Extension'
-import { Observable, pluck, Subject, take } from 'rxjs'
+import { lastValueFrom, Observable, pluck, Subject, take } from 'rxjs'
 import { Answers, CheckboxQuestion, DistinctQuestion } from 'inquirer'
 import chalk from 'chalk'
 import { checkDependencies } from '../DependencyChecks'
@@ -49,5 +49,5 @@ export const selectExtensions = (
     },
   } as CheckboxQuestion)
 
-  return answers$.pipe(take(1), pluck('answer')).toPromise()
+  return lastValueFrom(answers$.pipe(take(1), pluck('answer')))
 }
