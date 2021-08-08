@@ -4,7 +4,7 @@ import { generateMockOtherExtensionInformation } from '../MockOtherExtensionInfo
 import { generateMockExtension } from '../MockExtension'
 import { AngularExtension } from '../AngularExtension'
 import { ReactExtension } from '../ReactExtension'
-import Mock = jest.Mock
+import fs from 'fs/promises'
 
 describe('canBeSkipped', () => {
   it('should return true if Angular has been chosen', () => {
@@ -31,10 +31,15 @@ describe('canBeSkipped', () => {
 })
 
 describe('run', () => {
+  beforeEach(() => {
+    jest.spyOn(fs, 'rm').mockResolvedValue(undefined)
+    jest.spyOn(fs, 'copyFile').mockResolvedValue(undefined)
+  })
+
   it('should install the latest version as a dev dependency if React has not been chosen', async () => {
     const otherInformation = generateMockOtherExtensionInformation()
     const installDependenciesMock = otherInformation.projectMetadata
-      .packageManagerStrategy.installDependencies as Mock
+      .packageManagerStrategy.installDependencies as jest.Mock
 
     await ScssExtension.run(undefined, otherInformation)
 
@@ -53,7 +58,7 @@ describe('run', () => {
       chosenExtensions: [ReactExtension],
     })
     const installDependenciesMock = otherInformation.projectMetadata
-      .packageManagerStrategy.installDependencies as Mock
+      .packageManagerStrategy.installDependencies as jest.Mock
 
     await ScssExtension.run(undefined, otherInformation)
 

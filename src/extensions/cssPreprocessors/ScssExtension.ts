@@ -4,7 +4,9 @@ import {
   ExtensionWithSpecificOptions,
 } from '../../core/Extension'
 import { getAngularExtension } from '../AngularExtension'
-import { ReactExtension } from '../ReactExtension'
+import { getReactExtension, ReactExtension } from '../ReactExtension'
+import { copyFile, rm } from 'fs/promises'
+import * as path from 'path'
 
 export type ScssExtensionOptions = Record<string, never>
 
@@ -35,6 +37,38 @@ export const ScssExtension: Extension = {
         },
       ],
     )
+
+    if (getReactExtension(otherInformation.chosenExtensions)) {
+      // If React is installed, replace index.css and App.css with index.scss and App.scss from this extension
+      const srcDir = path.join(
+        otherInformation.projectMetadata.rootDirectory,
+        'src',
+      )
+
+      const reactFileTemplatesDir = path.join(
+        __dirname, // ScssExtension
+        '..', // cssPreprocessors
+        '..', // extensions
+        '..', // src
+        '..', // generate-web-app root
+        'fileTemplates',
+        'extensions',
+        'ScssExtension',
+        'react',
+      )
+
+      await rm(path.join(srcDir, 'index.css'))
+      await copyFile(
+        path.join(reactFileTemplatesDir, 'index.scss'),
+        path.join(srcDir, 'index.scss'),
+      )
+
+      await rm(path.join(srcDir, 'App.css'))
+      await copyFile(
+        path.join(reactFileTemplatesDir, 'App.scss'),
+        path.join(srcDir, 'App.scss'),
+      )
+    }
   },
 }
 

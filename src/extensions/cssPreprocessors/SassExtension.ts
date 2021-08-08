@@ -4,7 +4,9 @@ import {
   ExtensionWithSpecificOptions,
 } from '../../core/Extension'
 import { getAngularExtension } from '../AngularExtension'
-import { ReactExtension } from '../ReactExtension'
+import { getReactExtension, ReactExtension } from '../ReactExtension'
+import path from 'path'
+import { copyFile, rm } from 'fs/promises'
 
 export type SassExtensionOptions = Record<string, never>
 
@@ -35,6 +37,37 @@ export const SassExtension: Extension = {
         },
       ],
     )
+
+    if (getReactExtension(otherInformation.chosenExtensions)) {
+      // If React is installed, replace index.css and App.css with index.sass and App.sass from this extension
+      const srcDir = path.join(
+        otherInformation.projectMetadata.rootDirectory,
+        'src',
+      )
+      const reactFileTemplatesDir = path.join(
+        __dirname, // SassExtension
+        '..', // cssPreprocessors
+        '..', // extensions
+        '..', // src
+        '..', // generate-web-app root
+        'fileTemplates',
+        'extensions',
+        'SassExtension',
+        'react',
+      )
+
+      await rm(path.join(srcDir, 'index.css'))
+      await copyFile(
+        path.join(reactFileTemplatesDir, 'index.sass'),
+        path.join(srcDir, 'index.sass'),
+      )
+
+      await rm(path.join(srcDir, 'App.css'))
+      await copyFile(
+        path.join(reactFileTemplatesDir, 'App.sass'),
+        path.join(srcDir, 'App.sass'),
+      )
+    }
   },
 }
 
