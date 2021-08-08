@@ -224,7 +224,10 @@ describe('installDependencies', () => {
 
   it('should only print a warning but not throw an error if an installation fails', async () => {
     installPackagesMock.mockRejectedValue(new Error('test error'))
-    const consoleErrorSpy = jest.spyOn(console, 'error')
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      .mockImplementation(() => {})
 
     // The promise should resolve but the actual result doesn't matter.
     // Currently, it's undefined, but if that ever changes, that won't matter for this test.
