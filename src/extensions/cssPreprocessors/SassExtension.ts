@@ -11,7 +11,7 @@ import { copyFile, rm } from 'fs/promises'
 export type SassExtensionOptions = Record<string, never>
 
 export const SassExtension: Extension = {
-  name: 'SASS',
+  name: 'Sass',
   description:
     'A CSS pre-processor with the same features as SCSS, but a different syntax. Valid CSS is not valid Sass.',
   linkToDocumentation: new URL(
@@ -74,6 +74,6 @@ export const SassExtension: Extension = {
 export const getSassExtension = (
   extensions: Array<Extension>,
 ): ExtensionWithSpecificOptions<SassExtensionOptions> | undefined =>
-  extensions.find((extension) => extension.name === 'SASS') as
+  extensions.find((extension) => extension.name === 'Sass') as
     | ExtensionWithSpecificOptions<SassExtensionOptions>
     | undefined
