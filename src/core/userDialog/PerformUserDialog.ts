@@ -170,8 +170,8 @@ export const promptMetadata = async (
 
   const defaultMetaData = getDefaultMetadata(npmIsInstalled, yarnIsInstalled)
 
-  return answers$
-    .pipe(
+  return lastValueFrom(
+    answers$.pipe(
       take(questions.length),
       reduce((acc, answer) => {
         const copy = { ...acc }
@@ -187,8 +187,8 @@ export const promptMetadata = async (
 
         return copy
       }, defaultMetaData),
-    )
-    .toPromise()
+    ),
+  )
 }
 
 export const performUserDialog = async (
