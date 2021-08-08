@@ -1,6 +1,8 @@
 import { ScssExtension } from './ScssExtension'
+import { SassExtension } from './SassExtension'
+import { LessExtension } from './LessExtension'
 
-export const allCssPreprocessors = [ScssExtension]
+export const allCssPreprocessors = [ScssExtension, SassExtension, LessExtension]
 
 allCssPreprocessors.forEach((currentExtension) => {
   const otherPreprocessors = allCssPreprocessors.filter(
