@@ -22,6 +22,7 @@ export const selectExtensions = (
     type: 'checkbox',
     name: 'chosenExtensions',
     message: 'What libraries / tools would you like to use in your project?',
+    pageSize: 20,
     choices: extensions
       // Ensure all extensions are grouped by category
       .sort((a, b) => a.category - b.category)
