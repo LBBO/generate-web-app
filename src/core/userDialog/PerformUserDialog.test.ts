@@ -49,6 +49,10 @@ describe('promptMetadata', () => {
       isYarnInstalledSpy.mockReset().mockReturnValue(true)
       prompt$ = new Subject()
       answers$ = new Subject()
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      jest.spyOn(console, 'info').mockImplementation(() => {})
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      jest.spyOn(console, 'log').mockImplementation(() => {})
     })
 
     afterAll(() => {
