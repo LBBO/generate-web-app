@@ -25,6 +25,9 @@ const oneExtensionPerCategory = [
   generateMockExtension({
     category: ExtensionCategory.JAVASCRIPT_FLAVOR,
   }),
+  generateMockExtension({
+    category: ExtensionCategory.LINTER_OR_FORMATTER,
+  }),
 ]
 type Separator = { line: string; type: 'separator' }
 

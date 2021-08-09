@@ -7,6 +7,7 @@ export enum ExtensionCategory {
   JAVASCRIPT_FLAVOR,
   FRONTEND_FRAMEWORK,
   CSS_PREPROCESSOR,
+  LINTER_OR_FORMATTER,
 }
 
 export type AdditionalInformationForExtensions = {

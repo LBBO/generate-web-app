@@ -11,6 +11,7 @@ export const extensionCategoryTitles: Record<ExtensionCategory, string> = {
   [ExtensionCategory.FRONTEND_FRAMEWORK]: 'Frontend frameworks',
   [ExtensionCategory.JAVASCRIPT_FLAVOR]: 'JavaScript Flavors',
   [ExtensionCategory.ONLY_FOR_TESTING]: 'Only for testing, please ignore',
+  [ExtensionCategory.LINTER_OR_FORMATTER]: 'Linting and formatting',
 }
 
 export const selectExtensions = (
