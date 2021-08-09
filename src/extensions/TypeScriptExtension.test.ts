@@ -1,11 +1,7 @@
 import { ReactExtension } from './ReactExtension'
-import {
-  getTypeScriptExtension,
-  TypeScriptExtension,
-} from './TypeScriptExtension'
+import { TypeScriptExtension } from './TypeScriptExtension'
 import { AngularExtension } from './AngularExtension/AngularExtension'
 import { generateMockExtension } from './MockExtension'
-import { allExtensions } from './allExtensions'
 import { generateMockProjectMetadata } from './MockOtherExtensionInformation'
 
 describe('canBeSkipped', () => {
@@ -39,21 +35,5 @@ describe('canBeSkipped', () => {
         chosenExtensions,
       }),
     ).toBe(false)
-  })
-})
-
-describe('getTypeScriptExtension', () => {
-  it('should be able to identify the actual TypeScriptExtension', () => {
-    expect(getTypeScriptExtension(allExtensions)).toBe(TypeScriptExtension)
-  })
-
-  it('should be able to identify a copy (non-identical reference!) of the TypeScriptExtension', () => {
-    const copiedTypeScriptExtension = { ...TypeScriptExtension }
-    const listWithModifiedExtension = allExtensions.map((extension) =>
-      extension === TypeScriptExtension ? copiedTypeScriptExtension : extension,
-    )
-    expect(getTypeScriptExtension(listWithModifiedExtension)).toBe(
-      copiedTypeScriptExtension,
-    )
   })
 })

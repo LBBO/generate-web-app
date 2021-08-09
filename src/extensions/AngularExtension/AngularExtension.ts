@@ -1,20 +1,16 @@
-import {
-  Extension,
-  ExtensionCategory,
-  ExtensionWithSpecificOptions,
-} from '../../core/Extension'
-import {
-  getTypeScriptExtension,
-  TypeScriptExtension,
-} from '../TypeScriptExtension'
+import { Extension, ExtensionCategory } from '../../core/Extension'
+import { TypeScriptExtension } from '../TypeScriptExtension'
 import { ReactExtension } from '../ReactExtension'
 import { spawn } from 'child_process'
 import * as path from 'path'
 import { reduce } from 'rxjs'
 import { PackageManagerNames } from '../../core/packageManagers/PackageManagerStrategy'
-import { getScssExtension } from '../cssPreprocessors/ScssExtension'
-import { getSassExtension } from '../cssPreprocessors/SassExtension'
-import { getLessExtension } from '../cssPreprocessors/LessExtension'
+import {
+  getLessExtension,
+  getSassExtension,
+  getScssExtension,
+  getTypeScriptExtension,
+} from '../Getters'
 
 export type AngularExtensionOptions = {
   useRouting: boolean
@@ -123,10 +119,3 @@ export const AngularExtension: Extension = {
     })
   },
 }
-
-export const getAngularExtension = (
-  extensions: Array<Extension>,
-): ExtensionWithSpecificOptions<AngularExtensionOptions> | undefined =>
-  extensions.find((extension) => extension.name === 'Angular') as
-    | ExtensionWithSpecificOptions<AngularExtensionOptions>
-    | undefined

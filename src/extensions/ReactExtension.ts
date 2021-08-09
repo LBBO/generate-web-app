@@ -1,12 +1,8 @@
-import {
-  Extension,
-  ExtensionCategory,
-  ExtensionWithSpecificOptions,
-} from '../core/Extension'
+import { Extension, ExtensionCategory } from '../core/Extension'
 import { spawn } from 'child_process'
-import { getTypeScriptExtension } from './TypeScriptExtension'
 import { PackageManagerNames } from '../core/packageManagers/PackageManagerStrategy'
 import { ESLintExtension } from './ESLintExtension'
+import { getTypeScriptExtension } from './Getters'
 
 export type ReactExtensionOptions = Record<string, never>
 
@@ -55,12 +51,4 @@ export const ReactExtension: Extension = {
       })
     })
   },
-}
-
-export const getReactExtension = (
-  extensions: Array<Extension>,
-): ExtensionWithSpecificOptions<ReactExtensionOptions> | undefined => {
-  return extensions.find((extension) => extension.name === 'React') as
-    | ExtensionWithSpecificOptions<ReactExtensionOptions>
-    | undefined
 }

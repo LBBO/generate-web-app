@@ -1,5 +1,4 @@
-import { getLessExtension, LessExtension } from './LessExtension'
-import { allExtensions } from '../allExtensions'
+import { LessExtension } from './LessExtension'
 import { generateMockOtherExtensionInformation } from '../MockOtherExtensionInformation'
 import { generateMockExtension } from '../MockExtension'
 import { AngularExtension } from '../AngularExtension/AngularExtension'
@@ -25,21 +24,5 @@ describe('canBeSkipped', () => {
         }),
       ),
     ).toBe(false)
-  })
-})
-
-describe('getLessExtension', () => {
-  it('should be able to identify the actual LessExtension', () => {
-    expect(getLessExtension(allExtensions)).toBe(LessExtension)
-  })
-
-  it('should be able to identify a copy (non-identical reference!) of the LessExtension', () => {
-    const copiedLessExtension = { ...LessExtension }
-    const listWithModifiedExtension = allExtensions.map((extension) =>
-      extension === LessExtension ? copiedLessExtension : extension,
-    )
-    expect(getLessExtension(listWithModifiedExtension)).toBe(
-      copiedLessExtension,
-    )
   })
 })
