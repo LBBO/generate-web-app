@@ -1,5 +1,5 @@
 import { AngularExtension, getAngularExtension } from './AngularExtension'
-import { allExtensions } from './allExtensions'
+import { allExtensions } from '../allExtensions'
 
 describe('getAngularExtension', () => {
   it('should be able to identify the actual AngularExtension', () => {

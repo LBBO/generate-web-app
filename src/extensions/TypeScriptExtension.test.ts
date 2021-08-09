@@ -3,7 +3,7 @@ import {
   getTypeScriptExtension,
   TypeScriptExtension,
 } from './TypeScriptExtension'
-import { AngularExtension } from './AngularExtension'
+import { AngularExtension } from './AngularExtension/AngularExtension'
 import { generateMockExtension } from './MockExtension'
 import { allExtensions } from './allExtensions'
 import { generateMockProjectMetadata } from './MockOtherExtensionInformation'

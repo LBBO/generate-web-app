@@ -2,7 +2,7 @@ import { getLessExtension, LessExtension } from './LessExtension'
 import { allExtensions } from '../allExtensions'
 import { generateMockOtherExtensionInformation } from '../MockOtherExtensionInformation'
 import { generateMockExtension } from '../MockExtension'
-import { AngularExtension } from '../AngularExtension'
+import { AngularExtension } from '../AngularExtension/AngularExtension'
 
 describe('canBeSkipped', () => {
   it('should return true if Angular has been chosen', () => {

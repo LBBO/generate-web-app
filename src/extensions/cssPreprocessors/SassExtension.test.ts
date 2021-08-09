@@ -2,7 +2,7 @@ import { getSassExtension, SassExtension } from './SassExtension'
 import { allExtensions } from '../allExtensions'
 import { generateMockOtherExtensionInformation } from '../MockOtherExtensionInformation'
 import { generateMockExtension } from '../MockExtension'
-import { AngularExtension } from '../AngularExtension'
+import { AngularExtension } from '../AngularExtension/AngularExtension'
 import { ReactExtension } from '../ReactExtension'
 import fs from 'fs/promises'
 

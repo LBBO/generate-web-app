@@ -3,7 +3,7 @@ import {
   ExtensionCategory,
   ExtensionWithSpecificOptions,
 } from '../../core/Extension'
-import { getAngularExtension } from '../AngularExtension'
+import { getAngularExtension } from '../AngularExtension/AngularExtension'
 import { getReactExtension, ReactExtension } from '../ReactExtension'
 import path from 'path'
 import { copyFile, rm } from 'fs/promises'

@@ -3,7 +3,7 @@ import {
   ExtensionCategory,
   ExtensionWithSpecificOptions,
 } from '../../core/Extension'
-import { getAngularExtension } from '../AngularExtension'
+import { getAngularExtension } from '../AngularExtension/AngularExtension'
 import { ReactExtension } from '../ReactExtension'
 
 export type LessExtensionOptions = Record<string, never>
