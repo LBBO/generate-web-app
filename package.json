@@ -1,6 +1,6 @@
 {
   "name": "generate-web-app",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "",
   "bin": {
     "generate-web-app": "./dist/index.js"
