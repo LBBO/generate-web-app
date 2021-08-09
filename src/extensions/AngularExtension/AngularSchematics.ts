@@ -6,6 +6,7 @@ export const addSchematic = (cwd: string, args: string[]): Promise<void> => {
     const nodeArgs = [
       path.join(__dirname, '../../../node_modules/@angular/cli/bin/ng'),
       'add',
+      '--skip-confirmation',
       ...args,
     ]
 
