@@ -1,12 +1,9 @@
-import {
-  Extension,
-  ExtensionCategory,
-  ExtensionWithSpecificOptions,
-} from '../../core/Extension'
-import { getAngularExtension } from '../AngularExtension'
-import { getReactExtension, ReactExtension } from '../ReactExtension'
+import type { Extension } from '../../core/Extension'
+import { ExtensionCategory } from '../../core/Extension'
+import { ReactExtension } from '../ReactExtension'
 import { copyFile, rm } from 'fs/promises'
 import * as path from 'path'
+import { getAngularExtension, getReactExtension } from '../Getters'
 
 export type ScssExtensionOptions = Record<string, never>
 
@@ -46,8 +43,7 @@ export const ScssExtension: Extension = {
       )
 
       const reactFileTemplatesDir = path.join(
-        __dirname, // ScssExtension
-        '..', // cssPreprocessors
+        __dirname, // cssPreprocessors
         '..', // extensions
         '..', // src
         '..', // generate-web-app root
@@ -71,10 +67,3 @@ export const ScssExtension: Extension = {
     }
   },
 }
-
-export const getScssExtension = (
-  extensions: Array<Extension>,
-): ExtensionWithSpecificOptions<ScssExtensionOptions> | undefined =>
-  extensions.find((extension) => extension.name === 'SCSS') as
-    | ExtensionWithSpecificOptions<ScssExtensionOptions>
-    | undefined

@@ -1,10 +1,7 @@
-import {
-  Extension,
-  ExtensionCategory,
-  ExtensionWithSpecificOptions,
-} from '../../core/Extension'
-import { getAngularExtension } from '../AngularExtension'
+import type { Extension } from '../../core/Extension'
+import { ExtensionCategory } from '../../core/Extension'
 import { ReactExtension } from '../ReactExtension'
+import { getAngularExtension } from '../Getters'
 
 export type LessExtensionOptions = Record<string, never>
 
@@ -27,10 +24,3 @@ export const LessExtension: Extension = {
     throw new Error('Installation of less has not been implemented yet.')
   },
 }
-
-export const getLessExtension = (
-  extensions: Array<Extension>,
-): ExtensionWithSpecificOptions<LessExtensionOptions> | undefined =>
-  extensions.find((extension) => extension.name === 'Less') as
-    | ExtensionWithSpecificOptions<LessExtensionOptions>
-    | undefined

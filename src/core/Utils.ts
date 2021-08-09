@@ -1,4 +1,4 @@
-import { Extension } from './Extension'
+import type { Extension } from './Extension'
 
 export const getDeepDependencies = (extension: Extension): Array<Extension> => {
   const dependencies = extension.dependsOn ?? []

@@ -1,6 +1,8 @@
-import { Extension, ExtensionCategory } from '../Extension'
-import { lastValueFrom, Observable, pluck, Subject, take } from 'rxjs'
-import { Answers, CheckboxQuestion, DistinctQuestion } from 'inquirer'
+import type { Extension } from '../Extension'
+import { ExtensionCategory } from '../Extension'
+import type { Observable, Subject } from 'rxjs'
+import { lastValueFrom, pluck, take } from 'rxjs'
+import type { Answers, CheckboxQuestion, DistinctQuestion } from 'inquirer'
 import chalk from 'chalk'
 import { checkDependencies } from '../DependencyChecks'
 import { checkExclusivities } from '../ExclusivityChecks'
@@ -11,6 +13,7 @@ export const extensionCategoryTitles: Record<ExtensionCategory, string> = {
   [ExtensionCategory.FRONTEND_FRAMEWORK]: 'Frontend frameworks',
   [ExtensionCategory.JAVASCRIPT_FLAVOR]: 'JavaScript Flavors',
   [ExtensionCategory.ONLY_FOR_TESTING]: 'Only for testing, please ignore',
+  [ExtensionCategory.LINTER_OR_FORMATTER]: 'Linting and formatting',
 }
 
 export const selectExtensions = (

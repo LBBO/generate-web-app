@@ -1,6 +1,6 @@
 {
   "name": "generate-web-app",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "",
   "bin": {
     "generate-web-app": "./dist/index.js"
@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/LBBO/generate-web-app#readme",
   "devDependencies": {
+    "@types/eslint": "^7.28.0",
     "@types/inquirer": "^7.3.3",
     "@types/jest": "^26.0.24",
     "@typescript-eslint/eslint-plugin": "^4.28.2",

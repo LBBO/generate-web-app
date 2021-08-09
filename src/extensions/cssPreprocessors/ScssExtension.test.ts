@@ -1,8 +1,7 @@
-import { getScssExtension, ScssExtension } from './ScssExtension'
-import { allExtensions } from '../allExtensions'
+import { ScssExtension } from './ScssExtension'
 import { generateMockOtherExtensionInformation } from '../MockOtherExtensionInformation'
 import { generateMockExtension } from '../MockExtension'
-import { AngularExtension } from '../AngularExtension'
+import { AngularExtension } from '../AngularExtension/AngularExtension'
 import { ReactExtension } from '../ReactExtension'
 import fs from 'fs/promises'
 
@@ -70,21 +69,5 @@ describe('run', () => {
         version: '^5.0.0',
       },
     ])
-  })
-})
-
-describe('getScssExtension', () => {
-  it('should be able to identify the actual ScssExtension', () => {
-    expect(getScssExtension(allExtensions)).toBe(ScssExtension)
-  })
-
-  it('should be able to identify a copy (non-identical reference!) of the ScssExtension', () => {
-    const copiedScssExtension = { ...ScssExtension }
-    const listWithModifiedExtension = allExtensions.map((extension) =>
-      extension === ScssExtension ? copiedScssExtension : extension,
-    )
-    expect(getScssExtension(listWithModifiedExtension)).toBe(
-      copiedScssExtension,
-    )
   })
 })

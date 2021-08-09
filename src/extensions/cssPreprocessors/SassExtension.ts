@@ -1,12 +1,9 @@
-import {
-  Extension,
-  ExtensionCategory,
-  ExtensionWithSpecificOptions,
-} from '../../core/Extension'
-import { getAngularExtension } from '../AngularExtension'
-import { getReactExtension, ReactExtension } from '../ReactExtension'
+import type { Extension } from '../../core/Extension'
+import { ExtensionCategory } from '../../core/Extension'
+import { ReactExtension } from '../ReactExtension'
 import path from 'path'
 import { copyFile, rm } from 'fs/promises'
+import { getAngularExtension, getReactExtension } from '../Getters'
 
 export type SassExtensionOptions = Record<string, never>
 
@@ -45,8 +42,7 @@ export const SassExtension: Extension = {
         'src',
       )
       const reactFileTemplatesDir = path.join(
-        __dirname, // SassExtension
-        '..', // cssPreprocessors
+        __dirname, // cssPreprocessors
         '..', // extensions
         '..', // src
         '..', // generate-web-app root
@@ -70,10 +66,3 @@ export const SassExtension: Extension = {
     }
   },
 }
-
-export const getSassExtension = (
-  extensions: Array<Extension>,
-): ExtensionWithSpecificOptions<SassExtensionOptions> | undefined =>
-  extensions.find((extension) => extension.name === 'Sass') as
-    | ExtensionWithSpecificOptions<SassExtensionOptions>
-    | undefined

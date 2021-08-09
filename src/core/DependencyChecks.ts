@@ -1,4 +1,4 @@
-import { Extension } from './Extension'
+import type { Extension } from './Extension'
 
 export type ValidDependenciesResponse = {
   isValidConfiguration: true

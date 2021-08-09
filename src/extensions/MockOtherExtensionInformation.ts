@@ -1,9 +1,9 @@
-import { Extension } from '../core/Extension'
-import { ProjectMetaData } from '../core/userDialog/PerformUserDialog'
+import type { Extension } from '../core/Extension'
+import type { ProjectMetaData } from '../core/userDialog/PerformUserDialog'
 import { generateMockPackageManagerStrategy } from '../core/packageManagers/MockPackageManagerStrategy'
 import { PackageManagerNames } from '../core/packageManagers/PackageManagerStrategy'
 import { generateMockExtension } from './MockExtension'
-import { OverrideProperties } from '../types/UtilityTypes'
+import type { OverrideProperties } from '../types/UtilityTypes'
 import path from 'path'
 
 export const generateMockProjectMetadata = (

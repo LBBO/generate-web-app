@@ -1,20 +1,17 @@
-import {
-  Extension,
-  ExtensionCategory,
-  ExtensionWithSpecificOptions,
-} from '../core/Extension'
-import {
-  getTypeScriptExtension,
-  TypeScriptExtension,
-} from './TypeScriptExtension'
-import { ReactExtension } from './ReactExtension'
+import type { Extension } from '../../core/Extension'
+import { ExtensionCategory } from '../../core/Extension'
+import { TypeScriptExtension } from '../TypeScriptExtension'
+import { ReactExtension } from '../ReactExtension'
 import { spawn } from 'child_process'
 import * as path from 'path'
 import { reduce } from 'rxjs'
-import { PackageManagerNames } from '../core/packageManagers/PackageManagerStrategy'
-import { getScssExtension } from './cssPreprocessors/ScssExtension'
-import { getSassExtension } from './cssPreprocessors/SassExtension'
-import { getLessExtension } from './cssPreprocessors/LessExtension'
+import { PackageManagerNames } from '../../core/packageManagers/PackageManagerStrategy'
+import {
+  getLessExtension,
+  getSassExtension,
+  getScssExtension,
+  getTypeScriptExtension,
+} from '../Getters'
 
 export type AngularExtensionOptions = {
   useRouting: boolean
@@ -68,7 +65,7 @@ export const AngularExtension: Extension = {
       }
 
       const nodeArgs = [
-        path.join(__dirname, '../../node_modules/@angular/cli/bin/ng'),
+        path.join(__dirname, '../../../node_modules/@angular/cli/bin/ng'),
         'new',
         otherInformation.projectMetadata.name,
         // Disable interactive prompts since this CLI already asks all necessary questions
@@ -123,10 +120,3 @@ export const AngularExtension: Extension = {
     })
   },
 }
-
-export const getAngularExtension = (
-  extensions: Array<Extension>,
-): ExtensionWithSpecificOptions<AngularExtensionOptions> | undefined =>
-  extensions.find((extension) => extension.name === 'Angular') as
-    | ExtensionWithSpecificOptions<AngularExtensionOptions>
-    | undefined

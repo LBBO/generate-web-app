@@ -1,11 +1,9 @@
-import {
-  Extension,
-  ExtensionCategory,
-  ExtensionWithSpecificOptions,
-} from '../core/Extension'
+import type { Extension } from '../core/Extension'
+import { ExtensionCategory } from '../core/Extension'
 import { spawn } from 'child_process'
-import { getTypeScriptExtension } from './TypeScriptExtension'
 import { PackageManagerNames } from '../core/packageManagers/PackageManagerStrategy'
+import { ESLintExtension } from './ESLintExtension'
+import { getTypeScriptExtension } from './Getters'
 
 export type ReactExtensionOptions = Record<string, never>
 
@@ -15,6 +13,7 @@ export const ReactExtension: Extension = {
   linkToDocumentation: new URL('https://reactjs.org/'),
   // Exclusiveness to Angular is declared in Angular plugin
   exclusiveTo: [],
+  dependsOn: [ESLintExtension],
   category: ExtensionCategory.FRONTEND_FRAMEWORK,
 
   run: (options, otherInformation) => {
@@ -53,12 +52,4 @@ export const ReactExtension: Extension = {
       })
     })
   },
-}
-
-export const getReactExtension = (
-  extensions: Array<Extension>,
-): ExtensionWithSpecificOptions<ReactExtensionOptions> | undefined => {
-  return extensions.find((extension) => extension.name === 'React') as
-    | ExtensionWithSpecificOptions<ReactExtensionOptions>
-    | undefined
 }

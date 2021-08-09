@@ -1,8 +1,5 @@
-import {
-  Extension,
-  ExtensionCategory,
-  ExtensionWithSpecificOptions,
-} from '../core/Extension'
+import type { Extension } from '../core/Extension'
+import { ExtensionCategory } from '../core/Extension'
 import { reduce } from 'rxjs'
 
 export type TypeScriptExtensionOptions = {
@@ -56,15 +53,4 @@ export const TypeScriptExtension: Extension = {
   run(): Promise<void> {
     return Promise.resolve(undefined)
   },
-}
-
-// This is really much ado about nothing to help TypeScript understand
-// that this function returns the AngularExtension / AngularExtensionWithOptions
-// if it has been chosen and undefined otherwise
-export const getTypeScriptExtension = (
-  extensions: Array<Extension>,
-): ExtensionWithSpecificOptions<TypeScriptExtensionOptions> | undefined => {
-  return extensions.find(
-    (extension) => extension.name === TypeScriptExtension.name,
-  ) as ExtensionWithSpecificOptions<TypeScriptExtensionOptions> | undefined
 }
