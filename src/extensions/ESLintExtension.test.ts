@@ -5,7 +5,7 @@ import {
   generateESLintConfigObject,
 } from './ESLintExtension'
 import { formatWithPrettier } from '../core/FormatCode'
-import { AdditionalInformationForExtensions } from '../core/Extension'
+import type { AdditionalInformationForExtensions } from '../core/Extension'
 import { generateMockOtherExtensionInformation } from './MockOtherExtensionInformation'
 import { TypeScriptExtension } from './TypeScriptExtension'
 import { ReactExtension } from './ReactExtension'

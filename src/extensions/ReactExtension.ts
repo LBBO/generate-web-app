@@ -1,4 +1,5 @@
-import { Extension, ExtensionCategory } from '../core/Extension'
+import type { Extension } from '../core/Extension'
+import { ExtensionCategory } from '../core/Extension'
 import { spawn } from 'child_process'
 import { PackageManagerNames } from '../core/packageManagers/PackageManagerStrategy'
 import { ESLintExtension } from './ESLintExtension'

@@ -1,10 +1,6 @@
 import { Subject } from 'rxjs'
-import {
-  Answers,
-  CheckboxQuestion,
-  DistinctQuestion,
-  Separator,
-} from 'inquirer'
+import type { Answers, CheckboxQuestion, DistinctQuestion } from 'inquirer'
+import { Separator } from 'inquirer'
 import { generateMockExtension } from '../../extensions/MockExtension'
 import { ExtensionCategory } from '../Extension'
 import { extensionCategoryTitles, selectExtensions } from './SelectExtensions'

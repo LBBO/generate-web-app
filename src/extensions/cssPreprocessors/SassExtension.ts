@@ -1,4 +1,5 @@
-import { Extension, ExtensionCategory } from '../../core/Extension'
+import type { Extension } from '../../core/Extension'
+import { ExtensionCategory } from '../../core/Extension'
 import { ReactExtension } from '../ReactExtension'
 import path from 'path'
 import { copyFile, rm } from 'fs/promises'

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Subject } from 'rxjs'
-import inquirer, { DistinctQuestion } from 'inquirer'
+import type { DistinctQuestion } from 'inquirer'
+import inquirer from 'inquirer'
 import { performUserDialog } from './core/userDialog/PerformUserDialog'
 import chalk from 'chalk'
 import { allExtensions } from './extensions/allExtensions'

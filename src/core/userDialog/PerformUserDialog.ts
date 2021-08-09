@@ -1,10 +1,10 @@
+import type { Observable } from 'rxjs'
 import {
   count,
   distinctUntilChanged,
   lastValueFrom,
   map,
   merge,
-  Observable,
   of,
   reduce,
   ReplaySubject,
@@ -13,18 +13,16 @@ import {
   takeWhile,
   withLatestFrom,
 } from 'rxjs'
-import { Answers, DistinctQuestion } from 'inquirer'
-import { Extension } from '../Extension'
+import type { Answers, DistinctQuestion } from 'inquirer'
+import type { Extension } from '../Extension'
 import { selectExtensions } from './SelectExtensions'
 import chalk from 'chalk'
 import {
   isNpmInstalled,
   isYarnInstalled,
 } from '../packageManagers/PackageManagerDetectors'
-import {
-  PackageManagerNames,
-  PackageManagerStrategy,
-} from '../packageManagers/PackageManagerStrategy'
+import type { PackageManagerStrategy } from '../packageManagers/PackageManagerStrategy'
+import { PackageManagerNames } from '../packageManagers/PackageManagerStrategy'
 import * as path from 'path'
 import { generateNpmPackageManagerStrategy } from '../packageManagers/NpmPackageManagerStrategy'
 import { generateYarnPackageManagerStrategy } from '../packageManagers/YarnPackageManagerStrategy'

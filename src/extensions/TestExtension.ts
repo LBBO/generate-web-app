@@ -1,5 +1,7 @@
-import { Extension, ExtensionCategory } from '../core/Extension'
-import { Observable, reduce } from 'rxjs'
+import type { Extension } from '../core/Extension'
+import { ExtensionCategory } from '../core/Extension'
+import type { Observable } from 'rxjs'
+import { reduce } from 'rxjs'
 
 export type TestExtensionOptions = {
   pineappleOnPizza: boolean

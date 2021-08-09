@@ -1,5 +1,5 @@
 import { spawn } from 'child_process'
-import { PackageManagerStrategy } from './PackageManagerStrategy'
+import type { PackageManagerStrategy } from './PackageManagerStrategy'
 import { generatePackageJsonBasedPackageManagerStrategy } from './PackageJsonBasedPackageManagerStrategy'
 
 export const runNpmInstall = (

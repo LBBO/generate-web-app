@@ -1,6 +1,6 @@
-import { Observable, Subject } from 'rxjs'
-import { Answers, DistinctQuestion } from 'inquirer'
-import { ProjectMetaData } from './userDialog/PerformUserDialog'
+import type { Observable, Subject } from 'rxjs'
+import type { Answers, DistinctQuestion } from 'inquirer'
+import type { ProjectMetaData } from './userDialog/PerformUserDialog'
 
 export enum ExtensionCategory {
   ONLY_FOR_TESTING,

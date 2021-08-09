@@ -1,4 +1,4 @@
-import { PackageManagerStrategy } from './PackageManagerStrategy'
+import type { PackageManagerStrategy } from './PackageManagerStrategy'
 
 export const generateMockPackageManagerStrategy = (
   override: Partial<PackageManagerStrategy> = {},

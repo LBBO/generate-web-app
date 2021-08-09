@@ -1,7 +1,5 @@
-import {
-  checkExclusivities,
-  InvalidExclusivitiesResponse,
-} from './ExclusivityChecks'
+import type { InvalidExclusivitiesResponse } from './ExclusivityChecks'
+import { checkExclusivities } from './ExclusivityChecks'
 import { generateMockExtension } from '../extensions/MockExtension'
 import { performSanityChecksOnExtensions } from './SanityChecks'
 

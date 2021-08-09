@@ -1,8 +1,8 @@
-import {
+import type {
   AdditionalInformationForExtensions,
   Extension,
-  ExtensionCategory,
 } from '../core/Extension'
+import { ExtensionCategory } from '../core/Extension'
 import { formatWithPrettier } from '../core/FormatCode'
 import type * as ESLint from 'eslint'
 import { addSchematic } from './AngularExtension/AngularSchematics'

@@ -1,4 +1,5 @@
-import { Extension, ExtensionCategory } from '../../core/Extension'
+import type { Extension } from '../../core/Extension'
+import { ExtensionCategory } from '../../core/Extension'
 import { TypeScriptExtension } from '../TypeScriptExtension'
 import { ReactExtension } from '../ReactExtension'
 import { spawn } from 'child_process'

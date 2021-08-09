@@ -1,5 +1,6 @@
 import * as ts from 'typescript'
-import { format, Options as PrettierOptions } from 'prettier'
+import type { Options as PrettierOptions } from 'prettier'
+import { format } from 'prettier'
 
 export const defaultTypescriptCompilerOptions: ts.CompilerOptions = {
   target: ts.ScriptTarget.ESNext,

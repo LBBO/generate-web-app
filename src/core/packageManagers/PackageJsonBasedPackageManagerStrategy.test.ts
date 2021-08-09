@@ -1,7 +1,7 @@
 import SpyInstance = jest.SpyInstance
 import Mock = jest.Mock
 import fs from 'fs/promises'
-import { PackageManagerStrategy } from './PackageManagerStrategy'
+import type { PackageManagerStrategy } from './PackageManagerStrategy'
 import { generatePackageJsonBasedPackageManagerStrategy } from './PackageJsonBasedPackageManagerStrategy'
 import * as path from 'path'
 // Taken from this package's package.json at 454085ff2e805be10976d605b06fe365fbb443a9

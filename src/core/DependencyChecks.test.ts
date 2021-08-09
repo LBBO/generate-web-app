@@ -1,7 +1,5 @@
-import {
-  checkDependencies,
-  InvalidDependenciesResponse,
-} from './DependencyChecks'
+import type { InvalidDependenciesResponse } from './DependencyChecks'
+import { checkDependencies } from './DependencyChecks'
 import { generateMockExtension } from '../extensions/MockExtension'
 import { performSanityChecksOnExtensions } from './SanityChecks'
 
