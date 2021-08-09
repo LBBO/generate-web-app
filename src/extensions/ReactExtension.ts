@@ -6,6 +6,7 @@ import {
 import { spawn } from 'child_process'
 import { getTypeScriptExtension } from './TypeScriptExtension'
 import { PackageManagerNames } from '../core/packageManagers/PackageManagerStrategy'
+import { ESLintExtension } from './ESLintExtension'
 
 export type ReactExtensionOptions = Record<string, never>
 
@@ -15,6 +16,7 @@ export const ReactExtension: Extension = {
   linkToDocumentation: new URL('https://reactjs.org/'),
   // Exclusiveness to Angular is declared in Angular plugin
   exclusiveTo: [],
+  dependsOn: [ESLintExtension],
   category: ExtensionCategory.FRONTEND_FRAMEWORK,
 
   run: (options, otherInformation) => {
