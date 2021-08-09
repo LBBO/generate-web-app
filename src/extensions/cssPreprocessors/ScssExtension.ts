@@ -46,8 +46,7 @@ export const ScssExtension: Extension = {
       )
 
       const reactFileTemplatesDir = path.join(
-        __dirname, // ScssExtension
-        '..', // cssPreprocessors
+        __dirname, // cssPreprocessors
         '..', // extensions
         '..', // src
         '..', // generate-web-app root

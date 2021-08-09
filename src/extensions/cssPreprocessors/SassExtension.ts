@@ -45,8 +45,7 @@ export const SassExtension: Extension = {
         'src',
       )
       const reactFileTemplatesDir = path.join(
-        __dirname, // SassExtension
-        '..', // cssPreprocessors
+        __dirname, // cssPreprocessors
         '..', // extensions
         '..', // src
         '..', // generate-web-app root
