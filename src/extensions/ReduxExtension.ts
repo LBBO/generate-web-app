@@ -1,5 +1,6 @@
 import type { Extension } from '../core/Extension'
 import { ExtensionCategory } from '../core/Extension'
+import { getReactExtension, getReduxExtension } from './Getters'
 
 export type ReduxExtensionOptions = Record<string, unknown>
 
@@ -11,6 +12,20 @@ export const ReduxExtension: Extension = {
   linkToDocumentation: new URL('https://redux.js.org/'),
   category: ExtensionCategory.JAVASCRIPT_LIBRARY,
   run: async (options, otherInformation) => {
-    console.log('Hello, Redux')
+    const packageManager =
+      otherInformation.projectMetadata.packageManagerStrategy
+    const dependenciesToInstall = ['redux', '@reduxjs/toolkit']
+
+    if (getReactExtension(otherInformation.chosenExtensions)) {
+      dependenciesToInstall.push('react-redux')
+    }
+
+    await packageManager.installDependencies(dependenciesToInstall)
+
+    if (getReduxExtension(otherInformation.chosenExtensions)) {
+      // Copy files
+      // Add provider
+      // Add component
+    }
   },
 }
