@@ -22,6 +22,9 @@ const oneExtensionPerCategory = [
     category: ExtensionCategory.JAVASCRIPT_FLAVOR,
   }),
   generateMockExtension({
+    category: ExtensionCategory.JAVASCRIPT_LIBRARY,
+  }),
+  generateMockExtension({
     category: ExtensionCategory.LINTER_OR_FORMATTER,
   }),
 ]
@@ -32,36 +35,46 @@ beforeEach(() => {
   answers$ = new Subject()
 })
 
-it('should always ensure correct order of categories (Only for Testing, JS flavor, framework, CSS pre-processor)', (done) => {
-  prompts$.subscribe((question) => {
-    const choices = (question as CheckboxQuestion).choices as Array<
-      Choice | Separator
-    >
-    const separators = choices.filter(
-      (choice): choice is Separator => choice instanceof Separator,
-    )
+it(
+  'should always ensure correct order of categories (Only for Testing, JS flavor, framework, JS' +
+    ' lib, CSS pre-processor, linter / formatter)',
+  (done) => {
+    prompts$.subscribe((question) => {
+      const choices = (question as CheckboxQuestion).choices as Array<
+        Choice | Separator
+      >
+      const separators = choices.filter(
+        (choice): choice is Separator => choice instanceof Separator,
+      )
 
-    // Enums are transpiled to objects containing name: value, but also value: name
-    // Therefore, each actual enum value appears twice in the transpiled object
-    expect(separators).toHaveLength(Object.keys(ExtensionCategory).length / 2)
-    expect(separators[0].line).toMatch(
-      extensionCategoryTitles[ExtensionCategory.ONLY_FOR_TESTING],
-    )
-    expect(separators[1].line).toMatch(
-      extensionCategoryTitles[ExtensionCategory.JAVASCRIPT_FLAVOR],
-    )
-    expect(separators[2].line).toMatch(
-      extensionCategoryTitles[ExtensionCategory.FRONTEND_FRAMEWORK],
-    )
-    expect(separators[3].line).toMatch(
-      extensionCategoryTitles[ExtensionCategory.CSS_PREPROCESSOR],
-    )
+      // Enums are transpiled to objects containing name: value, but also value: name
+      // Therefore, each actual enum value appears twice in the transpiled object
+      expect(separators).toHaveLength(Object.keys(ExtensionCategory).length / 2)
+      expect(separators[0].line).toMatch(
+        extensionCategoryTitles[ExtensionCategory.ONLY_FOR_TESTING],
+      )
+      expect(separators[1].line).toMatch(
+        extensionCategoryTitles[ExtensionCategory.JAVASCRIPT_FLAVOR],
+      )
+      expect(separators[2].line).toMatch(
+        extensionCategoryTitles[ExtensionCategory.FRONTEND_FRAMEWORK],
+      )
+      expect(separators[3].line).toMatch(
+        extensionCategoryTitles[ExtensionCategory.CSS_PREPROCESSOR],
+      )
+      expect(separators[4].line).toMatch(
+        extensionCategoryTitles[ExtensionCategory.JAVASCRIPT_LIBRARY],
+      )
+      expect(separators[5].line).toMatch(
+        extensionCategoryTitles[ExtensionCategory.LINTER_OR_FORMATTER],
+      )
 
-    done()
-  })
+      done()
+    })
 
-  selectExtensions(prompts$, answers$, oneExtensionPerCategory)
-})
+    selectExtensions(prompts$, answers$, oneExtensionPerCategory)
+  },
+)
 
 it('should insert a separator before the first question', (done) => {
   prompts$.subscribe((question) => {
