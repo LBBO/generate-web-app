@@ -1,6 +1,12 @@
 import type { Extension } from '../core/Extension'
 import { ExtensionCategory } from '../core/Extension'
-import { getReactExtension, getReduxExtension } from './Getters'
+import { getReactExtension, getTypeScriptExtension } from './Getters'
+import { readFile, writeFile } from 'fs/promises'
+import path from 'path'
+import {
+  convertTypeScriptToFormattedJavaScript,
+  formatWithPrettier,
+} from '../core/FormatCode'
 
 export type ReduxExtensionOptions = Record<string, unknown>
 
@@ -22,8 +28,50 @@ export const ReduxExtension: Extension = {
 
     await packageManager.installDependencies(dependenciesToInstall)
 
-    if (getReduxExtension(otherInformation.chosenExtensions)) {
+    if (getReactExtension(otherInformation.chosenExtensions)) {
       // Copy files
+      const files = [
+        'src/app/hooks.ts',
+        'src/app/store.ts',
+        'src/features/counter/Counter.css',
+        'src/features/counter/Counter.tsx',
+        'src/features/counter/counterAPI.ts',
+        'src/features/counter/counterSlice.ts',
+        'src/features/counter/counterSlice.test.ts',
+      ]
+      const pathToTemplateFolder = path.join(
+        __dirname,
+        '../../fileTemplates/extensions/ReduxExtension',
+      )
+      const typescriptHasBeenChosen = Boolean(
+        getTypeScriptExtension(otherInformation.chosenExtensions),
+      )
+
+      for (const relativeFilePath of files) {
+        const fileContent = (
+          await readFile(path.join(pathToTemplateFolder, relativeFilePath))
+        ).toString()
+        let targetFilePath = path.join(
+          otherInformation.projectMetadata.rootDirectory,
+          relativeFilePath,
+        )
+
+        let newFileContent = fileContent
+        if (!typescriptHasBeenChosen && /\.tsx?$/.test(targetFilePath)) {
+          newFileContent = convertTypeScriptToFormattedJavaScript(
+            fileContent,
+            targetFilePath,
+          )
+          targetFilePath = targetFilePath.replace(/\.ts$/, '.js')
+          targetFilePath = targetFilePath.replace(/\.tsx$/, '.jsx')
+        }
+
+        await writeFile(
+          targetFilePath,
+          formatWithPrettier(newFileContent, targetFilePath),
+        )
+      }
+
       // Add provider
       // Add component
     }

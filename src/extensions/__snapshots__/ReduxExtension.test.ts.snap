@@ -1,0 +1,231 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`run when chosen alongside react should compile all relevant TS files to JS before copying if TS was not chosen 1`] = `
+Array [
+  "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/app/hooks.js",
+  "import { useDispatch, useSelector } from 'react-redux'
+
+export const useAppDispatch = () => useDispatch()
+export const useAppSelector = useSelector
+",
+]
+`;
+
+exports[`run when chosen alongside react should compile all relevant TS files to JS before copying if TS was not chosen 2`] = `
+Array [
+  "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/app/store.js",
+  "import { configureStore } from '@reduxjs/toolkit'
+import { counterReducer } from '../features/counter/counterSlice'
+
+export const store = configureStore({
+  reducer: {
+    counter: counterReducer,
+  },
+})
+",
+]
+`;
+
+exports[`run when chosen alongside react should compile all relevant TS files to JS before copying if TS was not chosen 3`] = `
+Array [
+  "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/features/counter/Counter.jsx",
+  "import React, { useState } from 'react'
+import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import {
+  decrement,
+  increment,
+  incrementAsync,
+  incrementByAmount,
+  incrementIfOdd,
+  selectCount,
+} from './counterSlice'
+import styles from './Counter.module.scss'
+
+export const Counter = () => {
+  const count = useAppSelector(selectCount)
+  const dispatch = useAppDispatch()
+  const [incrementAmount, setIncrementAmount] = useState('2')
+
+  const incrementValue = Number(incrementAmount) ?? 0
+
+  return (
+    <div>
+      <div className={styles.row}>
+        <button
+          className={styles.button}
+          aria-label=\\"Decrement value\\"
+          onClick={() => dispatch(decrement())}
+        >
+          -
+        </button>
+        <span className={styles.value}>{count}</span>
+        <button
+          className={styles.button}
+          aria-label=\\"Increment value\\"
+          onClick={() => dispatch(increment())}
+        >
+          +
+        </button>
+      </div>
+      <div className={styles.row}>
+        <input
+          className={styles.textbox}
+          aria-label=\\"Set increment amount\\"
+          value={incrementAmount}
+          onChange={(e) => setIncrementAmount(e.target.value)}
+        />
+        <button
+          className={styles.button}
+          onClick={() => dispatch(incrementByAmount(incrementValue))}
+        >
+          Add Amount
+        </button>
+        <button
+          className={styles.asyncButton}
+          onClick={() => dispatch(incrementAsync(incrementValue))}
+        >
+          Add Async
+        </button>
+        <button
+          className={styles.button}
+          onClick={() => dispatch(incrementIfOdd(incrementValue))}
+        >
+          Add If Odd
+        </button>
+      </div>
+    </div>
+  )
+}
+",
+]
+`;
+
+exports[`run when chosen alongside react should compile all relevant TS files to JS before copying if TS was not chosen 4`] = `
+Array [
+  "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/features/counter/counterAPI.js",
+  "// A mock function to mimic making an async request for data
+export const fetchCount = (amount = 1) =>
+  new Promise((resolve) => setTimeout(() => resolve({ data: amount }), 500))
+",
+]
+`;
+
+exports[`run when chosen alongside react should compile all relevant TS files to JS before copying if TS was not chosen 5`] = `
+Array [
+  "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/features/counter/counterSlice.js",
+  "import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { fetchCount } from './counterAPI'
+
+const initialState = {
+  value: 0,
+  status: 'idle',
+}
+
+// The function below is called a thunk and allows us to perform async logic. It
+// can be dispatched like a regular action: \`dispatch(incrementAsync(10))\`. This
+// will call the thunk with the \`dispatch\` function as the first argument. Async
+// code can then be executed and other actions can be dispatched. Thunks are
+// typically used to make async requests.
+export const incrementAsync = createAsyncThunk(
+  'counter/fetchCount',
+  async (amount) => {
+    const response = await fetchCount(amount)
+    // The value we return becomes the \`fulfilled\` action payload
+    return response.data
+  },
+)
+
+export const counterSlice = createSlice({
+  name: 'counter',
+  initialState,
+  // The \`reducers\` field lets us define reducers and generate associated actions
+  reducers: {
+    increment: (state) => {
+      // Redux Toolkit allows us to write \\"mutating\\" logic in reducers. It
+      // doesn't actually mutate the state because it uses the Immer library,
+      // which detects changes to a \\"draft state\\" and produces a brand new
+      // immutable state based off those changes
+      state.value += 1
+    },
+    decrement: (state) => {
+      state.value -= 1
+    },
+    // Use the PayloadAction type to declare the contents of \`action.payload\`
+    incrementByAmount: (state, action) => {
+      state.value += action.payload
+    },
+  },
+  // The \`extraReducers\` field lets the slice handle actions defined elsewhere,
+  // including actions generated by createAsyncThunk or in other slices.
+  extraReducers: (builder) => {
+    builder
+      .addCase(incrementAsync.pending, (state) => {
+        state.status = 'loading'
+      })
+      .addCase(incrementAsync.fulfilled, (state, action) => {
+        state.status = 'idle'
+        state.value += action.payload
+      })
+  },
+})
+
+export const { increment, decrement, incrementByAmount } = counterSlice.actions
+
+// The function below is called a selector and allows us to select a value from
+// the state. Selectors can also be defined inline where they're used instead of
+// in the slice file. For example: \`useSelector((state: RootState) => state.counter.value)\`
+export const selectCount = (state) => state.counter.value
+
+export const incrementIfOdd = (amount) => (dispatch, getState) => {
+  const currentValue = selectCount(getState())
+  if (currentValue % 2 === 1) {
+    dispatch(incrementByAmount(amount))
+  }
+}
+
+export const counterReducer = counterSlice.reducer
+",
+]
+`;
+
+exports[`run when chosen alongside react should compile all relevant TS files to JS before copying if TS was not chosen 6`] = `
+Array [
+  "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/features/counter/counterSlice.test.js",
+  "import {
+  counterReducer,
+  decrement,
+  increment,
+  incrementByAmount,
+} from './counterSlice'
+
+describe('counter reducer', () => {
+  const initialState = {
+    value: 3,
+    status: 'idle',
+  }
+
+  it('should handle initial state', () => {
+    expect(counterReducer(undefined, { type: 'unknown' })).toEqual({
+      value: 0,
+      status: 'idle',
+    })
+  })
+
+  it('should handle increment', () => {
+    const actual = counterReducer(initialState, increment())
+    expect(actual.value).toEqual(4)
+  })
+
+  it('should handle decrement', () => {
+    const actual = counterReducer(initialState, decrement())
+    expect(actual.value).toEqual(2)
+  })
+
+  it('should handle incrementByAmount', () => {
+    const actual = counterReducer(initialState, incrementByAmount(2))
+    expect(actual.value).toEqual(5)
+  })
+})
+",
+]
+`;
