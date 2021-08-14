@@ -9,82 +9,11 @@ import path from 'path'
 import { ReactExtension } from '../ReactExtension'
 import { TypeScriptExtension } from '../TypeScriptExtension'
 import * as GeneralCodeGeneration from '../../core/CodeGeneration'
-
-const defaultIndexTsx = `import React from 'react'
-import ReactDOM from 'react-dom'
-import './index.css'
-import App from './App'
-import reportWebVitals from './reportWebVitals'
-
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root'),
-)
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals()
-`
-const defaultAppTsx = `import React from 'react'
-import logo from './logo.svg'
-import './App.scss'
-
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
-  )
-}
-
-export default App
-`
+import {
+  appTsxWithAdditionalComponents,
+  defaultAppTsx,
+  defaultIndexTsx,
+} from './MockValues'
 
 let readFileMock: jest.SpyInstance<ReturnType<typeof fs['readFile']>>
 let writeFileMock: jest.SpyInstance<Promise<void>>
@@ -111,7 +40,7 @@ describe('addComponent', () => {
   it('should modify App.jsx if typescript is not installed', async () => {
     await addComponent(
       './SomeComponent',
-      '<SomeComponent />',
+      'SomeComponent',
       generateMockOtherExtensionInformation({
         chosenExtensions: [ReactExtension],
       }),
@@ -132,7 +61,7 @@ describe('addComponent', () => {
   it('should modify App.tsx if typescript is installed', async () => {
     await addComponent(
       './SomeComponent',
-      '<SomeComponent />',
+      'SomeComponent',
       otherExtensionInformation,
     )
 
@@ -155,20 +84,36 @@ describe('addComponent', () => {
       otherExtensionInformation,
     )
 
-    const pathToIndexTsx = path.join(
-      otherExtensionInformation.projectMetadata.rootDirectory,
-      'src',
-      'App.tsx',
-    )
-
     expect(addImportToJsOrTsFileMock).toHaveBeenCalledTimes(1)
-    expect(addImportToJsOrTsFileMock).toHaveBeenCalledWith(pathToIndexTsx, {
+    expect(addImportToJsOrTsFileMock.mock.calls[0][1]).toEqual({
       sourcePath: './SomeComponent',
       importItems: ['SomeComponent'],
     })
   })
 
-  it.todo('should add the component to the end of the App.tsx return statement')
+  it('should add the component to the end of the App.tsx return statement', async () => {
+    await addComponent(
+      './SomeComponent',
+      'SomeComponent',
+      otherExtensionInformation,
+    )
+
+    expect(writeFileMock).toHaveBeenCalledTimes(1)
+    expect(writeFileMock.mock.calls[0][1]).toMatchSnapshot()
+  })
+
+  it('should add the component to the end of the App.tsx return statement', async () => {
+    readFileMock.mockResolvedValue(appTsxWithAdditionalComponents)
+
+    await addComponent(
+      './NewComponent',
+      'NewComponent',
+      otherExtensionInformation,
+    )
+
+    expect(writeFileMock).toHaveBeenCalledTimes(1)
+    expect(writeFileMock.mock.calls[0][1]).toMatchSnapshot()
+  })
 
   it('should support default import', async () => {
     await addComponent(

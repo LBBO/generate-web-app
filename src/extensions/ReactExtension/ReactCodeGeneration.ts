@@ -25,8 +25,31 @@ export const addComponent = async (
     importDefault: exportType === 'default' ? componentName : undefined,
   })
 
-  await readFile(pathToAppComponent)
-  await writeFile(pathToAppComponent, '')
+  const fileContent = (await readFile(pathToAppComponent)).toString()
+  const pTagToInsertComponentBefore =
+    /<p>\s*Edit <code>src\/App.tsx<\/code> and save to reload.\s*<\/p>/
+
+  const newComponent = `<${componentName} />`
+
+  const pTagMatch = fileContent.match(pTagToInsertComponentBefore)
+  const pTagContent = pTagMatch?.[0]
+  const pTagIndex = pTagMatch?.index
+
+  if (!pTagMatch || !pTagContent || !pTagIndex) {
+    throw new Error(
+      `P tag couldn't be found, so the component could not be inserted!`,
+    )
+  } else {
+    const newFileContent =
+      fileContent.slice(0, pTagIndex) +
+      newComponent +
+      fileContent.slice(pTagIndex)
+
+    await writeFile(
+      pathToAppComponent,
+      formatWithPrettier(newFileContent, pathToAppComponent),
+    )
+  }
 }
 
 export const surroundAppWithComponentWithoutImport = async (
