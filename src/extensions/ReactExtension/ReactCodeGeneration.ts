@@ -21,8 +21,8 @@ export const addComponent = async (
 
   await addImportToJsOrTsFile(pathToAppComponent, {
     sourcePath: srcFilePath,
-    importItems: [componentName],
-    // [exportType === 'item' ? 'importItems' : 'importDefault']: componentName,
+    importItems: exportType === 'item' ? [componentName] : undefined,
+    importDefault: exportType === 'default' ? componentName : undefined,
   })
 
   await readFile(pathToAppComponent)

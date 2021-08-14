@@ -170,7 +170,26 @@ describe('addComponent', () => {
 
   it.todo('should add the component to the end of the App.tsx return statement')
 
-  it.todo('should support default import')
+  it('should support default import', async () => {
+    await addComponent(
+      './SomeComponent',
+      'SomeComponent',
+      otherExtensionInformation,
+      'default',
+    )
+
+    const pathToIndexTsx = path.join(
+      otherExtensionInformation.projectMetadata.rootDirectory,
+      'src',
+      'App.tsx',
+    )
+
+    expect(addImportToJsOrTsFileMock).toHaveBeenCalledTimes(1)
+    expect(addImportToJsOrTsFileMock).toHaveBeenCalledWith(pathToIndexTsx, {
+      sourcePath: './SomeComponent',
+      importDefault: 'SomeComponent',
+    })
+  })
 })
 
 describe('surroundAppWithComponentWithoutImport', () => {
