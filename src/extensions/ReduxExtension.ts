@@ -1,6 +1,8 @@
 import type { Extension } from '../core/Extension'
 import { ExtensionCategory } from '../core/Extension'
 
+export type ReduxExtensionOptions = Record<string, unknown>
+
 export const ReduxExtension: Extension = {
   name: 'Redux',
   description:
