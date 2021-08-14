@@ -3,13 +3,16 @@ import { generateMockOtherExtensionInformation } from './MockOtherExtensionInfor
 import { ReduxExtension } from './ReduxExtension'
 import { ReactExtension } from './ReactExtension'
 import { TypeScriptExtension } from './TypeScriptExtension'
-import fs, { readFile, writeFile } from 'fs/promises'
+import fs, { readFile } from 'fs/promises'
 import path from 'path'
+import * as ReactCodeGeneration from './ReactExtension/ReactCodeGeneration'
+import * as GeneralCodeGeneration from '../core/CodeGeneration'
 
 describe('run', () => {
   let otherInformation: AdditionalInformationForExtensions
   let installDependenciesMock: jest.SpyInstance
   let writeFileMock: jest.SpyInstance
+  let addImportToJsOrTsFileSpy: jest.SpyInstance
 
   beforeEach(() => {
     otherInformation = generateMockOtherExtensionInformation()
@@ -18,6 +21,9 @@ describe('run', () => {
     installDependenciesMock = otherInformation.projectMetadata
       .packageManagerStrategy.installDependencies as unknown as jest.SpyInstance
     writeFileMock = jest.spyOn(fs, 'writeFile').mockResolvedValue()
+    addImportToJsOrTsFileSpy = jest
+      .spyOn(GeneralCodeGeneration, 'addImportToJsOrTsFile')
+      .mockResolvedValue()
   })
 
   it('should always install redux and redux toolkit', async () => {
@@ -40,6 +46,9 @@ describe('run', () => {
   })
 
   describe('when chosen alongside react', () => {
+    let surroundAppWithComponentWithoutImportSpy: jest.SpyInstance
+    let addComponentSpy: jest.SpyInstance
+
     beforeEach(() => {
       otherInformation = generateMockOtherExtensionInformation({
         chosenExtensions: [ReactExtension, TypeScriptExtension],
@@ -49,6 +58,14 @@ describe('run', () => {
       installDependenciesMock = otherInformation.projectMetadata
         .packageManagerStrategy
         .installDependencies as unknown as jest.SpyInstance
+
+      surroundAppWithComponentWithoutImportSpy = jest
+        .spyOn(ReactCodeGeneration, 'surroundAppWithComponentWithoutImport')
+        .mockResolvedValue()
+
+      addComponentSpy = jest
+        .spyOn(ReactCodeGeneration, 'addComponent')
+        .mockResolvedValue()
     })
 
     it('should install react-redux', async () => {
@@ -136,8 +153,17 @@ describe('run', () => {
       }
     })
 
-    it.todo('should add the state provider to the index.j|tsx')
+    it('should add the state provider to the index.j|tsx', async () => {
+      await ReduxExtension.run(undefined, otherInformation)
 
-    it.todo('should add the component to the App.j|tsx')
+      expect(addImportToJsOrTsFileSpy).toHaveBeenCalledTimes(2)
+      expect(surroundAppWithComponentWithoutImportSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should add the component to the App.j|tsx', async () => {
+      await ReduxExtension.run(undefined, otherInformation)
+
+      expect(addComponentSpy).toHaveBeenCalledTimes(1)
+    })
   })
 })

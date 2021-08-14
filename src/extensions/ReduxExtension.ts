@@ -7,6 +7,11 @@ import {
   convertTypeScriptToFormattedJavaScript,
   formatWithPrettier,
 } from '../core/FormatCode'
+import { addImportToJsOrTsFile } from '../core/CodeGeneration'
+import {
+  addComponent,
+  surroundAppWithComponentWithoutImport,
+} from './ReactExtension/ReactCodeGeneration'
 
 export type ReduxExtensionOptions = Record<string, unknown>
 
@@ -47,6 +52,8 @@ export const ReduxExtension: Extension = {
         getTypeScriptExtension(otherInformation.chosenExtensions),
       )
 
+      const scriptFileExtension = typescriptHasBeenChosen ? 'ts' : 'js'
+
       for (const relativeFilePath of files) {
         const fileContent = (
           await readFile(path.join(pathToTemplateFolder, relativeFilePath))
@@ -72,8 +79,37 @@ export const ReduxExtension: Extension = {
         )
       }
 
-      // Add provider
+      await addImportToJsOrTsFile(
+        path.join(
+          otherInformation.projectMetadata.rootDirectory,
+          `src/index.${scriptFileExtension}x`,
+        ),
+        {
+          sourcePath: 'react-redux',
+          importItems: ['Provider'],
+        },
+      )
+      await addImportToJsOrTsFile(
+        path.join(
+          otherInformation.projectMetadata.rootDirectory,
+          `src/index.${scriptFileExtension}x`,
+        ),
+        {
+          sourcePath: './app/store',
+          importItems: ['store'],
+        },
+      )
+
+      await surroundAppWithComponentWithoutImport(
+        '<Provider store={store}>',
+        otherInformation,
+      )
       // Add component
+      await addComponent(
+        './features/counter/Counter',
+        'Counter',
+        otherInformation,
+      )
     }
   },
 }
