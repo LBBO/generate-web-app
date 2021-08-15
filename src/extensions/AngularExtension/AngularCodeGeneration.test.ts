@@ -125,4 +125,18 @@ describe('addAngularComponent', () => {
     expect(writeFileMock).toHaveBeenCalledTimes(1)
     expect(writeFileMock.mock.calls[0][1]).toMatchSnapshot()
   })
+
+  it('should edit the correct file', async () => {
+    const otherInformation = generateMockOtherExtensionInformation({
+      chosenExtensions: [TypeScriptExtension, AngularExtension],
+    })
+    await addAngularComponentToAppComponent('my-component', otherInformation)
+
+    expect(writeFileMock.mock.calls[0][0]).toBe(
+      path.join(
+        otherInformation.projectMetadata.rootDirectory,
+        'src/app/app.component.html',
+      ),
+    )
+  })
 })

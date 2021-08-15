@@ -80,7 +80,7 @@ export const addAngularComponentToAppComponent = async (
 ): Promise<void> => {
   const pathToAppComponentHtml = path.join(
     otherInformation.projectMetadata.rootDirectory,
-    'src/app.component.html',
+    'src/app/app.component.html',
   )
   const appComponentContent = (
     await readFile(pathToAppComponentHtml)
