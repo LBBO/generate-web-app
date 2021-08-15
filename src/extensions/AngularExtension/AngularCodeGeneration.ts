@@ -3,6 +3,8 @@ import { addImportToJsOrTsFile } from '../../core/CodeGeneration'
 import { readFile, writeFile } from 'fs/promises'
 import { sortAlphabetically } from '../../core/Utils'
 import { formatWithPrettier } from '../../core/FormatCode'
+import type { AdditionalInformationForExtensions } from '../../core/Extension'
+import path from 'path'
 
 const addItemWithImportToOneDimensionalArray = async (
   moduleFilePath: string,
@@ -69,5 +71,32 @@ export const addAngularImportToModule = async (
     moduleFilePath,
     'imports',
     importData,
+  )
+}
+
+export const addAngularComponentToAppComponent = async (
+  componentName: string,
+  otherInformation: AdditionalInformationForExtensions,
+): Promise<void> => {
+  const pathToAppComponentHtml = path.join(
+    otherInformation.projectMetadata.rootDirectory,
+    'src/app.component.html',
+  )
+  const appComponentContent = (
+    await readFile(pathToAppComponentHtml)
+  ).toString()
+
+  const newAppComponentContent = appComponentContent.replace(
+    `
+  <!-- Resources -->`,
+    `
+<${componentName}></${componentName}>
+    
+  <!-- Resources -->`,
+  )
+
+  await writeFile(
+    pathToAppComponentHtml,
+    formatWithPrettier(newAppComponentContent, pathToAppComponentHtml),
   )
 }

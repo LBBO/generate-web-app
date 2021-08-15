@@ -1,5 +1,6 @@
 import path from 'path'
 import {
+  addAngularComponentToAppComponent,
   addAngularImportToModule,
   addDeclarationToModule,
 } from './AngularCodeGeneration'
@@ -9,8 +10,12 @@ import fs from 'fs/promises'
 import {
   appModuleWithMoreDeclarations,
   appModuleWithMoreImports,
+  defaultAppComponentHtml,
   defaultAppModule,
 } from './AngularCodeGenerationMockData'
+import { generateMockOtherExtensionInformation } from '../MockOtherExtensionInformation'
+import { TypeScriptExtension } from '../TypeScriptExtension'
+import { AngularExtension } from './AngularExtension'
 
 const defaultPathToAppModule = path.join(__dirname, 'app.module.ts')
 const defaultComponentImportData: JsOrTsImportData = {
@@ -105,5 +110,19 @@ describe('addAngularImportToModule', () => {
 })
 
 describe('addAngularComponent', () => {
-  it.todo('should add the component in the correct position')
+  beforeEach(() => {
+    readFileMock.mockResolvedValue(defaultAppComponentHtml)
+  })
+
+  it('should add the component in the correct position', async () => {
+    await addAngularComponentToAppComponent(
+      'my-component',
+      generateMockOtherExtensionInformation({
+        chosenExtensions: [TypeScriptExtension, AngularExtension],
+      }),
+    )
+
+    expect(writeFileMock).toHaveBeenCalledTimes(1)
+    expect(writeFileMock.mock.calls[0][1]).toMatchSnapshot()
+  })
 })
