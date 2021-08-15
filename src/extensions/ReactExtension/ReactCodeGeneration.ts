@@ -15,8 +15,8 @@ export const addComponent = async (
     otherInformation.projectMetadata.rootDirectory,
     'src',
     `App.${
-      getTypeScriptExtension(otherInformation.chosenExtensions) ? 't' : 'j'
-    }sx`,
+      getTypeScriptExtension(otherInformation.chosenExtensions) ? 'tsx' : 'js'
+    }`,
   )
 
   await addImportToJsOrTsFile(pathToAppComponent, {
@@ -27,7 +27,7 @@ export const addComponent = async (
 
   const fileContent = (await readFile(pathToAppComponent)).toString()
   const pTagToInsertComponentBefore =
-    /<p>\s*Edit <code>src\/App.tsx<\/code> and save to reload.\s*<\/p>/
+    /<p>\s*Edit <code>src\/App.(?:js|tsx)<\/code> and save to reload.\s*<\/p>/
 
   const newComponent = `<${componentName} />`
 
@@ -60,8 +60,8 @@ export const surroundAppWithComponentWithoutImport = async (
     otherInformation.projectMetadata.rootDirectory,
     'src',
     `index.${
-      getTypeScriptExtension(otherInformation.chosenExtensions) ? 't' : 'j'
-    }sx`,
+      getTypeScriptExtension(otherInformation.chosenExtensions) ? 'tsx' : 'js'
+    }`,
   )
   const fileContent = (await readFile(pathToIndexFile)).toString()
   const componentName = componentOpeningTag.match(/<(.*?)\W/)?.[1]

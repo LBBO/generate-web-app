@@ -13,6 +13,7 @@ import {
   appTsxWithAdditionalComponents,
   defaultAppTsx,
   defaultIndexTsx,
+  defaultReactAppJs,
 } from './MockValues'
 
 let readFileMock: jest.SpyInstance<ReturnType<typeof fs['readFile']>>
@@ -37,7 +38,7 @@ describe('addComponent', () => {
       .mockResolvedValue(undefined)
   })
 
-  it('should modify App.jsx if typescript is not installed', async () => {
+  it('should modify App.js if typescript is not installed', async () => {
     await addComponent(
       './SomeComponent',
       'SomeComponent',
@@ -46,16 +47,16 @@ describe('addComponent', () => {
       }),
     )
 
-    const pathToIndexJsx = path.join(
+    const pathToIndexJs = path.join(
       otherExtensionInformation.projectMetadata.rootDirectory,
       'src',
-      'App.jsx',
+      'App.js',
     )
 
     expect(readFileMock).toHaveBeenCalledTimes(1)
-    expect(readFileMock).toHaveBeenCalledWith(pathToIndexJsx)
+    expect(readFileMock).toHaveBeenCalledWith(pathToIndexJs)
     expect(writeFileMock).toHaveBeenCalledTimes(1)
-    expect(writeFileMock.mock.calls[0][0]).toBe(pathToIndexJsx)
+    expect(writeFileMock.mock.calls[0][0]).toBe(pathToIndexJs)
   })
 
   it('should modify App.tsx if typescript is installed', async () => {
@@ -115,6 +116,17 @@ describe('addComponent', () => {
     expect(writeFileMock.mock.calls[0][1]).toMatchSnapshot()
   })
 
+  it('should find the paragraph (i.e. not throw an error) for the JS paragraph', async () => {
+    readFileMock.mockResolvedValue(defaultReactAppJs)
+
+    // This call should just not throw an error.
+    await addComponent(
+      './NewComponent',
+      'NewComponent',
+      otherExtensionInformation,
+    )
+  })
+
   it('should support default import', async () => {
     await addComponent(
       './SomeComponent',
@@ -142,7 +154,7 @@ describe('surroundAppWithComponentWithoutImport', () => {
     readFileMock.mockResolvedValue(defaultIndexTsx)
   })
 
-  it('should modify index.jsx if typescript is not installed', async () => {
+  it('should modify index.js if typescript is not installed', async () => {
     await surroundAppWithComponentWithoutImport(
       '<Switch>',
       generateMockOtherExtensionInformation({
@@ -150,16 +162,16 @@ describe('surroundAppWithComponentWithoutImport', () => {
       }),
     )
 
-    const pathToIndexJsx = path.join(
+    const pathToIndexJs = path.join(
       otherExtensionInformation.projectMetadata.rootDirectory,
       'src',
-      'index.jsx',
+      'index.js',
     )
 
     expect(readFileMock).toHaveBeenCalledTimes(1)
-    expect(readFileMock).toHaveBeenCalledWith(pathToIndexJsx)
+    expect(readFileMock).toHaveBeenCalledWith(pathToIndexJs)
     expect(writeFileMock).toHaveBeenCalledTimes(1)
-    expect(writeFileMock.mock.calls[0][0]).toBe(pathToIndexJsx)
+    expect(writeFileMock.mock.calls[0][0]).toBe(pathToIndexJs)
   })
 
   it('should modify index.tsx if typescript is installed', async () => {
