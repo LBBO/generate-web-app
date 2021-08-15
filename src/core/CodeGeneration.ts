@@ -1,5 +1,6 @@
 import { readFile, writeFile } from 'fs/promises'
 import { formatWithPrettier } from './FormatCode'
+import { sortAlphabetically } from './Utils'
 
 export type JsOrTsImportData = {
   importDefault?: string
@@ -43,17 +44,7 @@ export const addImportToJsOrTsFile = async (
       if (importData.importItems) {
         partsOfValuesToImport.push(
           '{ ' +
-            importData.importItems
-              .sort((a, b) => {
-                if (a < b) {
-                  return -1
-                } else if (a > b) {
-                  return 1
-                } else {
-                  return 0
-                }
-              })
-              .join(', ') +
+            importData.importItems.sort(sortAlphabetically()).join(', ') +
             ' }',
         )
       }

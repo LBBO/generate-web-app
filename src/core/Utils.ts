@@ -10,3 +10,15 @@ export const getDeepDependencies = (extension: Extension): Array<Extension> => {
       dependencies,
     )
 }
+
+export const sortAlphabetically =
+  (desc = true) =>
+  (a: string, b: string): number => {
+    if (a < b === desc) {
+      return -1
+    } else if (a > b === desc) {
+      return 1
+    } else {
+      return 0
+    }
+  }
