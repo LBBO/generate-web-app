@@ -63,7 +63,7 @@ async function installESLintForOtherFrameworks(
 
   // React already installs eslint. However, some additional config should be installed
   if (!getReactExtension(otherInformation.chosenExtensions)) {
-    packagesToBeInstalled.push('eslint')
+    packagesToBeInstalled.push('eslint', 'eslint-config-react-app')
   }
 
   if (getTypeScriptExtension(otherInformation.chosenExtensions)) {

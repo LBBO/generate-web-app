@@ -1,0 +1,14 @@
+<h2>Counter</h2>
+<div>
+  <div class="row">
+    <button (click)="decrement()">-</button>
+    <span class="value">{{ count$ | async }}</span>
+    <button (click)="increment()">+</button>
+  </div>
+  <div class="row">
+    <input type="number" [(ngModel)]="incrementAmount" />
+    <button (click)="incrementByAmount()">Add amount</button>
+    <button (click)="incrementAsync()" class="asyncButton">Add async</button>
+    <button (click)="incrementIfOdd()">Add if odd</button>
+  </div>
+</div>

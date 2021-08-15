@@ -3,6 +3,7 @@ import {
   getESLintExtension,
   getLessExtension,
   getReactExtension,
+  getReduxExtension,
   getSassExtension,
   getScssExtension,
   getTypeScriptExtension,
@@ -15,6 +16,7 @@ import { ScssExtension } from './cssPreprocessors/ScssExtension'
 import { ESLintExtension } from './ESLintExtension'
 import { ReactExtension } from './ReactExtension'
 import { TypeScriptExtension } from './TypeScriptExtension'
+import { ReduxExtension } from './ReduxExtension'
 
 const getters = [
   [getTypeScriptExtension, TypeScriptExtension, 'TypeScriptExtension'],
@@ -24,7 +26,12 @@ const getters = [
   [getSassExtension, SassExtension, 'SassExtension'],
   [getLessExtension, LessExtension, 'LessExtension'],
   [getESLintExtension, ESLintExtension, 'ESLintExtension'],
+  [getReduxExtension, ReduxExtension, 'ReduxExtension'],
 ] as const
+
+it('should have one getter per extension', () => {
+  expect(getters.length).toBe(allExtensions.length)
+})
 
 getters.forEach(([getter, extension, extensionName]) => {
   describe('get' + extensionName, () => {

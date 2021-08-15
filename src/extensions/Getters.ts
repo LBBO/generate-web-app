@@ -6,6 +6,7 @@ import type { ScssExtensionOptions } from './cssPreprocessors/ScssExtension'
 import type { ESLintExtensionOptions } from './ESLintExtension'
 import type { ReactExtensionOptions } from './ReactExtension'
 import type { TypeScriptExtensionOptions } from './TypeScriptExtension'
+import type { ReduxExtensionOptions } from './ReduxExtension'
 
 const createExtensionGetter =
   <ExtensionOptions extends Record<string, unknown>>(extensionName: string) =>
@@ -37,3 +38,6 @@ export const getReactExtension =
 
 export const getTypeScriptExtension =
   createExtensionGetter<TypeScriptExtensionOptions>('TypeScript')
+
+export const getReduxExtension =
+  createExtensionGetter<ReduxExtensionOptions>('Redux')

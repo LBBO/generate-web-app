@@ -1,5 +1,6 @@
 import * as FormatCode from './FormatCode'
 import {
+  convertTypeScriptToFormattedJavaScript,
   defaultPrettierOptions,
   formatWithPrettier,
   generatePrettierOptions,
@@ -63,5 +64,66 @@ export const getTimer = (time: number) => timer(time);
     })
 
     generatePrettierOptionsSpy.mockRestore()
+  })
+})
+
+describe('convertTypeScriptToFormattedJavaScript', () => {
+  it('should remove type annotations', () => {
+    expect(
+      convertTypeScriptToFormattedJavaScript(
+        `const foo: string = 'asdf'`,
+        'index.ts',
+      ),
+    ).toBe(`const foo = 'asdf'` + '\n')
+  })
+
+  it('should keep empty lines between blocks', () => {
+    expect(
+      convertTypeScriptToFormattedJavaScript(
+        `const foo: string = 'asdf'
+
+const bar = (): string => foo
+`,
+        'index.ts',
+      ),
+    ).toBe(`const foo = 'asdf'
+
+const bar = () => foo
+`)
+  })
+
+  it('should correctly compile an actual file example', () => {
+    expect(
+      convertTypeScriptToFormattedJavaScript(
+        `import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from './store'
+
+export const useAppDispatch = () => useDispatch<AppDispatch>()
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+`,
+        'index.ts',
+      ),
+    ).toBe(`import { useDispatch, useSelector } from 'react-redux'
+
+export const useAppDispatch = () => useDispatch()
+export const useAppSelector = useSelector
+`)
+  })
+
+  it('should correctly remove a type block with newline', () => {
+    expect(
+      convertTypeScriptToFormattedJavaScript(
+        `const foo = 'asdf'
+
+type SomeType = { asdf: boolean }
+
+const someValue: SomeType = { asdf: true }
+`,
+        'index.ts',
+      ),
+    ).toBe(`const foo = 'asdf'
+
+const someValue = { asdf: true }
+`)
   })
 })

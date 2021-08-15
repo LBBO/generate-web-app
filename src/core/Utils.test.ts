@@ -1,5 +1,5 @@
 import { generateMockExtension } from '../extensions/MockExtension'
-import { getDeepDependencies } from './Utils'
+import { getDeepDependencies, sortAlphabetically } from './Utils'
 
 describe('getDeepDependencies', () => {
   it('should return the normal dependencies', () => {
@@ -30,5 +30,19 @@ describe('getDeepDependencies', () => {
     expect(deepDependencies).toContain(c)
     expect(deepDependencies).toContain(d)
     expect(deepDependencies).toContain(e)
+  })
+})
+
+describe('sortAlphabetically', () => {
+  it('should work perfectly as a parameter Array.sort for sorting alphabetically descending', () => {
+    const arr = ['b', 'c', 'a']
+
+    expect(arr.sort(sortAlphabetically())).toEqual(['a', 'b', 'c'])
+  })
+
+  it('should work perfectly as a parameter Array.sort for sorting alphabetically ascending', () => {
+    const arr = ['b', 'c', 'a']
+
+    expect(arr.sort(sortAlphabetically(false))).toEqual(['c', 'b', 'a'])
   })
 })
