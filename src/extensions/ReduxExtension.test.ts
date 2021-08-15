@@ -171,8 +171,23 @@ describe('run', () => {
       expect(addComponentSpy).toHaveBeenCalledTimes(1)
     })
 
-    it.todo(
-      'should create the src/app and src/features/counter folders recursively',
-    )
+    it('should create the src/app and src/features/counter folders recursively', async () => {
+      await ReduxExtension.run(undefined, otherInformation)
+
+      expect(mkDirSpy).toHaveBeenCalledTimes(2)
+      expect(mkDirSpy).toHaveBeenCalledWith(
+        path.join(otherInformation.projectMetadata.rootDirectory, 'src/app'),
+        {
+          recursive: true,
+        },
+      )
+      expect(mkDirSpy).toHaveBeenCalledWith(
+        path.join(
+          otherInformation.projectMetadata.rootDirectory,
+          'src/features/counter',
+        ),
+        { recursive: true },
+      )
+    })
   })
 })
