@@ -1,5 +1,10 @@
 {
-  "exclude": ["**/*.test.ts", "./dist/**/*", "./*.config.ts"],
+  "exclude": [
+    "**/*.test.ts",
+    "./dist/**/*",
+    "./*.config.ts",
+    "fileTemplates/**/*"
+  ],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
 
