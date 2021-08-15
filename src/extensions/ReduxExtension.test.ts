@@ -7,6 +7,9 @@ import fs, { readFile } from 'fs/promises'
 import path from 'path'
 import * as ReactCodeGeneration from './ReactExtension/ReactCodeGeneration'
 import * as GeneralCodeGeneration from '../core/CodeGeneration'
+import { AngularExtension } from './AngularExtension/AngularExtension'
+import { ESLintExtension } from './ESLintExtension'
+import * as AngularCodeGeneration from './AngularExtension/AngularCodeGeneration'
 
 describe('run', () => {
   let otherInformation: AdditionalInformationForExtensions
@@ -14,6 +17,7 @@ describe('run', () => {
   let writeFileMock: jest.SpyInstance
   let addImportToJsOrTsFileSpy: jest.SpyInstance
   let mkDirSpy: jest.SpyInstance
+  let copyFileSpy: jest.SpyInstance
   let consoleLogSpy: jest.SpyInstance
 
   beforeEach(() => {
@@ -27,6 +31,7 @@ describe('run', () => {
       .spyOn(GeneralCodeGeneration, 'addImportToJsOrTsFile')
       .mockResolvedValue()
     mkDirSpy = jest.spyOn(fs, 'mkdir').mockResolvedValue(undefined)
+    copyFileSpy = jest.spyOn(fs, 'copyFile').mockResolvedValue(undefined)
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
   })
@@ -56,7 +61,12 @@ describe('run', () => {
 
     beforeEach(() => {
       otherInformation = generateMockOtherExtensionInformation({
-        chosenExtensions: [ReactExtension, TypeScriptExtension],
+        chosenExtensions: [
+          ReactExtension,
+          TypeScriptExtension,
+          ESLintExtension,
+          ReduxExtension,
+        ],
       })
       // The return type doesn't show it, but this mock data generation
       // generates mocks for everything
@@ -187,6 +197,113 @@ describe('run', () => {
           'src/features/counter',
         ),
         { recursive: true },
+      )
+    })
+  })
+
+  describe('when chosen alongside Angular', () => {
+    let addAngularImportToModuleSpy: jest.SpyInstance
+    let addDeclarationToModuleSpy: jest.SpyInstance
+    let addAngularComponentToAppComponentSpy: jest.SpyInstance
+
+    beforeEach(() => {
+      otherInformation = generateMockOtherExtensionInformation({
+        chosenExtensions: [
+          AngularExtension,
+          TypeScriptExtension,
+          ReduxExtension,
+        ],
+      })
+      // The return type doesn't show it, but this mock data generation
+      // generates mocks for everything
+      installDependenciesMock = otherInformation.projectMetadata
+        .packageManagerStrategy
+        .installDependencies as unknown as jest.SpyInstance
+
+      addAngularImportToModuleSpy = jest
+        .spyOn(AngularCodeGeneration, 'addAngularImportToModule')
+        .mockResolvedValue()
+
+      addDeclarationToModuleSpy = jest
+        .spyOn(AngularCodeGeneration, 'addDeclarationToModule')
+        .mockResolvedValue()
+
+      addAngularComponentToAppComponentSpy = jest
+        .spyOn(AngularCodeGeneration, 'addAngularComponentToAppComponent')
+        .mockResolvedValue()
+    })
+
+    it('should create src/app/counter and src/app/services directories', async () => {
+      await ReduxExtension.run(undefined, otherInformation)
+
+      const rootDir = otherInformation.projectMetadata.rootDirectory
+      expect(mkDirSpy).toHaveBeenCalledTimes(2)
+      expect(mkDirSpy).toHaveBeenCalledWith(
+        path.join(rootDir, 'src/app/counter'),
+        { recursive: true },
+      )
+      expect(mkDirSpy).toHaveBeenCalledWith(
+        path.join(rootDir, 'src/app/services'),
+        { recursive: true },
+      )
+    })
+
+    it('should copy all required files (component, service)', async () => {
+      await ReduxExtension.run(undefined, otherInformation)
+
+      expect(copyFileSpy).toHaveBeenCalledTimes(8)
+    })
+
+    it(`should not attempt to copy files that don't exist`, async () => {
+      await ReduxExtension.run(undefined, otherInformation)
+
+      for (const call of copyFileSpy.mock.calls) {
+        const sourceFilePath: string = call[0]
+
+        console.log(sourceFilePath)
+        await expect(readFile(sourceFilePath)).resolves.toBeDefined()
+      }
+    })
+
+    it('should add imports to AppModule', async () => {
+      await ReduxExtension.run(undefined, otherInformation)
+
+      expect(addAngularImportToModuleSpy).toHaveBeenCalledTimes(1)
+      expect(addAngularImportToModuleSpy).toHaveBeenCalledWith(
+        path.join(
+          otherInformation.projectMetadata.rootDirectory,
+          'src/app/app.module.ts',
+        ),
+        {
+          sourcePath: '@angular/forms',
+          importItems: ['FormsModule'],
+        },
+      )
+    })
+
+    it('should add declarations to AppModule', async () => {
+      await ReduxExtension.run(undefined, otherInformation)
+
+      expect(addDeclarationToModuleSpy).toHaveBeenCalledTimes(1)
+      expect(addDeclarationToModuleSpy).toHaveBeenCalledWith(
+        path.join(
+          otherInformation.projectMetadata.rootDirectory,
+          'src/app/app.module.ts',
+        ),
+        {
+          sourcePath: './counter/counter.component',
+          importItems: ['CounterComponent'],
+        },
+      )
+    })
+
+    it('should add the counter component to the app component', async () => {
+      await ReduxExtension.run(undefined, otherInformation)
+
+      expect(addAngularComponentToAppComponentSpy).toHaveBeenCalledTimes(1)
+      expect(addAngularComponentToAppComponentSpy).toHaveBeenCalledWith(
+        'app-counter',
+        otherInformation,
       )
     })
   })

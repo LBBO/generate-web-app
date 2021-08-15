@@ -1,7 +1,11 @@
 import type { Extension } from '../core/Extension'
 import { ExtensionCategory } from '../core/Extension'
-import { getReactExtension, getTypeScriptExtension } from './Getters'
-import { mkdir, readFile, writeFile } from 'fs/promises'
+import {
+  getAngularExtension,
+  getReactExtension,
+  getTypeScriptExtension,
+} from './Getters'
+import { copyFile, mkdir, readFile, writeFile } from 'fs/promises'
 import path from 'path'
 import {
   convertTypeScriptToFormattedJavaScript,
@@ -12,6 +16,11 @@ import {
   addComponent,
   surroundAppWithComponentWithoutImport,
 } from './ReactExtension/ReactCodeGeneration'
+import {
+  addAngularComponentToAppComponent,
+  addAngularImportToModule,
+  addDeclarationToModule,
+} from './AngularExtension/AngularCodeGeneration'
 
 export type ReduxExtensionOptions = Record<string, unknown>
 
@@ -125,6 +134,67 @@ export const ReduxExtension: Extension = {
         'Counter',
         otherInformation,
       )
+    }
+
+    if (getAngularExtension(otherInformation.chosenExtensions)) {
+      await mkdir(
+        path.join(
+          otherInformation.projectMetadata.rootDirectory,
+          'src/app/counter',
+        ),
+        {
+          recursive: true,
+        },
+      )
+      await mkdir(
+        path.join(
+          otherInformation.projectMetadata.rootDirectory,
+          'src/app/services',
+        ),
+        {
+          recursive: true,
+        },
+      )
+
+      const filePaths = [
+        'src/app/counter/counter.component.html',
+        'src/app/counter/counter.component.css',
+        'src/app/counter/counter.component.ts',
+        'src/app/counter/counter.component.spec.ts',
+
+        'src/app/services/counterAPI.ts',
+        'src/app/services/counterSlice.ts',
+        'src/app/services/store.service.ts',
+        'src/app/services/store.service.spec.ts',
+      ]
+
+      const pathToAngularSpecificTemplateFiles =
+        '../../fileTemplates/extensions/ReduxExtension/Angular'
+
+      for (const filePath of filePaths) {
+        await copyFile(
+          path.join(__dirname, pathToAngularSpecificTemplateFiles, filePath),
+          path.join(otherInformation.projectMetadata.rootDirectory, filePath),
+        )
+      }
+
+      const pathToAppModule = path.join(
+        otherInformation.projectMetadata.rootDirectory,
+        'src/app/app.module.ts',
+      )
+
+      // Import forms module for counter component
+      await addAngularImportToModule(pathToAppModule, {
+        sourcePath: '@angular/forms',
+        importItems: ['FormsModule'],
+      })
+
+      await addDeclarationToModule(pathToAppModule, {
+        sourcePath: './counter/counter.component',
+        importItems: ['CounterComponent'],
+      })
+
+      await addAngularComponentToAppComponent('app-counter', otherInformation)
     }
   },
 }
