@@ -1,0 +1,82 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`addAngularImportToModule should correctly add imports to the AppModule 1`] = `
+"import { NgModule } from '@angular/core'
+import { BrowserModule } from '@angular/platform-browser'
+
+import { AppComponent } from './app.component'
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [BrowserModule, FormsModule],
+  providers: [],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+"
+`;
+
+exports[`addAngularImportToModule should sort imports alphabetically 1`] = `
+"import { NgModule } from '@angular/core'
+import { BrowserModule } from '@angular/platform-browser'
+
+import { AppComponent } from './app.component'
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [
+    AModule,
+    AnotherModule,
+    BrowserModule,
+    CoolModule,
+    DemonstrationModule,
+    FormsModule,
+    TestingModule,
+    YoMamasModule,
+    ZebraModule,
+  ],
+  providers: [],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+"
+`;
+
+exports[`addDeclarationToModule should correctly add declarations to the AppModule 1`] = `
+"import { NgModule } from '@angular/core'
+import { BrowserModule } from '@angular/platform-browser'
+
+import { AppComponent } from './app.component'
+
+@NgModule({
+  declarations: [AppComponent, MyComponent],
+  imports: [BrowserModule],
+  providers: [],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+"
+`;
+
+exports[`addDeclarationToModule should sort declarations alphabetically 1`] = `
+"import { NgModule } from '@angular/core'
+import { BrowserModule } from '@angular/platform-browser'
+
+import { AppComponent } from './app.component'
+
+@NgModule({
+  declarations: [
+    AnotherComponent,
+    AppComponent,
+    CreativelyNamedComponent,
+    MagicalComponent,
+    MyComponent,
+    SomeComponent,
+  ],
+  imports: [BrowserModule],
+  providers: [],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+"
+`;
