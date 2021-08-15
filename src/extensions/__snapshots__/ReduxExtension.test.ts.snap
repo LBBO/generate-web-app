@@ -28,7 +28,7 @@ export const store = configureStore({
 
 exports[`run when chosen alongside react should compile all relevant TS files to JS before copying if TS was not chosen 3`] = `
 Array [
-  "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/features/counter/Counter.jsx",
+  "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/features/counter/Counter.js",
   "import React, { useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import {
@@ -39,7 +39,7 @@ import {
   incrementIfOdd,
   selectCount,
 } from './counterSlice'
-import styles from './Counter.module.scss'
+import './Counter.css'
 
 export const Counter = () => {
   const count = useAppSelector(selectCount)
@@ -50,44 +50,44 @@ export const Counter = () => {
 
   return (
     <div>
-      <div className={styles.row}>
+      <div className={'row'}>
         <button
-          className={styles.button}
+          className={'button'}
           aria-label=\\"Decrement value\\"
           onClick={() => dispatch(decrement())}
         >
           -
         </button>
-        <span className={styles.value}>{count}</span>
+        <span className={'value'}>{count}</span>
         <button
-          className={styles.button}
+          className={'button'}
           aria-label=\\"Increment value\\"
           onClick={() => dispatch(increment())}
         >
           +
         </button>
       </div>
-      <div className={styles.row}>
+      <div className={'row'}>
         <input
-          className={styles.textbox}
+          className={'textbox'}
           aria-label=\\"Set increment amount\\"
           value={incrementAmount}
           onChange={(e) => setIncrementAmount(e.target.value)}
         />
         <button
-          className={styles.button}
+          className={'button'}
           onClick={() => dispatch(incrementByAmount(incrementValue))}
         >
           Add Amount
         </button>
         <button
-          className={styles.asyncButton}
+          className={'asyncButton'}
           onClick={() => dispatch(incrementAsync(incrementValue))}
         >
           Add Async
         </button>
         <button
-          className={styles.button}
+          className={'button'}
           onClick={() => dispatch(incrementIfOdd(incrementValue))}
         >
           Add If Odd

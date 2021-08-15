@@ -1,7 +1,7 @@
 import type { Extension } from '../core/Extension'
 import { ExtensionCategory } from '../core/Extension'
 import { getReactExtension, getTypeScriptExtension } from './Getters'
-import { readFile, writeFile } from 'fs/promises'
+import { mkdir, readFile, writeFile } from 'fs/promises'
 import path from 'path'
 import {
   convertTypeScriptToFormattedJavaScript,
@@ -34,6 +34,22 @@ export const ReduxExtension: Extension = {
     await packageManager.installDependencies(dependenciesToInstall)
 
     if (getReactExtension(otherInformation.chosenExtensions)) {
+      await mkdir(
+        path.join(otherInformation.projectMetadata.rootDirectory, 'src/app'),
+        {
+          recursive: true,
+        },
+      )
+      await mkdir(
+        path.join(
+          otherInformation.projectMetadata.rootDirectory,
+          'src/features/counter',
+        ),
+        {
+          recursive: true,
+        },
+      )
+
       // Copy files
       const files = [
         'src/app/hooks.ts',
@@ -52,12 +68,9 @@ export const ReduxExtension: Extension = {
         getTypeScriptExtension(otherInformation.chosenExtensions),
       )
 
-      const scriptFileExtension = typescriptHasBeenChosen ? 'ts' : 'js'
-
       for (const relativeFilePath of files) {
-        const fileContent = (
-          await readFile(path.join(pathToTemplateFolder, relativeFilePath))
-        ).toString()
+        const sourceFilePath = path.join(pathToTemplateFolder, relativeFilePath)
+        const fileContent = (await readFile(sourceFilePath)).toString()
         let targetFilePath = path.join(
           otherInformation.projectMetadata.rootDirectory,
           relativeFilePath,
@@ -69,20 +82,22 @@ export const ReduxExtension: Extension = {
             fileContent,
             targetFilePath,
           )
-          targetFilePath = targetFilePath.replace(/\.ts$/, '.js')
-          targetFilePath = targetFilePath.replace(/\.tsx$/, '.jsx')
+          targetFilePath = targetFilePath.replace(/\.tsx?$/, '.js')
         }
 
+        console.log(`Creating ${targetFilePath} from ${sourceFilePath}`)
         await writeFile(
           targetFilePath,
           formatWithPrettier(newFileContent, targetFilePath),
         )
       }
 
+      const scriptFileExtension = typescriptHasBeenChosen ? 'tsx' : 'js'
+
       await addImportToJsOrTsFile(
         path.join(
           otherInformation.projectMetadata.rootDirectory,
-          `src/index.${scriptFileExtension}x`,
+          `src/index.${scriptFileExtension}`,
         ),
         {
           sourcePath: 'react-redux',
@@ -92,7 +107,7 @@ export const ReduxExtension: Extension = {
       await addImportToJsOrTsFile(
         path.join(
           otherInformation.projectMetadata.rootDirectory,
-          `src/index.${scriptFileExtension}x`,
+          `src/index.${scriptFileExtension}`,
         ),
         {
           sourcePath: './app/store',

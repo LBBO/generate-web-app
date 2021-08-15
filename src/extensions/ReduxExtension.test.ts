@@ -13,6 +13,8 @@ describe('run', () => {
   let installDependenciesMock: jest.SpyInstance
   let writeFileMock: jest.SpyInstance
   let addImportToJsOrTsFileSpy: jest.SpyInstance
+  let mkDirSpy: jest.SpyInstance
+  let consoleLogSpy: jest.SpyInstance
 
   beforeEach(() => {
     otherInformation = generateMockOtherExtensionInformation()
@@ -24,6 +26,9 @@ describe('run', () => {
     addImportToJsOrTsFileSpy = jest
       .spyOn(GeneralCodeGeneration, 'addImportToJsOrTsFile')
       .mockResolvedValue()
+    mkDirSpy = jest.spyOn(fs, 'mkdir').mockResolvedValue(undefined)
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
   })
 
   it('should always install redux and redux toolkit', async () => {
@@ -129,7 +134,7 @@ describe('run', () => {
       const filePaths = [
         'src/app/hooks.js',
         'src/app/store.js',
-        'src/features/counter/Counter.jsx',
+        'src/features/counter/Counter.js',
         'src/features/counter/counterAPI.js',
         'src/features/counter/counterSlice.js',
         'src/features/counter/counterSlice.test.js',
@@ -165,5 +170,9 @@ describe('run', () => {
 
       expect(addComponentSpy).toHaveBeenCalledTimes(1)
     })
+
+    it.todo(
+      'should create the src/app and src/features/counter folders recursively',
+    )
   })
 })
