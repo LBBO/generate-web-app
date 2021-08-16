@@ -5,15 +5,24 @@ import inquirer from 'inquirer'
 import { performUserDialog } from './core/userDialog/PerformUserDialog'
 import chalk from 'chalk'
 import { allExtensions } from './extensions/allExtensions'
+import { Command } from 'commander'
+import { parseCommandLineArgs } from './core/ParseCommandLineArgs'
 
 const prompts$ = new Subject<DistinctQuestion>()
 const answers$ = inquirer.prompt(prompts$).ui.process
+const program = new Command()
 
 const run = async () => {
+  const { metaData: partialMetaData } = parseCommandLineArgs(
+    program,
+    allExtensions,
+  )
+
   const { extensionsWithOptions, projectMetadata } = await performUserDialog(
     prompts$,
     answers$,
     allExtensions,
+    partialMetaData,
   )
   const projectInformation = {
     projectMetadata,

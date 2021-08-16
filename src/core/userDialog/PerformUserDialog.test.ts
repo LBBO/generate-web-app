@@ -1,3 +1,4 @@
+import type { ProjectMetaData } from './PerformUserDialog'
 import * as PerformUserDialog from './PerformUserDialog'
 import {
   getExtensionOptions,
@@ -38,6 +39,7 @@ describe('promptMetadata', () => {
     let isYarnInstalledSpy: jest.SpyInstance
     let prompt$: Subject<DistinctQuestion>
     let answers$: Subject<Answers>
+    let partialMetaDataFromCliArgs: Partial<ProjectMetaData>
 
     beforeAll(() => {
       isNpmInstalledSpy = jest.spyOn(ChoosePackageManager, 'isNpmInstalled')
@@ -49,6 +51,7 @@ describe('promptMetadata', () => {
       isYarnInstalledSpy.mockReset().mockReturnValue(true)
       prompt$ = new Subject()
       answers$ = new Subject()
+      partialMetaDataFromCliArgs = {}
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       jest.spyOn(console, 'info').mockImplementation(() => {})
       // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -71,11 +74,13 @@ describe('promptMetadata', () => {
         }
       })
 
-      const testIsFinishedPromise = promptMetadata(prompt$, answers$).then(
-        () => {
-          expect(packageManagerQuestionAppeared).toBe(true)
-        },
-      )
+      const testIsFinishedPromise = promptMetadata(
+        prompt$,
+        answers$,
+        partialMetaDataFromCliArgs,
+      ).then(() => {
+        expect(packageManagerQuestionAppeared).toBe(true)
+      })
 
       // This causes the promptMetadata promise to resolve
       respondToAllMetaDataQuestions(answers$)
@@ -101,7 +106,7 @@ describe('promptMetadata', () => {
         }
       })
 
-      promptMetadata(prompt$, answers$)
+      promptMetadata(prompt$, answers$, partialMetaDataFromCliArgs)
     })
 
     it('should disable the yarn choice if yarn is not installed', (done) => {
@@ -122,11 +127,15 @@ describe('promptMetadata', () => {
         }
       })
 
-      promptMetadata(prompt$, answers$)
+      promptMetadata(prompt$, answers$, partialMetaDataFromCliArgs)
     })
 
     it('should return npm if npm is chosen', (done) => {
-      const metadataPromise = promptMetadata(prompt$, answers$)
+      const metadataPromise = promptMetadata(
+        prompt$,
+        answers$,
+        partialMetaDataFromCliArgs,
+      )
 
       respondToAllQuestionsExcept(answers$, 'packageManager')
       answers$.next({ name: 'packageManager', answer: 'npm' })
@@ -138,7 +147,11 @@ describe('promptMetadata', () => {
     })
 
     it('should return yarn if yarn is chosen', (done) => {
-      const metadataPromise = promptMetadata(prompt$, answers$)
+      const metadataPromise = promptMetadata(
+        prompt$,
+        answers$,
+        partialMetaDataFromCliArgs,
+      )
 
       respondToAllQuestionsExcept(answers$, 'packageManager')
       answers$.next({ name: 'packageManager', answer: 'yarn' })
@@ -153,7 +166,9 @@ describe('promptMetadata', () => {
       isNpmInstalledSpy.mockReturnValueOnce(false)
       isYarnInstalledSpy.mockReturnValueOnce(false)
 
-      expect(promptMetadata(prompt$, answers$)).rejects.toBeInstanceOf(Error)
+      expect(
+        promptMetadata(prompt$, answers$, partialMetaDataFromCliArgs),
+      ).rejects.toBeInstanceOf(Error)
     })
   })
 })
@@ -232,7 +247,7 @@ describe('performUserDialog', () => {
     expect(onCompletedSpy).not.toHaveBeenCalled()
 
     try {
-      await performUserDialog(prompts$, answers$, extensions)
+      await performUserDialog(prompts$, answers$, extensions, {})
     } catch (e) {
       // Error expected!
     }
