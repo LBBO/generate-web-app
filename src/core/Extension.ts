@@ -33,7 +33,6 @@ export type Extension = {
   ) => Observable<Record<string, unknown>>
 
   declareCliOptions?: (program: Command) => void
-  computePartialOptionsFromCliArgs?: () => Record<string, unknown>
 
   // Actually TypescriptExtensionOptions, but TypeScript can't understand that...
   options?: Record<string, unknown>
