@@ -1,6 +1,7 @@
 import type { Observable, Subject } from 'rxjs'
 import type { Answers, DistinctQuestion } from 'inquirer'
 import type { ProjectMetaData } from './userDialog/PerformUserDialog'
+import type { Command } from 'commander'
 
 export enum ExtensionCategory {
   ONLY_FOR_TESTING,
@@ -29,6 +30,9 @@ export type Extension = {
     prompts$: Subject<DistinctQuestion>,
     answers$: Observable<Answers>,
   ) => Observable<Record<string, unknown>>
+
+  declareCliOptions?: (program: Command) => void
+  computePartialOptionsFromCliArgs?: () => Record<string, unknown>
 
   // Actually TypescriptExtensionOptions, but TypeScript can't understand that...
   options?: Record<string, unknown>

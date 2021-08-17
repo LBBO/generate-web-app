@@ -21,6 +21,31 @@ export const declareArgsAndOptions = (
       '-p, --package-manager <package-manager-name>',
       'Choose your package manager (npm or yarn)',
     )
+
+  allExtensions.forEach((extension) => {
+    const normalDescription = `Install ${extension.name}`
+    const dependencyDescription = extension.dependsOn?.length
+      ? `Requires ${extension.dependsOn
+          ?.map((dependency) => dependency.name)
+          .join(', ')}`
+      : undefined
+    const exclusivityDescription = extension.exclusiveTo?.length
+      ? `Cannot be used alongside ${extension.exclusiveTo
+          ?.map((exclusivity) => exclusivity.name)
+          .join(', ')}`
+      : undefined
+
+    const finalDescription = [
+      normalDescription,
+      dependencyDescription,
+      exclusivityDescription,
+    ]
+      .filter((description) => description !== undefined)
+      .join(' - ')
+
+    program.option(`--${extension.name.toLowerCase()}`, finalDescription)
+    extension.declareCliOptions?.(program)
+  })
 }
 
 export const parseMetaData = (

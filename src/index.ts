@@ -11,6 +11,14 @@ import { parseCommandLineArgs } from './core/ParseCommandLineArgs'
 const prompts$ = new Subject<DistinctQuestion>()
 const answers$ = inquirer.prompt(prompts$).ui.process
 const program = new Command()
+program.description(
+  'Allows you to interactively configure a new web app project. When called without any options concerning tools to' +
+    ' use (i.e. when at most the -p option is used), an interactive mode will be entered that will ask you a set of' +
+    ' questions regarding your desired setup. If you choose any libraries via CLI options (e.g. by appending' +
+    ' `--react`), your input will be validated and either rejected or installed immediately. For more information' +
+    ' about certain tools, please run interactive mode.',
+)
+program.helpOption('-h, --help', 'Display help for generate-web-app')
 
 const run = async () => {
   const { metaData: partialMetaData } = parseCommandLineArgs(

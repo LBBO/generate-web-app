@@ -12,11 +12,15 @@ export const TypeScriptExtension: Extension = {
     'An open-source language which builds on JavaScript by adding static type definitions.',
   linkToDocumentation: new URL('https://www.typescriptlang.org/'),
   category: ExtensionCategory.JAVASCRIPT_FLAVOR,
+  declareCliOptions: (program) => {
+    program.option('--ts-strict-mode', 'Install TypeScript in strict mode')
+  },
   promptOptions: (prompts$, answers$) => {
     prompts$.next({
       name: 'typescriptStrictMode',
       type: 'confirm',
-      message: 'Would you like to enable the TypeScript strict mode?',
+      message:
+        'Would you like to enable the TypeScript strict mode? More info: https://www.typescriptlang.org/tsconfig#strict',
       default: true,
     })
 
