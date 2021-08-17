@@ -69,18 +69,32 @@ export const getExtensionOptions = async (
 
     // Forward questions to actual prompts observable,
     // but don't forward complete as actual prompts aren't necessarily done yet
-    const questionsForwardingSubscription = customPrompts$.subscribe({
-      next: prompts$.next.bind(prompts$),
-    })
+    const questionsForwardingSubscription = customPrompts$
+      .pipe(
+        // Log which extension is being asked about before first question
+        map((value, index) => {
+          if (index === 0) {
+            console.log(chalk.bold.underline(extension.name))
+          }
+          return value
+        }),
+      )
+      .subscribe({
+        next: prompts$.next.bind(prompts$),
+      })
 
     let chosenOptions: Record<string, unknown> | undefined
 
     if (extension.promptOptions) {
-      console.log(chalk.bold.underline(extension.name))
       chosenOptions = await lastValueFrom(
         extension.promptOptions(customPrompts$, customAnswers$, cliArgs),
       )
-      console.log()
+
+      // Add an empty line to console output if at least one question was asked
+      const numberOfQuestionsAsked = await lastValueFrom(actualCount$)
+      if (numberOfQuestionsAsked > 0) {
+        console.log()
+      }
     }
 
     const extensionWithOptions = extension
