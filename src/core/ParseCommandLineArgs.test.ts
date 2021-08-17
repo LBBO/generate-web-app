@@ -1,5 +1,9 @@
 import { Command } from 'commander'
-import { declareArgsAndOptions, parseMetaData } from './ParseCommandLineArgs'
+import {
+  declareArgsAndOptions,
+  parseChosenExtensions,
+  parseMetaData,
+} from './ParseCommandLineArgs'
 import type { Extension } from './Extension'
 import { allExtensions } from '../extensions/allExtensions'
 import path from 'path'
@@ -7,6 +11,11 @@ import type { PackageManagerStrategy } from './packageManagers/PackageManagerStr
 import { PackageManagerNames } from './packageManagers/PackageManagerStrategy'
 import * as NpmPackageManagerStrategy from './packageManagers/NpmPackageManagerStrategy'
 import * as YarnPackageManagerStrategy from './packageManagers/YarnPackageManagerStrategy'
+import { ReactExtension } from '../extensions/ReactExtension/ReactExtension'
+import { ESLintExtension } from '../extensions/ESLintExtension'
+import { TypeScriptExtension } from '../extensions/TypeScriptExtension'
+import * as DependencyChecks from './DependencyChecks'
+import * as ExclusivityChecks from './ExclusivityChecks'
 
 const getArgsAndOptionsFromCliArgs = (
   cliArgsString: string,
@@ -156,5 +165,103 @@ describe('parseMetaData', () => {
     const metaData = parseMetaData(args, options)
 
     expect(metaData.packageManagerStrategy).toBe(undefined)
+  })
+})
+
+describe('parseChosenExtensions', () => {
+  let consoleErrorSpy: jest.SpyInstance
+  let checkDependenciesSpy: jest.SpyInstance
+  let checkExclusivitiesSpy: jest.SpyInstance
+
+  beforeEach(() => {
+    consoleErrorSpy = jest.spyOn(console, 'error').mockReturnValue()
+    checkDependenciesSpy = jest
+      .spyOn(DependencyChecks, 'checkDependencies')
+      .mockReturnValue({
+        isValidConfiguration: true,
+      })
+    checkExclusivitiesSpy = jest
+      .spyOn(ExclusivityChecks, 'checkExclusivities')
+      .mockReturnValue({
+        isValidConfiguration: true,
+      })
+  })
+
+  it('should correctly parse the chosen extensions', () => {
+    const { args, options } = getArgsAndOptionsFromCliArgs(
+      '--react --eslint --typescript',
+    )
+
+    expect(parseChosenExtensions(args, options, allExtensions)).toEqual([
+      TypeScriptExtension,
+      ReactExtension,
+      ESLintExtension,
+    ])
+  })
+
+  it('should not be confused by other options', () => {
+    const { args, options } = getArgsAndOptionsFromCliArgs(
+      '--react --eslint -p yarn --typescript --ts-strict-mode',
+    )
+
+    expect(parseChosenExtensions(args, options, allExtensions)).toEqual([
+      TypeScriptExtension,
+      ReactExtension,
+      ESLintExtension,
+    ])
+  })
+
+  it('should match the order that the items appear in in allExtensions', () => {
+    // Guarantee test is actually correct
+    expect(allExtensions.indexOf(TypeScriptExtension)).toBeLessThan(
+      allExtensions.indexOf(ReactExtension),
+    )
+    expect(allExtensions.indexOf(ReactExtension)).toBeLessThan(
+      allExtensions.indexOf(ESLintExtension),
+    )
+
+    // Other order!!
+    const { args, options } = getArgsAndOptionsFromCliArgs(
+      '--eslint -p yarn --typescript --ts-strict-mode --react',
+    )
+
+    expect(parseChosenExtensions(args, options, allExtensions)).toEqual([
+      TypeScriptExtension,
+      ReactExtension,
+      ESLintExtension,
+    ])
+  })
+
+  it('should log all errors thrown by checkDependencies and checkExclusivities and throw an error', () => {
+    const message1 = 'message 1'
+    const message2 = 'message 2'
+    const message3 = 'message 3'
+    const message4 = 'message 4'
+    checkDependenciesSpy.mockReturnValue({
+      isValidConfiguration: false,
+      errorMessages: [message1, message2],
+    })
+    checkExclusivitiesSpy.mockReturnValue({
+      isValidConfiguration: false,
+      errorMessages: [message3, message4],
+    })
+
+    const { args, options } = getArgsAndOptionsFromCliArgs(
+      '--eslint -p yarn --typescript --ts-strict-mode --react',
+    )
+
+    expect(() => parseChosenExtensions(args, options, allExtensions)).toThrow()
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(4)
+    expect(consoleErrorSpy.mock.calls[0][0]).toMatch(message1)
+    expect(consoleErrorSpy.mock.calls[1][0]).toMatch(message2)
+    expect(consoleErrorSpy.mock.calls[2][0]).toMatch(message3)
+    expect(consoleErrorSpy.mock.calls[3][0]).toMatch(message4)
+  })
+
+  it('should return undefined if no extensions were chosen per CLI arg', () => {
+    const { args, options } = getArgsAndOptionsFromCliArgs('-p yarn')
+
+    expect(parseChosenExtensions(args, options, allExtensions)).toBe(undefined)
   })
 })

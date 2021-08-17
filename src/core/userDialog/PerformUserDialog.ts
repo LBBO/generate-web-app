@@ -238,6 +238,7 @@ export const performUserDialog = async (
   answers$: Observable<Answers>,
   extensions: Array<Extension>,
   metaDataFromCliArgs: Partial<ProjectMetaData>,
+  preChosenExtensions?: Array<Extension>,
 ): Promise<{
   extensionsWithOptions: Array<Extension>
   projectMetadata: ProjectMetaData
@@ -253,11 +254,9 @@ export const performUserDialog = async (
       throw new Error('Project metadata could not be computed.')
     }
 
-    const chosenExtensions = await selectExtensions(
-      prompts$,
-      answers$,
-      extensions,
-    )
+    const chosenExtensions =
+      preChosenExtensions ??
+      (await selectExtensions(prompts$, answers$, extensions))
 
     // Create empty line before asking about extension options
     console.log()

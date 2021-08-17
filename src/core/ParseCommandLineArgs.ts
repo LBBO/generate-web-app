@@ -6,6 +6,9 @@ import { PackageManagerNames } from './packageManagers/PackageManagerStrategy'
 import path from 'path'
 import { generateYarnPackageManagerStrategy } from './packageManagers/YarnPackageManagerStrategy'
 import { generateNpmPackageManagerStrategy } from './packageManagers/NpmPackageManagerStrategy'
+import { checkExclusivities } from './ExclusivityChecks'
+import { checkDependencies } from './DependencyChecks'
+import chalk from 'chalk'
 
 export const declareArgsAndOptions = (
   program: Command,
@@ -98,6 +101,60 @@ export const parseMetaData = (
   }
 }
 
+export const parseChosenExtensions = (
+  args: string[],
+  options: OptionValues,
+  allExtensions: Array<Extension>,
+): Array<Extension> | undefined => {
+  const chosenExtensionInOrderOfCliArg = Object.entries(options)
+    // Remove options that were explicitly disabled
+    .filter(([, optionValue]) => Boolean(optionValue))
+    .map(([optionName]) =>
+      allExtensions.find(
+        (extension) => extension.name.toLowerCase() === optionName,
+      ),
+    )
+    .filter(
+      (extension: Extension | undefined): extension is Extension =>
+        extension !== undefined,
+    )
+
+  const dependencyCheckResult = checkDependencies(
+    chosenExtensionInOrderOfCliArg,
+  )
+  const exclusivityCheckResult = checkExclusivities(
+    chosenExtensionInOrderOfCliArg,
+  )
+
+  if (!dependencyCheckResult.isValidConfiguration) {
+    dependencyCheckResult.errorMessages.forEach((message) =>
+      console.error(chalk.red(message)),
+    )
+  }
+  if (!exclusivityCheckResult.isValidConfiguration) {
+    exclusivityCheckResult.errorMessages.forEach((message) =>
+      console.error(chalk.red(message)),
+    )
+  }
+
+  if (
+    !dependencyCheckResult.isValidConfiguration ||
+    !exclusivityCheckResult.isValidConfiguration
+  ) {
+    throw new Error(
+      'Your chosen configuration is not valid. For more info, please see previous error messages.',
+    )
+  }
+
+  const chosenExtensionsInCorrectOrder = allExtensions.filter((extension) =>
+    chosenExtensionInOrderOfCliArg.includes(extension),
+  )
+
+  return chosenExtensionsInCorrectOrder.length
+    ? chosenExtensionsInCorrectOrder
+    : undefined
+}
+
 export const parseCommandLineArgs = (
   program: Command,
   allExtensions: Array<Extension>,
@@ -109,6 +166,7 @@ export const parseCommandLineArgs = (
   const options = program.opts()
   const args = program.args
   const metaData = parseMetaData(args, options)
+  const chosenExtensions = parseChosenExtensions(args, options, allExtensions)
 
-  return { metaData }
+  return { metaData, chosenExtensions }
 }

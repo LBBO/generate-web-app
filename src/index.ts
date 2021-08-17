@@ -2,11 +2,13 @@
 import { Subject } from 'rxjs'
 import type { DistinctQuestion } from 'inquirer'
 import inquirer from 'inquirer'
+import type { ProjectMetaData } from './core/userDialog/PerformUserDialog'
 import { performUserDialog } from './core/userDialog/PerformUserDialog'
 import chalk from 'chalk'
 import { allExtensions } from './extensions/allExtensions'
 import { Command } from 'commander'
 import { parseCommandLineArgs } from './core/ParseCommandLineArgs'
+import type { Extension } from './core/Extension'
 
 const prompts$ = new Subject<DistinctQuestion>()
 const answers$ = inquirer.prompt(prompts$).ui.process
@@ -21,16 +23,24 @@ program.description(
 program.helpOption('-h, --help', 'Display help for generate-web-app')
 
 const run = async () => {
-  const { metaData: partialMetaData } = parseCommandLineArgs(
-    program,
-    allExtensions,
-  )
+  let partialMetaData: Partial<ProjectMetaData>
+  let preChosenExtensions: Array<Extension> | undefined
+  try {
+    const cliArgsParsingResult = parseCommandLineArgs(program, allExtensions)
+    partialMetaData = cliArgsParsingResult.metaData
+    preChosenExtensions = cliArgsParsingResult.chosenExtensions
+  } catch (e) {
+    // Close prompts so the task isn't kept running
+    prompts$.complete()
+    throw e
+  }
 
   const { extensionsWithOptions, projectMetadata } = await performUserDialog(
     prompts$,
     answers$,
     allExtensions,
     partialMetaData,
+    preChosenExtensions,
   )
   const projectInformation = {
     projectMetadata,
