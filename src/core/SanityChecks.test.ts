@@ -39,6 +39,15 @@ describe('ensureAllExtensionsHaveUniqueNames', () => {
       ]),
     ).toThrow()
   })
+
+  it('should not accept names that only differ in capitalization', () => {
+    expect(() =>
+      ensureAllExtensionsHaveUniqueNames([
+        generateMockExtension({ name: 'someName' }),
+        generateMockExtension({ name: 'somename' }),
+      ]),
+    ).toThrow()
+  })
 })
 
 describe('ensureDependantsAreNotExclusiveToEachOther', () => {
