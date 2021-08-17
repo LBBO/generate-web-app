@@ -21,7 +21,7 @@ export const checkExclusivities = (
         ...errorMessages,
         `${
           extension.name
-        } cannot be used alongside the following extensions: ${forbiddenButYetChosenExtensionNames.join(
+        } cannot be used along with the following extensions: ${forbiddenButYetChosenExtensionNames.join(
           ', ',
         )}`,
       ]

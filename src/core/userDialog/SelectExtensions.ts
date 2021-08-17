@@ -80,6 +80,14 @@ export const selectExtensions = (
             )}`
           }
 
+          if (extension.exclusiveTo) {
+            name += ` - ${chalk.italic.red(
+              `Cannot be used along with: ${extension.exclusiveTo
+                ?.map((exclusivity) => exclusivity.name)
+                .join(', ')}`,
+            )}`
+          }
+
           return {
             name,
             value: extension,

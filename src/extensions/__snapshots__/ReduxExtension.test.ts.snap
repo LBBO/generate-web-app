@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`run when chosen alongside react should compile all relevant TS files to JS before copying if TS was not chosen 1`] = `
+exports[`run when chosen along with react should compile all relevant TS files to JS before copying if TS was not chosen 1`] = `
 Array [
   "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/app/hooks.js",
   "import { useDispatch, useSelector } from 'react-redux'
@@ -11,7 +11,7 @@ export const useAppSelector = useSelector
 ]
 `;
 
-exports[`run when chosen alongside react should compile all relevant TS files to JS before copying if TS was not chosen 2`] = `
+exports[`run when chosen along with react should compile all relevant TS files to JS before copying if TS was not chosen 2`] = `
 Array [
   "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/app/store.js",
   "import { configureStore } from '@reduxjs/toolkit'
@@ -26,7 +26,7 @@ export const store = configureStore({
 ]
 `;
 
-exports[`run when chosen alongside react should compile all relevant TS files to JS before copying if TS was not chosen 3`] = `
+exports[`run when chosen along with react should compile all relevant TS files to JS before copying if TS was not chosen 3`] = `
 Array [
   "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/features/counter/Counter.js",
   "import React, { useState } from 'react'
@@ -100,7 +100,7 @@ export const Counter = () => {
 ]
 `;
 
-exports[`run when chosen alongside react should compile all relevant TS files to JS before copying if TS was not chosen 4`] = `
+exports[`run when chosen along with react should compile all relevant TS files to JS before copying if TS was not chosen 4`] = `
 Array [
   "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/features/counter/counterAPI.js",
   "// A mock function to mimic making an async request for data
@@ -110,7 +110,7 @@ export const fetchCount = (amount = 1) =>
 ]
 `;
 
-exports[`run when chosen alongside react should compile all relevant TS files to JS before copying if TS was not chosen 5`] = `
+exports[`run when chosen along with react should compile all relevant TS files to JS before copying if TS was not chosen 5`] = `
 Array [
   "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/features/counter/counterSlice.js",
   "import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
@@ -188,7 +188,7 @@ export const counterReducer = counterSlice.reducer
 ]
 `;
 
-exports[`run when chosen alongside react should compile all relevant TS files to JS before copying if TS was not chosen 6`] = `
+exports[`run when chosen along with react should compile all relevant TS files to JS before copying if TS was not chosen 6`] = `
 Array [
   "/home/mdk/git-clones/GitHub/generate-web-app/mock-project-target/src/features/counter/counterSlice.test.js",
   "import {

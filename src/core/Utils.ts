@@ -11,6 +11,15 @@ export const getDeepDependencies = (extension: Extension): Array<Extension> => {
     )
 }
 
+/**
+ * Creates a callback to be passed to Array.sort() in order to sort strings alphabetically.
+ * The desc param can be set to change the sorting direction.
+ *
+ * @param desc
+ * @example
+ * const arr = ['Iron Man', 'Hulk', 'Thor', 'Captain America']
+ * const sorted = arr.sort(sortAlphabetically()) // = ['Captain America', 'Hulk', 'Iron Man', 'Thor']
+ */
 export const sortAlphabetically =
   (desc = true) =>
   (a: string, b: string): number => {
