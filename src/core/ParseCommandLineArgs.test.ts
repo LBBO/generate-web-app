@@ -1,10 +1,4 @@
-import { Command } from 'commander'
-import {
-  declareArgsAndOptions,
-  parseChosenExtensions,
-  parseMetaData,
-} from './ParseCommandLineArgs'
-import type { Extension } from './Extension'
+import { parseChosenExtensions, parseMetaData } from './ParseCommandLineArgs'
 import { allExtensions } from '../extensions/allExtensions'
 import path from 'path'
 import type { PackageManagerStrategy } from './packageManagers/PackageManagerStrategy'
@@ -16,27 +10,7 @@ import { ESLintExtension } from '../extensions/ESLintExtension'
 import { TypeScriptExtension } from '../extensions/TypeScriptExtension'
 import * as DependencyChecks from './DependencyChecks'
 import * as ExclusivityChecks from './ExclusivityChecks'
-
-const getArgsAndOptionsFromCliArgs = (
-  cliArgsString: string,
-  extensions: Array<Extension> = allExtensions,
-) => {
-  const program = new Command()
-  declareArgsAndOptions(program, extensions)
-
-  const cliArgs = [
-    '/path/to/node',
-    '/path/to/generate-web-app',
-    ...cliArgsString.split(' '),
-  ]
-
-  program.parse(cliArgs)
-
-  return {
-    args: program.args,
-    options: program.opts(),
-  }
-}
+import { getArgsAndOptionsFromCliArgs } from './TestingUtils'
 
 it.todo('should ensure all short-hand option names are unique')
 

@@ -4,7 +4,7 @@ import { TypeScriptExtension } from '../TypeScriptExtension'
 import { ReactExtension } from '../ReactExtension/ReactExtension'
 import { spawn } from 'child_process'
 import * as path from 'path'
-import { reduce } from 'rxjs'
+import { of, reduce } from 'rxjs'
 import { PackageManagerNames } from '../../core/packageManagers/PackageManagerStrategy'
 import {
   getLessExtension,
@@ -12,6 +12,7 @@ import {
   getScssExtension,
   getTypeScriptExtension,
 } from '../Getters'
+import type { Answers } from 'inquirer'
 
 export type AngularExtensionOptions = {
   useRouting: boolean
@@ -25,35 +26,46 @@ export const AngularExtension: Extension = {
   category: ExtensionCategory.FRONTEND_FRAMEWORK,
   dependsOn: [TypeScriptExtension],
   exclusiveTo: [ReactExtension],
-  promptOptions: (prompts$, answers$) => {
-    prompts$.next({
-      name: 'useRouter',
-      type: 'confirm',
-      message: 'Would you like to add Angular routing?',
-      default: true,
-    })
+  declareCliOptions: (program) => {
+    program.option('--angular-routing', 'Add routing to Angular')
+    program.option('--no-angular-routing')
+  },
+  promptOptions: (prompts$, answers$, cliOptions) => {
+    const routingIsPreselected = cliOptions.angularRouting as
+      | boolean
+      | undefined
+
+    if (routingIsPreselected === undefined) {
+      prompts$.next({
+        name: 'useRouting',
+        type: 'confirm',
+        message: 'Would you like to add Angular routing?',
+        default: true,
+      })
+    }
 
     prompts$.complete()
 
-    return answers$.pipe(
-      reduce(
-        (acc, answerObject) => {
-          const copy = { ...acc }
+    return routingIsPreselected !== undefined
+      ? of<AngularExtensionOptions>({ useRouting: routingIsPreselected })
+      : answers$.pipe(
+          reduce<Answers, AngularExtensionOptions>(
+            (acc, answerObject) => {
+              const copy = { ...acc }
 
-          switch (answerObject.name) {
-            case 'useRouter':
-              copy.useRouting = answerObject.answer
-              break
-          }
+              switch (answerObject.name) {
+                case 'useRouting':
+                  copy.useRouting = answerObject.answer
+                  break
+              }
 
-          return copy
-        },
-        {
-          cssPreProcessor: 'css',
-          useRouting: false,
-        } as AngularExtensionOptions,
-      ),
-    )
+              return copy
+            },
+            {
+              useRouting: false,
+            },
+          ),
+        )
   },
   run: (rawOptions, otherInformation) => {
     // This ugly re-assignment is necessary for TypeScript reasons :/
