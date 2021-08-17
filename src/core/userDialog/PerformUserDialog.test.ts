@@ -1,3 +1,4 @@
+import type { ProjectMetaData } from './PerformUserDialog'
 import * as PerformUserDialog from './PerformUserDialog'
 import {
   getExtensionOptions,
@@ -12,6 +13,8 @@ import type { Answers, DistinctQuestion, ListQuestion } from 'inquirer'
 import { generateMockExtension } from '../../extensions/MockExtension'
 import { PackageManagerNames } from '../packageManagers/PackageManagerStrategy'
 import { generateMockProjectMetadata } from '../../extensions/MockOtherExtensionInformation'
+import { allExtensions } from '../../extensions/allExtensions'
+import { ReactExtension } from '../../extensions/ReactExtension/ReactExtension'
 import Choice = require('inquirer/lib/objects/choice')
 
 describe('promptMetadata', () => {
@@ -38,6 +41,7 @@ describe('promptMetadata', () => {
     let isYarnInstalledSpy: jest.SpyInstance
     let prompt$: Subject<DistinctQuestion>
     let answers$: Subject<Answers>
+    let partialMetaDataFromCliArgs: Partial<ProjectMetaData>
 
     beforeAll(() => {
       isNpmInstalledSpy = jest.spyOn(ChoosePackageManager, 'isNpmInstalled')
@@ -49,6 +53,7 @@ describe('promptMetadata', () => {
       isYarnInstalledSpy.mockReset().mockReturnValue(true)
       prompt$ = new Subject()
       answers$ = new Subject()
+      partialMetaDataFromCliArgs = {}
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       jest.spyOn(console, 'info').mockImplementation(() => {})
       // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -71,11 +76,13 @@ describe('promptMetadata', () => {
         }
       })
 
-      const testIsFinishedPromise = promptMetadata(prompt$, answers$).then(
-        () => {
-          expect(packageManagerQuestionAppeared).toBe(true)
-        },
-      )
+      const testIsFinishedPromise = promptMetadata(
+        prompt$,
+        answers$,
+        partialMetaDataFromCliArgs,
+      ).then(() => {
+        expect(packageManagerQuestionAppeared).toBe(true)
+      })
 
       // This causes the promptMetadata promise to resolve
       respondToAllMetaDataQuestions(answers$)
@@ -101,7 +108,7 @@ describe('promptMetadata', () => {
         }
       })
 
-      promptMetadata(prompt$, answers$)
+      promptMetadata(prompt$, answers$, partialMetaDataFromCliArgs)
     })
 
     it('should disable the yarn choice if yarn is not installed', (done) => {
@@ -122,11 +129,15 @@ describe('promptMetadata', () => {
         }
       })
 
-      promptMetadata(prompt$, answers$)
+      promptMetadata(prompt$, answers$, partialMetaDataFromCliArgs)
     })
 
     it('should return npm if npm is chosen', (done) => {
-      const metadataPromise = promptMetadata(prompt$, answers$)
+      const metadataPromise = promptMetadata(
+        prompt$,
+        answers$,
+        partialMetaDataFromCliArgs,
+      )
 
       respondToAllQuestionsExcept(answers$, 'packageManager')
       answers$.next({ name: 'packageManager', answer: 'npm' })
@@ -138,7 +149,11 @@ describe('promptMetadata', () => {
     })
 
     it('should return yarn if yarn is chosen', (done) => {
-      const metadataPromise = promptMetadata(prompt$, answers$)
+      const metadataPromise = promptMetadata(
+        prompt$,
+        answers$,
+        partialMetaDataFromCliArgs,
+      )
 
       respondToAllQuestionsExcept(answers$, 'packageManager')
       answers$.next({ name: 'packageManager', answer: 'yarn' })
@@ -153,7 +168,9 @@ describe('promptMetadata', () => {
       isNpmInstalledSpy.mockReturnValueOnce(false)
       isYarnInstalledSpy.mockReturnValueOnce(false)
 
-      expect(promptMetadata(prompt$, answers$)).rejects.toBeInstanceOf(Error)
+      expect(
+        promptMetadata(prompt$, answers$, partialMetaDataFromCliArgs),
+      ).rejects.toBeInstanceOf(Error)
     })
   })
 })
@@ -188,7 +205,7 @@ describe('getExtensionOptions', () => {
         },
       })
 
-      getExtensionOptions([extension], answers$, prompts$)
+      getExtensionOptions([extension], {}, answers$, prompts$)
 
       for (let i = 0; i < numberOfAskedQuestions; i++) {
         answers$.next({ name: 'AWESOME TEST QUESTION', answer: i })
@@ -201,6 +218,8 @@ describe('performUserDialog', () => {
   let promptMetaDataSpy: jest.SpyInstance
   let getExtensionOptionsSpy: jest.SpyInstance
   let selectExtensionsSpy: jest.SpyInstance
+  let prompts$: Subject<DistinctQuestion>
+  let answers$: Subject<Answers>
 
   beforeEach(() => {
     promptMetaDataSpy = jest
@@ -213,16 +232,15 @@ describe('performUserDialog', () => {
     selectExtensionsSpy = jest
       .spyOn(SelectExtensions, 'selectExtensions')
       .mockResolvedValue([] as Array<Extension>)
+    prompts$ = new Subject<DistinctQuestion>()
+    answers$ = new Subject<Answers>()
   })
 
   it('should complete prompts$ even if one of the submethods fails', async () => {
     const onCompletedSpy = jest.fn()
-
-    const prompts$ = new Subject<DistinctQuestion>()
     prompts$.subscribe({
       complete: onCompletedSpy,
     })
-    const answers$ = new Subject<Answers>()
     const extensions: Extension[] = []
 
     getExtensionOptionsSpy.mockImplementationOnce(() =>
@@ -232,11 +250,32 @@ describe('performUserDialog', () => {
     expect(onCompletedSpy).not.toHaveBeenCalled()
 
     try {
-      await performUserDialog(prompts$, answers$, extensions)
+      await performUserDialog(prompts$, answers$, extensions, {}, {})
     } catch (e) {
       // Error expected!
     }
 
     expect(onCompletedSpy).toHaveBeenCalled()
+  })
+
+  it('should NOTskip the extension selection if no extensions have been pre-chosen', async () => {
+    await performUserDialog(
+      prompts$,
+      answers$,
+      allExtensions,
+      {},
+      {},
+      undefined,
+    )
+
+    expect(selectExtensionsSpy).toHaveBeenCalled()
+  })
+
+  it('should skip the extension selection if extensions have been pre-chosen', async () => {
+    await performUserDialog(prompts$, answers$, allExtensions, {}, {}, [
+      ReactExtension,
+    ])
+
+    expect(selectExtensionsSpy).not.toHaveBeenCalled()
   })
 })

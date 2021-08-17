@@ -6,7 +6,7 @@ import {
 import { generateMockOtherExtensionInformation } from '../MockOtherExtensionInformation'
 import type { AdditionalInformationForExtensions } from '../../core/Extension'
 import path from 'path'
-import { ReactExtension } from '../ReactExtension'
+import { ReactExtension } from './ReactExtension'
 import { TypeScriptExtension } from '../TypeScriptExtension'
 import * as GeneralCodeGeneration from '../../core/CodeGeneration'
 import {

@@ -1,5 +1,5 @@
 import { TypeScriptExtension } from './TypeScriptExtension'
-import { ReactExtension } from './ReactExtension'
+import { ReactExtension } from './ReactExtension/ReactExtension'
 import { AngularExtension } from './AngularExtension/AngularExtension'
 import type { Extension } from '../core/Extension'
 import { allCssPreprocessors } from './cssPreprocessors/CssPreprocessors'

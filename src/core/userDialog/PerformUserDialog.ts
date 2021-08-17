@@ -29,6 +29,7 @@ import { generateYarnPackageManagerStrategy } from '../packageManagers/YarnPacka
 
 export const getExtensionOptions = async (
   chosenExtensions: Array<Extension>,
+  cliArgs: Record<string, unknown>,
   answers$: Observable<Answers>,
   prompts$: Subject<DistinctQuestion>,
 ): Promise<Array<Extension>> => {
@@ -68,18 +69,32 @@ export const getExtensionOptions = async (
 
     // Forward questions to actual prompts observable,
     // but don't forward complete as actual prompts aren't necessarily done yet
-    const questionsForwardingSubscription = customPrompts$.subscribe({
-      next: prompts$.next.bind(prompts$),
-    })
+    const questionsForwardingSubscription = customPrompts$
+      .pipe(
+        // Log which extension is being asked about before first question
+        map((value, index) => {
+          if (index === 0) {
+            console.log(chalk.bold.underline(extension.name))
+          }
+          return value
+        }),
+      )
+      .subscribe({
+        next: prompts$.next.bind(prompts$),
+      })
 
     let chosenOptions: Record<string, unknown> | undefined
 
     if (extension.promptOptions) {
-      console.log(chalk.bold.underline(extension.name))
       chosenOptions = await lastValueFrom(
-        extension.promptOptions(customPrompts$, customAnswers$),
+        extension.promptOptions(customPrompts$, customAnswers$, cliArgs),
       )
-      console.log()
+
+      // Add an empty line to console output if at least one question was asked
+      const numberOfQuestionsAsked = await lastValueFrom(actualCount$)
+      if (numberOfQuestionsAsked > 0) {
+        console.log()
+      }
     }
 
     const extensionWithOptions = extension
@@ -101,8 +116,16 @@ export type ProjectMetaData = {
   packageManagerStrategy: PackageManagerStrategy
 }
 
-function getDefaultMetadata(npmIsInstalled: boolean, yarnIsInstalled: boolean) {
-  const defaultMetaData = {} as Omit<ProjectMetaData, 'packageManagerStrategy'>
+function getDefaultMetadata(
+  npmIsInstalled: boolean,
+  yarnIsInstalled: boolean,
+  partialMetaDataFromCliArgs: Partial<ProjectMetaData>,
+) {
+  const defaultMetaData = {
+    rootDirectory: partialMetaDataFromCliArgs.rootDirectory,
+    chosenPackageManager: partialMetaDataFromCliArgs.chosenPackageManager,
+    name: partialMetaDataFromCliArgs.name,
+  } as Omit<ProjectMetaData, 'packageManagerStrategy'>
 
   if (npmIsInstalled && !yarnIsInstalled) {
     console.info(
@@ -127,6 +150,7 @@ function getDefaultMetadata(npmIsInstalled: boolean, yarnIsInstalled: boolean) {
 export const promptMetadata = async (
   prompts$: Subject<DistinctQuestion>,
   answers$: Observable<Answers>,
+  partialMetaDataFromCliArgs: Partial<ProjectMetaData>,
 ): Promise<ProjectMetaData | undefined> => {
   const npmIsInstalled = isNpmInstalled()
   const yarnIsInstalled = isYarnInstalled()
@@ -139,13 +163,18 @@ export const promptMetadata = async (
 
   const notInstalledMessage = chalk.bold.red(' NOT INSTALLED! ') + '-'
 
-  const questions: Array<DistinctQuestion> = [
-    {
+  const questions: Array<DistinctQuestion> = []
+
+  if (!partialMetaDataFromCliArgs.name) {
+    questions.push({
       name: 'name',
       type: 'input',
       message: 'What should your project be called?',
-    },
-    {
+    })
+  }
+
+  if (!partialMetaDataFromCliArgs.chosenPackageManager) {
+    questions.push({
       type: 'list',
       name: 'packageManager',
       message:
@@ -169,72 +198,88 @@ export const promptMetadata = async (
         },
       ],
       default: 'npm',
-    },
-  ]
+    })
+  }
 
   questions.forEach((question) => prompts$.next(question))
 
-  const defaultMetaData = getDefaultMetadata(npmIsInstalled, yarnIsInstalled)
+  const defaultMetaData = getDefaultMetadata(
+    npmIsInstalled,
+    yarnIsInstalled,
+    partialMetaDataFromCliArgs,
+  )
 
-  return lastValueFrom(
-    answers$.pipe(
-      take(questions.length),
-      reduce((acc, answer) => {
-        const copy = { ...acc }
+  if (
+    partialMetaDataFromCliArgs.name &&
+    partialMetaDataFromCliArgs.chosenPackageManager
+  ) {
+    return Promise.resolve(partialMetaDataFromCliArgs as ProjectMetaData)
+  } else {
+    return lastValueFrom(
+      answers$.pipe(
+        take(questions.length),
+        reduce((acc, answer) => {
+          const copy = { ...acc }
 
-        switch (answer.name) {
-          case 'name':
-            copy.name = answer.answer
-            copy.rootDirectory = path.join(process.cwd(), answer.answer)
-            break
-          case 'packageManager':
-            copy.chosenPackageManager = answer.answer
-            break
-        }
+          switch (answer.name) {
+            case 'name':
+              copy.rootDirectory = path.join(process.cwd(), answer.answer)
+              copy.name = path.basename(copy.rootDirectory)
+              break
+            case 'packageManager':
+              copy.chosenPackageManager = answer.answer
+              break
+          }
 
-        return copy
-      }, defaultMetaData),
-    ),
-  ).then((incompleteMetadata) => {
-    const rootDirectory = path.join(process.cwd(), incompleteMetadata.name)
-    const packageManagerStrategy =
-      incompleteMetadata.chosenPackageManager === PackageManagerNames.NPM
-        ? generateNpmPackageManagerStrategy(rootDirectory)
-        : generateYarnPackageManagerStrategy(rootDirectory)
+          return copy
+        }, defaultMetaData),
+      ),
+    ).then((incompleteMetadata) => {
+      const packageManagerStrategy =
+        incompleteMetadata.chosenPackageManager === PackageManagerNames.NPM
+          ? generateNpmPackageManagerStrategy(incompleteMetadata.rootDirectory)
+          : generateYarnPackageManagerStrategy(incompleteMetadata.rootDirectory)
 
-    return {
-      ...incompleteMetadata,
-      packageManagerStrategy,
-    }
-  })
+      return {
+        ...incompleteMetadata,
+        packageManagerStrategy,
+      } as ProjectMetaData
+    })
+  }
 }
 
 export const performUserDialog = async (
   prompts$: Subject<DistinctQuestion>,
   answers$: Observable<Answers>,
   extensions: Array<Extension>,
+  metaDataFromCliArgs: Partial<ProjectMetaData>,
+  cliArgs: Record<string, unknown>,
+  preChosenExtensions?: Array<Extension>,
 ): Promise<{
   extensionsWithOptions: Array<Extension>
   projectMetadata: ProjectMetaData
 }> => {
   try {
-    const projectMetadata = await promptMetadata(prompts$, answers$)
+    const projectMetadata = await promptMetadata(
+      prompts$,
+      answers$,
+      metaDataFromCliArgs,
+    )
 
     if (!projectMetadata) {
       throw new Error('Project metadata could not be computed.')
     }
 
-    const chosenExtensions = await selectExtensions(
-      prompts$,
-      answers$,
-      extensions,
-    )
+    const chosenExtensions =
+      preChosenExtensions ??
+      (await selectExtensions(prompts$, answers$, extensions))
 
     // Create empty line before asking about extension options
     console.log()
 
     const extensionsWithOptions = await getExtensionOptions(
       chosenExtensions,
+      cliArgs,
       answers$,
       prompts$,
     )

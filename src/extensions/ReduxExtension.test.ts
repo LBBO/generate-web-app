@@ -1,7 +1,7 @@
 import type { AdditionalInformationForExtensions } from '../core/Extension'
 import { generateMockOtherExtensionInformation } from './MockOtherExtensionInformation'
 import { ReduxExtension } from './ReduxExtension'
-import { ReactExtension } from './ReactExtension'
+import { ReactExtension } from './ReactExtension/ReactExtension'
 import { TypeScriptExtension } from './TypeScriptExtension'
 import fs, { readFile } from 'fs/promises'
 import path from 'path'

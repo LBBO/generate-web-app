@@ -1,6 +1,6 @@
 import type { Extension } from '../core/Extension'
 import { ExtensionCategory } from '../core/Extension'
-import { reduce } from 'rxjs'
+import { of, reduce } from 'rxjs'
 
 export type TypeScriptExtensionOptions = {
   enableStrictMode: boolean
@@ -12,34 +12,49 @@ export const TypeScriptExtension: Extension = {
     'An open-source language which builds on JavaScript by adding static type definitions.',
   linkToDocumentation: new URL('https://www.typescriptlang.org/'),
   category: ExtensionCategory.JAVASCRIPT_FLAVOR,
-  promptOptions: (prompts$, answers$) => {
-    prompts$.next({
-      name: 'typescriptStrictMode',
-      type: 'confirm',
-      message: 'Would you like to enable the TypeScript strict mode?',
-      default: true,
-    })
+  declareCliOptions: (program) => {
+    program.option('--ts-strict-mode', 'Install TypeScript in strict mode')
+    program.option('--no-ts-strict-mode')
+  },
+  promptOptions: (prompts$, answers$, cliOptions) => {
+    const strictModeIsPreEnabled = cliOptions.tsStrictMode as
+      | boolean
+      | undefined
+
+    if (strictModeIsPreEnabled === undefined) {
+      prompts$.next({
+        name: 'typescriptStrictMode',
+        type: 'confirm',
+        message:
+          'Would you like to enable the TypeScript strict mode? More info: https://www.typescriptlang.org/tsconfig#strict',
+        default: true,
+      })
+    }
 
     prompts$.complete()
 
-    return answers$.pipe(
-      reduce(
-        (acc, answerObject) => {
-          const copy = { ...acc }
+    return strictModeIsPreEnabled !== undefined
+      ? of<TypeScriptExtensionOptions>({
+          enableStrictMode: strictModeIsPreEnabled,
+        })
+      : answers$.pipe(
+          reduce(
+            (acc, answerObject) => {
+              const copy = { ...acc }
 
-          switch (answerObject.name) {
-            case 'typescriptStrictMode':
-              copy.enableStrictMode = answerObject.answer
-              break
-          }
+              switch (answerObject.name) {
+                case 'typescriptStrictMode':
+                  copy.enableStrictMode = answerObject.answer
+                  break
+              }
 
-          return copy
-        },
-        {
-          enableStrictMode: true,
-        } as TypeScriptExtensionOptions,
-      ),
-    )
+              return copy
+            },
+            {
+              enableStrictMode: true,
+            } as TypeScriptExtensionOptions,
+          ),
+        )
   },
   canBeSkipped: (options, otherInformation) => {
     const chosenExtensionNames = otherInformation.chosenExtensions.map(
@@ -51,6 +66,6 @@ export const TypeScriptExtension: Extension = {
     )
   },
   run(): Promise<void> {
-    return Promise.resolve(undefined)
+    return Promise.reject(new Error('TypeScript extension is not implemented'))
   },
 }

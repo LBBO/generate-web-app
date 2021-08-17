@@ -7,12 +7,12 @@ export const ensureAllExtensionsHaveUniqueNames = (
   const names = new Set<string>()
 
   extensions.forEach(({ name }) => {
-    if (names.has(name)) {
+    if (names.has(name.toLowerCase())) {
       throw new Error(
-        `Two extensions have the name "${name}". Please ensure all extensions have unique names!`,
+        `Two extensions have the name "${name}" (though the capitalization might differ). Please ensure all extensions have unique names!`,
       )
     } else {
-      names.add(name)
+      names.add(name.toLowerCase())
     }
   })
 }

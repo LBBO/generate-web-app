@@ -14,7 +14,7 @@ import { LessExtension } from './cssPreprocessors/LessExtension'
 import { SassExtension } from './cssPreprocessors/SassExtension'
 import { ScssExtension } from './cssPreprocessors/ScssExtension'
 import { ESLintExtension } from './ESLintExtension'
-import { ReactExtension } from './ReactExtension'
+import { ReactExtension } from './ReactExtension/ReactExtension'
 import { TypeScriptExtension } from './TypeScriptExtension'
 import { ReduxExtension } from './ReduxExtension'
 
