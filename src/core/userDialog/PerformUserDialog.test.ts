@@ -205,7 +205,7 @@ describe('getExtensionOptions', () => {
         },
       })
 
-      getExtensionOptions([extension], answers$, prompts$)
+      getExtensionOptions([extension], {}, answers$, prompts$)
 
       for (let i = 0; i < numberOfAskedQuestions; i++) {
         answers$.next({ name: 'AWESOME TEST QUESTION', answer: i })
@@ -250,7 +250,7 @@ describe('performUserDialog', () => {
     expect(onCompletedSpy).not.toHaveBeenCalled()
 
     try {
-      await performUserDialog(prompts$, answers$, extensions, {})
+      await performUserDialog(prompts$, answers$, extensions, {}, {})
     } catch (e) {
       // Error expected!
     }
@@ -259,13 +259,20 @@ describe('performUserDialog', () => {
   })
 
   it('should NOTskip the extension selection if no extensions have been pre-chosen', async () => {
-    await performUserDialog(prompts$, answers$, allExtensions, {}, undefined)
+    await performUserDialog(
+      prompts$,
+      answers$,
+      allExtensions,
+      {},
+      {},
+      undefined,
+    )
 
     expect(selectExtensionsSpy).toHaveBeenCalled()
   })
 
   it('should skip the extension selection if extensions have been pre-chosen', async () => {
-    await performUserDialog(prompts$, answers$, allExtensions, {}, [
+    await performUserDialog(prompts$, answers$, allExtensions, {}, {}, [
       ReactExtension,
     ])
 

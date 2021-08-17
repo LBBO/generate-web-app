@@ -40,6 +40,7 @@ const run = async () => {
     answers$,
     allExtensions,
     partialMetaData,
+    program.opts(),
     preChosenExtensions,
   )
   const projectInformation = {

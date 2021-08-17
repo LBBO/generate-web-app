@@ -29,6 +29,7 @@ import { generateYarnPackageManagerStrategy } from '../packageManagers/YarnPacka
 
 export const getExtensionOptions = async (
   chosenExtensions: Array<Extension>,
+  cliArgs: Record<string, unknown>,
   answers$: Observable<Answers>,
   prompts$: Subject<DistinctQuestion>,
 ): Promise<Array<Extension>> => {
@@ -77,7 +78,7 @@ export const getExtensionOptions = async (
     if (extension.promptOptions) {
       console.log(chalk.bold.underline(extension.name))
       chosenOptions = await lastValueFrom(
-        extension.promptOptions(customPrompts$, customAnswers$),
+        extension.promptOptions(customPrompts$, customAnswers$, cliArgs),
       )
       console.log()
     }
@@ -238,6 +239,7 @@ export const performUserDialog = async (
   answers$: Observable<Answers>,
   extensions: Array<Extension>,
   metaDataFromCliArgs: Partial<ProjectMetaData>,
+  cliArgs: Record<string, unknown>,
   preChosenExtensions?: Array<Extension>,
 ): Promise<{
   extensionsWithOptions: Array<Extension>
@@ -263,6 +265,7 @@ export const performUserDialog = async (
 
     const extensionsWithOptions = await getExtensionOptions(
       chosenExtensions,
+      cliArgs,
       answers$,
       prompts$,
     )

@@ -29,6 +29,7 @@ export type Extension = {
   promptOptions?: (
     prompts$: Subject<DistinctQuestion>,
     answers$: Observable<Answers>,
+    cliOptions: Record<string, unknown>,
   ) => Observable<Record<string, unknown>>
 
   declareCliOptions?: (program: Command) => void
