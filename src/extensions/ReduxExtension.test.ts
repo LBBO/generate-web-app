@@ -55,7 +55,7 @@ describe('run', () => {
     ).toBe(false)
   })
 
-  describe('when chosen alongside react', () => {
+  describe('when chosen along with react', () => {
     let surroundAppWithComponentWithoutImportSpy: jest.SpyInstance
     let addComponentSpy: jest.SpyInstance
 
@@ -201,7 +201,7 @@ describe('run', () => {
     })
   })
 
-  describe('when chosen alongside Angular', () => {
+  describe('when chosen along with Angular', () => {
     let addAngularImportToModuleSpy: jest.SpyInstance
     let addDeclarationToModuleSpy: jest.SpyInstance
     let addAngularComponentToAppComponentSpy: jest.SpyInstance

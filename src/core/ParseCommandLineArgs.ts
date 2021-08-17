@@ -33,7 +33,7 @@ export const declareArgsAndOptions = (
           .join(', ')}`
       : undefined
     const exclusivityDescription = extension.exclusiveTo?.length
-      ? `Cannot be used alongside ${extension.exclusiveTo
+      ? `Cannot be used along with ${extension.exclusiveTo
           ?.map((exclusivity) => exclusivity.name)
           .join(', ')}`
       : undefined
