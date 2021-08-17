@@ -2,7 +2,7 @@ import { SassExtension } from './SassExtension'
 import { generateMockOtherExtensionInformation } from '../MockOtherExtensionInformation'
 import { generateMockExtension } from '../MockExtension'
 import { AngularExtension } from '../AngularExtension/AngularExtension'
-import { ReactExtension } from '../ReactExtension'
+import { ReactExtension } from '../ReactExtension/ReactExtension'
 import fs from 'fs/promises'
 
 describe('canBeSkipped', () => {

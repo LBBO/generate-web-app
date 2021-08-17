@@ -1,6 +1,6 @@
 import type { Extension } from '../../core/Extension'
 import { ExtensionCategory } from '../../core/Extension'
-import { ReactExtension } from '../ReactExtension'
+import { ReactExtension } from '../ReactExtension/ReactExtension'
 import { getAngularExtension } from '../Getters'
 
 export type LessExtensionOptions = Record<string, never>

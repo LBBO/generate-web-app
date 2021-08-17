@@ -1,4 +1,4 @@
-import { ReactExtension } from './ReactExtension'
+import { ReactExtension } from './ReactExtension/ReactExtension'
 import { TypeScriptExtension } from './TypeScriptExtension'
 import { AngularExtension } from './AngularExtension/AngularExtension'
 import { generateMockExtension } from './MockExtension'

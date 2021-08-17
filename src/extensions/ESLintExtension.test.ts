@@ -8,7 +8,7 @@ import { formatWithPrettier } from '../core/FormatCode'
 import type { AdditionalInformationForExtensions } from '../core/Extension'
 import { generateMockOtherExtensionInformation } from './MockOtherExtensionInformation'
 import { TypeScriptExtension } from './TypeScriptExtension'
-import { ReactExtension } from './ReactExtension'
+import { ReactExtension } from './ReactExtension/ReactExtension'
 import { AngularExtension } from './AngularExtension/AngularExtension'
 
 describe('generateESLintConfigFileContent', () => {

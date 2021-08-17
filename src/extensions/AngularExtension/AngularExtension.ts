@@ -1,7 +1,7 @@
 import type { Extension } from '../../core/Extension'
 import { ExtensionCategory } from '../../core/Extension'
 import { TypeScriptExtension } from '../TypeScriptExtension'
-import { ReactExtension } from '../ReactExtension'
+import { ReactExtension } from '../ReactExtension/ReactExtension'
 import { spawn } from 'child_process'
 import * as path from 'path'
 import { reduce } from 'rxjs'
