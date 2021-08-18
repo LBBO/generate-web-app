@@ -76,6 +76,8 @@ export const AngularExtension: Extension = {
       }
 
       const npxArgs = [
+        // Do not ask if the package should be installed
+        '--yes',
         '-p=@angular/cli',
         'ng',
         'new',

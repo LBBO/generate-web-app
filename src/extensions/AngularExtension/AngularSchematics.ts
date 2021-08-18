@@ -3,6 +3,8 @@ import { spawn } from 'child_process'
 export const addSchematic = (cwd: string, args: string[]): Promise<void> => {
   return new Promise((resolve, reject) => {
     const npxArgs = [
+      // Do not ask if the package should be installed
+      '--yes',
       '-p=@angular/cli',
       'ng',
       'new',

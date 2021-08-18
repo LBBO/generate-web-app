@@ -19,6 +19,8 @@ export const ReactExtension: Extension = {
   run: (options, otherInformation) => {
     return new Promise((resolve, reject) => {
       const npxArgs = [
+        // Do not ask if the package should be installed
+        '--yes',
         'create-react-app',
         otherInformation.projectMetadata.name,
       ]
@@ -39,6 +41,11 @@ export const ReactExtension: Extension = {
 
       const child_process = spawn('npx', npxArgs, {
         stdio: 'inherit',
+      })
+
+      child_process.on('error', (e) => {
+        console.log(process.env.PATH)
+        console.error(e)
       })
 
       child_process.on('close', (statusCode) => {
