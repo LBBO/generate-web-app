@@ -13,7 +13,11 @@ export const addSchematic = (cwd: string, args: string[]): Promise<void> => {
       ...args,
     ]
 
-    const childProcess = spawn('npx', npxArgs, { stdio: 'inherit', cwd })
+    const childProcess = spawn('npx', npxArgs, {
+      stdio: 'inherit',
+      cwd,
+      shell: true,
+    })
 
     childProcess.on('close', (statusCode) => {
       if (statusCode === 0) {

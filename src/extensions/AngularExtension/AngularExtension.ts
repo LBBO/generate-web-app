@@ -120,7 +120,10 @@ export const AngularExtension: Extension = {
         npxArgs.push('--package-manager', 'yarn')
       }
 
-      const childProcess = spawn('npx', npxArgs, { stdio: 'inherit' })
+      const childProcess = spawn('npx', npxArgs, {
+        stdio: 'inherit',
+        shell: true,
+      })
 
       childProcess.on('close', (statusCode) => {
         console.log(`Angular finished with code ${statusCode}`)

@@ -41,6 +41,7 @@ export const ReactExtension: Extension = {
 
       const child_process = spawn('npx', npxArgs, {
         stdio: 'inherit',
+        shell: true,
       })
 
       child_process.on('error', (e) => {
