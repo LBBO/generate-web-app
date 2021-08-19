@@ -7,7 +7,6 @@ export const addSchematic = (cwd: string, args: string[]): Promise<void> => {
       '--yes',
       '-p=@angular/cli',
       'ng',
-      'new',
       'add',
       '--skip-confirmation',
       ...args,
