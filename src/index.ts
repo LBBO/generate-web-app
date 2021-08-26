@@ -73,4 +73,4 @@ const run = async () => {
   }
 }
 
-run()
+run().catch(chalk.bold.red)
