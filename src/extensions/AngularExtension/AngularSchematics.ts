@@ -1,16 +1,22 @@
-import path from 'path'
 import { spawn } from 'child_process'
 
 export const addSchematic = (cwd: string, args: string[]): Promise<void> => {
   return new Promise((resolve, reject) => {
-    const nodeArgs = [
-      path.join(__dirname, '../../../node_modules/@angular/cli/bin/ng'),
+    const npxArgs = [
+      // Do not ask if the package should be installed
+      '--yes',
+      '-p=@angular/cli',
+      'ng',
       'add',
       '--skip-confirmation',
       ...args,
     ]
 
-    const childProcess = spawn('node', nodeArgs, { stdio: 'inherit', cwd })
+    const childProcess = spawn('npx', npxArgs, {
+      stdio: 'inherit',
+      cwd,
+      shell: true,
+    })
 
     childProcess.on('close', (statusCode) => {
       if (statusCode === 0) {

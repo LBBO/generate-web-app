@@ -11,7 +11,7 @@ export const runNpmInstall = (
     const installationProcess = spawn(
       'npm',
       ['install', areDevDependencies ? '-D' : '-S', ...dependencies],
-      { stdio: 'inherit', cwd },
+      { stdio: 'inherit', cwd, shell: true },
     )
 
     installationProcess.on('close', () => {

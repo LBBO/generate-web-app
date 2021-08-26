@@ -3,7 +3,6 @@ import { ExtensionCategory } from '../../core/Extension'
 import { TypeScriptExtension } from '../TypeScriptExtension'
 import { ReactExtension } from '../ReactExtension/ReactExtension'
 import { spawn } from 'child_process'
-import * as path from 'path'
 import { of, reduce } from 'rxjs'
 import { PackageManagerNames } from '../../core/packageManagers/PackageManagerStrategy'
 import {
@@ -76,8 +75,11 @@ export const AngularExtension: Extension = {
         return reject(new Error('No Angular extension options provided!'))
       }
 
-      const nodeArgs = [
-        path.join(__dirname, '../../../node_modules/@angular/cli/bin/ng'),
+      const npxArgs = [
+        // Do not ask if the package should be installed
+        '--yes',
+        '-p=@angular/cli',
+        'ng',
         'new',
         otherInformation.projectMetadata.name,
         // Disable interactive prompts since this CLI already asks all necessary questions
@@ -88,37 +90,40 @@ export const AngularExtension: Extension = {
         getTypeScriptExtension(otherInformation.chosenExtensions)?.options
           ?.enableStrictMode
       ) {
-        nodeArgs.push('--strict')
+        npxArgs.push('--strict')
       }
 
-      nodeArgs.push('--style')
+      npxArgs.push('--style')
       if (getScssExtension(otherInformation.chosenExtensions)) {
-        nodeArgs.push('scss')
+        npxArgs.push('scss')
       } else if (getSassExtension(otherInformation.chosenExtensions)) {
-        nodeArgs.push('sass')
+        npxArgs.push('sass')
       } else if (getLessExtension(otherInformation.chosenExtensions)) {
-        nodeArgs.push('less')
+        npxArgs.push('less')
       } else {
-        nodeArgs.push('css')
+        npxArgs.push('css')
       }
 
       if (options.useRouting) {
-        nodeArgs.push('--routing')
+        npxArgs.push('--routing')
       }
 
       if (
         otherInformation.projectMetadata.chosenPackageManager ===
         PackageManagerNames.NPM
       ) {
-        nodeArgs.push('--package-manager', 'npm')
+        npxArgs.push('--package-manager', 'npm')
       } else if (
         otherInformation.projectMetadata.chosenPackageManager ===
         PackageManagerNames.YARN
       ) {
-        nodeArgs.push('--package-manager', 'yarn')
+        npxArgs.push('--package-manager', 'yarn')
       }
 
-      const childProcess = spawn('node', nodeArgs, { stdio: 'inherit' })
+      const childProcess = spawn('npx', npxArgs, {
+        stdio: 'inherit',
+        shell: true,
+      })
 
       childProcess.on('close', (statusCode) => {
         console.log(`Angular finished with code ${statusCode}`)

@@ -16,7 +16,11 @@ export const runYarnInstall = (
 
     args.push(...dependencies)
 
-    const installationProcess = spawn('yarn', args, { stdio: 'inherit', cwd })
+    const installationProcess = spawn('yarn', args, {
+      stdio: 'inherit',
+      cwd,
+      shell: true,
+    })
 
     installationProcess.on('close', () => {
       resolve()
