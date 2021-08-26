@@ -12,7 +12,7 @@ export const ReactExtension: Extension = {
   description: 'A JavaScript library for building user interfaces.',
   linkToDocumentation: new URL('https://reactjs.org/'),
   // Exclusiveness to Angular is declared in Angular plugin
-  exclusiveTo: [],
+  // exclusiveTo: [],
   dependsOn: [ESLintExtension],
   category: ExtensionCategory.FRONTEND_FRAMEWORK,
 
