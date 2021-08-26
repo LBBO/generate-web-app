@@ -20,8 +20,9 @@ export const ReactExtension: Extension = {
     return new Promise((resolve, reject) => {
       const npxArgs = [
         // Do not ask if the package should be installed
-        '--yes',
         'create-react-app',
+        '--yes',
+        '--',
         otherInformation.projectMetadata.name,
       ]
 
