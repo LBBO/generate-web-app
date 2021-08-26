@@ -26,7 +26,8 @@ export const selectExtensions = (
   prompts$.next({
     type: 'checkbox',
     name: 'chosenExtensions',
-    message: 'What libraries / tools would you like to use in your project?',
+    message:
+      'What libraries / tools would you like to use in your project?\n\n',
     pageSize: 20,
     choices: extensions
       // Ensure all extensions are grouped by category
