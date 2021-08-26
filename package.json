@@ -28,6 +28,9 @@
     "url": "https://github.com/LBBO/generate-web-app/issues"
   },
   "homepage": "https://github.com/LBBO/generate-web-app#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "devDependencies": {
     "@types/diff": "^5.0.1",
     "@types/eslint": "^7.28.0",
