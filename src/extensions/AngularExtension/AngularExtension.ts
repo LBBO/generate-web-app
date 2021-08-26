@@ -26,7 +26,7 @@ export const AngularExtension: Extension = {
   dependsOn: [TypeScriptExtension],
   exclusiveTo: [ReactExtension],
   declareCliOptions: (program) => {
-    program.option('--angular-routing', 'Add routing to Angular')
+    program.option('--angular-routing', 'Add default routing to Angular')
     program.option('--no-angular-routing')
   },
   promptOptions: (prompts$, answers$, cliOptions) => {
@@ -38,7 +38,8 @@ export const AngularExtension: Extension = {
       prompts$.next({
         name: 'useRouting',
         type: 'confirm',
-        message: 'Would you like to add Angular routing?',
+        message:
+          "Would you like to add Angular's default routing to the project?",
         default: true,
       })
     }
