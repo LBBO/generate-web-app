@@ -1,15 +1,10 @@
 import type { ProjectMetaData } from './PerformUserDialog'
 import * as PerformUserDialog from './PerformUserDialog'
-import {
-  getExtensionOptions,
-  performUserDialog,
-  promptMetadata,
-} from './PerformUserDialog'
+import { performUserDialog, promptMetadata } from './PerformUserDialog'
 import * as SelectExtensions from './SelectExtensions'
 import * as ChoosePackageManager from '../packageManagers/PackageManagerDetectors'
-import { filter, Subject } from 'rxjs'
 import type { Extension } from '../Extension'
-import type { Answers, DistinctQuestion, ListQuestion } from 'inquirer'
+import type { DistinctQuestion, ListQuestion } from 'inquirer'
 import inquirer from 'inquirer'
 import { PackageManagerNames } from '../packageManagers/PackageManagerStrategy'
 import { generateMockProjectMetadata } from '../../extensions/MockOtherExtensionInformation'
@@ -18,24 +13,6 @@ import { ReactExtension } from '../../extensions/ReactExtension/ReactExtension'
 import Choice = require('inquirer/lib/objects/choice')
 
 describe('promptMetadata', () => {
-  const respondToAllMetaDataQuestions = (answers$: Subject<Answers>): void => {
-    answers$.next({ name: 'name', answer: 'some package name' })
-    answers$.next({ name: 'packageManager', answer: PackageManagerNames.NPM })
-  }
-
-  const respondToAllQuestionsExcept = (
-    answers$: Subject<Answers>,
-    exceptionName: string,
-  ): void => {
-    const allAnswers$ = new Subject<Answers>()
-
-    allAnswers$
-      .pipe(filter((answer) => answer.name !== exceptionName))
-      .subscribe(answers$)
-
-    respondToAllMetaDataQuestions(allAnswers$)
-  }
-
   let promptSpy: jest.SpyInstance
 
   beforeEach(() => {
@@ -48,8 +25,6 @@ describe('promptMetadata', () => {
   describe('choose package manager', () => {
     let isNpmInstalledSpy: jest.SpyInstance
     let isYarnInstalledSpy: jest.SpyInstance
-    let prompt$: Subject<DistinctQuestion>
-    let answers$: Subject<Answers>
     let partialMetaDataFromCliArgs: Partial<ProjectMetaData>
 
     beforeAll(() => {
@@ -60,8 +35,6 @@ describe('promptMetadata', () => {
     beforeEach(() => {
       isNpmInstalledSpy.mockReset().mockReturnValue(true)
       isYarnInstalledSpy.mockReset().mockReturnValue(true)
-      prompt$ = new Subject()
-      answers$ = new Subject()
       partialMetaDataFromCliArgs = {}
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       jest.spyOn(console, 'info').mockImplementation(() => {})

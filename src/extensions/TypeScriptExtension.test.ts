@@ -3,20 +3,15 @@ import { TypeScriptExtension } from './TypeScriptExtension'
 import { AngularExtension } from './AngularExtension/AngularExtension'
 import { generateMockExtension } from './MockExtension'
 import { generateMockProjectMetadata } from './MockOtherExtensionInformation'
-import { Subject } from 'rxjs'
-import type { Answers, DistinctQuestion } from 'inquirer'
+import type { DistinctQuestion } from 'inquirer'
 import { getArgsAndOptionsFromCliArgs } from '../core/TestingUtils'
 
 describe('promptOptions', () => {
-  let prompts$: Subject<DistinctQuestion>
-  let answers$: Subject<Answers>
   let promptSpy: jest.SpyInstance
   // This is just another pointer to promptSpy, but with another type so TypeScript accepts that it's callable
   let callablePromptSpy: <T = unknown>(questions: Array<DistinctQuestion>) => T
 
   beforeEach(() => {
-    prompts$ = new Subject()
-    answers$ = new Subject()
     promptSpy = jest.fn().mockResolvedValue({})
     callablePromptSpy = promptSpy as unknown as typeof callablePromptSpy
   })
