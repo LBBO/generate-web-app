@@ -237,19 +237,18 @@ export const performUserDialog = async (
 }> => {
   const projectMetadata = await promptMetadata(metaDataFromCliArgs)
 
-  const prompts$ = new Subject<DistinctQuestion>()
-  const answers$ = inquirer.prompt(prompts$).ui.process
-
   if (!projectMetadata) {
     throw new Error('Project metadata could not be computed.')
   }
 
   const chosenExtensions =
-    preChosenExtensions ??
-    (await selectExtensions(prompts$, answers$, extensions))
+    preChosenExtensions ?? (await selectExtensions(extensions))
 
   // Create empty line before asking about extension options
   console.log()
+
+  const prompts$ = new Subject<DistinctQuestion>()
+  const answers$ = inquirer.prompt(prompts$).ui.process
 
   const extensionsWithOptions = await getExtensionOptions(
     chosenExtensions,
