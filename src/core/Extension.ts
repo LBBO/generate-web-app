@@ -2,6 +2,7 @@ import type { Observable, Subject } from 'rxjs'
 import type { Answers, DistinctQuestion } from 'inquirer'
 import type { ProjectMetaData } from './userDialog/PerformUserDialog'
 import type { Command } from 'commander'
+import type { OverrideProperties } from '../types/UtilityTypes'
 
 export enum ExtensionCategory {
   ONLY_FOR_TESTING,
@@ -34,7 +35,6 @@ export type Extension = {
 
   declareCliOptions?: (program: Command) => void
 
-  // Actually TypescriptExtensionOptions, but TypeScript can't understand that...
   options?: Record<string, unknown>
 
   canBeSkipped?: (
@@ -54,6 +54,4 @@ export type Extension = {
 
 export type ExtensionWithSpecificOptions<
   Options extends Record<string, unknown>,
-> = Omit<Extension, 'options'> & {
-  options: Options
-}
+> = OverrideProperties<Extension, { options: Options }>
