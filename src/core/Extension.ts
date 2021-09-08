@@ -1,7 +1,8 @@
-import type { Observable, Subject } from 'rxjs'
-import type { Answers, DistinctQuestion } from 'inquirer'
+import type inquirer from 'inquirer'
 import type { ProjectMetaData } from './userDialog/PerformUserDialog'
 import type { Command } from 'commander'
+import type { OverrideProperties } from '../types/UtilityTypes'
+import type PromptUI from 'inquirer/lib/ui/prompt'
 
 export enum ExtensionCategory {
   ONLY_FOR_TESTING,
@@ -27,14 +28,14 @@ export type Extension = {
   exclusiveTo?: Array<Extension>
 
   promptOptions?: (
-    prompts$: Subject<DistinctQuestion>,
-    answers$: Observable<Answers>,
+    prompt: <T = unknown>(
+      questions: Array<inquirer.DistinctQuestion>,
+    ) => Promise<T> & { ui: PromptUI },
     cliOptions: Record<string, unknown>,
-  ) => Observable<Record<string, unknown>>
+  ) => Promise<Record<string, unknown>>
 
   declareCliOptions?: (program: Command) => void
 
-  // Actually TypescriptExtensionOptions, but TypeScript can't understand that...
   options?: Record<string, unknown>
 
   canBeSkipped?: (
@@ -54,6 +55,4 @@ export type Extension = {
 
 export type ExtensionWithSpecificOptions<
   Options extends Record<string, unknown>,
-> = Omit<Extension, 'options'> & {
-  options: Options
-}
+> = OverrideProperties<Extension, { options: Options }>

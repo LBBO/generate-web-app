@@ -158,7 +158,10 @@ export const parseChosenExtensions = (
 export const parseCommandLineArgs = (
   program: Command,
   allExtensions: Array<Extension>,
-) => {
+): {
+  metaData: Partial<ProjectMetaData>
+  chosenExtensions: Array<Extension> | undefined
+} => {
   declareArgsAndOptions(program, allExtensions)
 
   program.parse(process.argv)

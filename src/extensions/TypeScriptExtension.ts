@@ -1,6 +1,5 @@
 import type { Extension } from '../core/Extension'
 import { ExtensionCategory } from '../core/Extension'
-import { of, reduce } from 'rxjs'
 
 export type TypeScriptExtensionOptions = {
   enableStrictMode: boolean
@@ -16,45 +15,29 @@ export const TypeScriptExtension: Extension = {
     program.option('--ts-strict-mode', 'Install TypeScript in strict mode')
     program.option('--no-ts-strict-mode')
   },
-  promptOptions: (prompts$, answers$, cliOptions) => {
+  promptOptions: async (prompt, cliOptions) => {
     const strictModeIsPreEnabled = cliOptions.tsStrictMode as
       | boolean
       | undefined
 
     if (strictModeIsPreEnabled === undefined) {
-      prompts$.next({
-        name: 'typescriptStrictMode',
-        type: 'confirm',
-        message:
-          'Would you like to enable the TypeScript strict mode? More info: https://www.typescriptlang.org/tsconfig#strict',
-        default: true,
-      })
+      const answers = await prompt<{ typescriptStrictMode: boolean }>([
+        {
+          name: 'typescriptStrictMode',
+          type: 'confirm',
+          message:
+            'Would you like to enable the TypeScript strict mode? More info: https://www.typescriptlang.org/tsconfig#strict',
+          default: true,
+        },
+      ])
+      return {
+        enableStrictMode: answers.typescriptStrictMode,
+      }
+    } else {
+      return {
+        enableStrictMode: strictModeIsPreEnabled,
+      }
     }
-
-    prompts$.complete()
-
-    return strictModeIsPreEnabled !== undefined
-      ? of<TypeScriptExtensionOptions>({
-          enableStrictMode: strictModeIsPreEnabled,
-        })
-      : answers$.pipe(
-          reduce(
-            (acc, answerObject) => {
-              const copy = { ...acc }
-
-              switch (answerObject.name) {
-                case 'typescriptStrictMode':
-                  copy.enableStrictMode = answerObject.answer
-                  break
-              }
-
-              return copy
-            },
-            {
-              enableStrictMode: true,
-            } as TypeScriptExtensionOptions,
-          ),
-        )
   },
   canBeSkipped: (options, otherInformation) => {
     const chosenExtensionNames = otherInformation.chosenExtensions.map(

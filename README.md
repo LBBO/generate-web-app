@@ -30,10 +30,6 @@ cd generate-web-app
 npm install
 ```
 
-⚠️ Due to [an issue with an npm package](https://github.com/DefinitelyTyped/DefinitelyTyped/pull/54885), you will
-need to delete the `./node_modules/@types/inquirer/node_modules`
-folder.
-
 Next, you'll need to build the current version by running
 
 ```
