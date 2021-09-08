@@ -1,6 +1,7 @@
 import type { Extension } from '../core/Extension'
 import { ExtensionCategory } from '../core/Extension'
-import { of, reduce } from 'rxjs'
+import type { DistinctQuestion } from 'inquirer'
+import inquirer from 'inquirer'
 
 export type TypeScriptExtensionOptions = {
   enableStrictMode: boolean
@@ -16,13 +17,15 @@ export const TypeScriptExtension: Extension = {
     program.option('--ts-strict-mode', 'Install TypeScript in strict mode')
     program.option('--no-ts-strict-mode')
   },
-  promptOptions: (prompts$, answers$, cliOptions) => {
+  promptOptions: async (prompts$, answers$, cliOptions) => {
     const strictModeIsPreEnabled = cliOptions.tsStrictMode as
       | boolean
       | undefined
 
+    const questions: Array<DistinctQuestion> = []
+
     if (strictModeIsPreEnabled === undefined) {
-      prompts$.next({
+      questions.push({
         name: 'typescriptStrictMode',
         type: 'confirm',
         message:
@@ -31,30 +34,15 @@ export const TypeScriptExtension: Extension = {
       })
     }
 
+    const answers = await inquirer.prompt<{ typescriptStrictMode?: boolean }>(
+      questions,
+    )
     prompts$.complete()
 
-    return strictModeIsPreEnabled !== undefined
-      ? of<TypeScriptExtensionOptions>({
-          enableStrictMode: strictModeIsPreEnabled,
-        })
-      : answers$.pipe(
-          reduce(
-            (acc, answerObject) => {
-              const copy = { ...acc }
-
-              switch (answerObject.name) {
-                case 'typescriptStrictMode':
-                  copy.enableStrictMode = answerObject.answer
-                  break
-              }
-
-              return copy
-            },
-            {
-              enableStrictMode: true,
-            } as TypeScriptExtensionOptions,
-          ),
-        )
+    return {
+      enableStrictMode:
+        answers.typescriptStrictMode ?? strictModeIsPreEnabled ?? true,
+    }
   },
   canBeSkipped: (options, otherInformation) => {
     const chosenExtensionNames = otherInformation.chosenExtensions.map(
