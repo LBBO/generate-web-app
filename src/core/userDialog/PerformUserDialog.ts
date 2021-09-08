@@ -6,14 +6,13 @@ import {
   map,
   merge,
   of,
-  reduce,
   ReplaySubject,
   Subject,
-  take,
   takeWhile,
   withLatestFrom,
 } from 'rxjs'
 import type { Answers, DistinctQuestion } from 'inquirer'
+import inquirer from 'inquirer'
 import type { Extension } from '../Extension'
 import { selectExtensions } from './SelectExtensions'
 import chalk from 'chalk'
@@ -148,8 +147,6 @@ function getDefaultMetadata(
 }
 
 export const promptMetadata = async (
-  prompts$: Subject<DistinctQuestion>,
-  answers$: Observable<Answers>,
   partialMetaDataFromCliArgs: Partial<ProjectMetaData>,
 ): Promise<ProjectMetaData | undefined> => {
   const npmIsInstalled = isNpmInstalled()
@@ -201,7 +198,10 @@ export const promptMetadata = async (
     })
   }
 
-  questions.forEach((question) => prompts$.next(question))
+  const answers = await inquirer.prompt<{
+    name: string
+    packageManager: PackageManagerNames
+  }>(questions)
 
   const defaultMetaData = getDefaultMetadata(
     npmIsInstalled,
@@ -209,48 +209,24 @@ export const promptMetadata = async (
     partialMetaDataFromCliArgs,
   )
 
-  if (
-    partialMetaDataFromCliArgs.name &&
-    partialMetaDataFromCliArgs.chosenPackageManager
-  ) {
-    return Promise.resolve(partialMetaDataFromCliArgs as ProjectMetaData)
-  } else {
-    return lastValueFrom(
-      answers$.pipe(
-        take(questions.length),
-        reduce((acc, answer) => {
-          const copy = { ...acc }
+  const rootDirectory = answers.name
+    ? path.join(process.cwd(), answers.name)
+    : defaultMetaData.rootDirectory
+  const chosenPackageManager =
+    answers.packageManager ?? defaultMetaData.chosenPackageManager
 
-          switch (answer.name) {
-            case 'name':
-              copy.rootDirectory = path.join(process.cwd(), answer.answer)
-              copy.name = path.basename(copy.rootDirectory)
-              break
-            case 'packageManager':
-              copy.chosenPackageManager = answer.answer
-              break
-          }
-
-          return copy
-        }, defaultMetaData),
-      ),
-    ).then((incompleteMetadata) => {
-      const packageManagerStrategy =
-        incompleteMetadata.chosenPackageManager === PackageManagerNames.NPM
-          ? generateNpmPackageManagerStrategy(incompleteMetadata.rootDirectory)
-          : generateYarnPackageManagerStrategy(incompleteMetadata.rootDirectory)
-
-      return {
-        ...incompleteMetadata,
-        packageManagerStrategy,
-      } as ProjectMetaData
-    })
+  return {
+    name: answers.name ? path.basename(rootDirectory) : defaultMetaData.name,
+    rootDirectory,
+    chosenPackageManager,
+    packageManagerStrategy:
+      chosenPackageManager === PackageManagerNames.NPM
+        ? generateNpmPackageManagerStrategy(rootDirectory)
+        : generateYarnPackageManagerStrategy(rootDirectory),
   }
 }
 
 export const performUserDialog = async (
-  prompts$: Subject<DistinctQuestion>,
-  answers$: Observable<Answers>,
   extensions: Array<Extension>,
   metaDataFromCliArgs: Partial<ProjectMetaData>,
   cliArgs: Record<string, unknown>,
@@ -259,41 +235,33 @@ export const performUserDialog = async (
   extensionsWithOptions: Array<Extension>
   projectMetadata: ProjectMetaData
 }> => {
-  try {
-    const projectMetadata = await promptMetadata(
-      prompts$,
-      answers$,
-      metaDataFromCliArgs,
-    )
+  const projectMetadata = await promptMetadata(metaDataFromCliArgs)
 
-    if (!projectMetadata) {
-      throw new Error('Project metadata could not be computed.')
-    }
+  const prompts$ = new Subject<DistinctQuestion>()
+  const answers$ = inquirer.prompt(prompts$).ui.process
 
-    const chosenExtensions =
-      preChosenExtensions ??
-      (await selectExtensions(prompts$, answers$, extensions))
+  if (!projectMetadata) {
+    throw new Error('Project metadata could not be computed.')
+  }
 
-    // Create empty line before asking about extension options
-    console.log()
+  const chosenExtensions =
+    preChosenExtensions ??
+    (await selectExtensions(prompts$, answers$, extensions))
 
-    const extensionsWithOptions = await getExtensionOptions(
-      chosenExtensions,
-      cliArgs,
-      answers$,
-      prompts$,
-    )
+  // Create empty line before asking about extension options
+  console.log()
 
-    prompts$.complete()
+  const extensionsWithOptions = await getExtensionOptions(
+    chosenExtensions,
+    cliArgs,
+    answers$,
+    prompts$,
+  )
 
-    return {
-      extensionsWithOptions,
-      projectMetadata,
-    }
-  } catch (e) {
-    // In case of an error, this uncompleted observable would keep the process
-    // running
-    prompts$.complete()
-    throw e
+  prompts$.complete()
+
+  return {
+    extensionsWithOptions,
+    projectMetadata,
   }
 }
