@@ -3,7 +3,6 @@ import { ExtensionCategory } from '../../core/Extension'
 import { TypeScriptExtension } from '../TypeScriptExtension'
 import { ReactExtension } from '../ReactExtension/ReactExtension'
 import { spawn } from 'child_process'
-import { of, reduce } from 'rxjs'
 import { PackageManagerNames } from '../../core/packageManagers/PackageManagerStrategy'
 import {
   getLessExtension,
@@ -11,7 +10,7 @@ import {
   getScssExtension,
   getTypeScriptExtension,
 } from '../Getters'
-import type { Answers } from 'inquirer'
+import inquirer from 'inquirer'
 
 export type AngularExtensionOptions = {
   useRouting: boolean
@@ -29,43 +28,26 @@ export const AngularExtension: Extension = {
     program.option('--angular-routing', 'Add default routing to Angular')
     program.option('--no-angular-routing')
   },
-  promptOptions: (prompts$, answers$, cliOptions) => {
+  promptOptions: async (prompts$, answers$, cliOptions) => {
     const routingIsPreselected = cliOptions.angularRouting as
       | boolean
       | undefined
 
+    prompts$.complete()
+
     if (routingIsPreselected === undefined) {
-      prompts$.next({
+      return inquirer.prompt<{ useRouting: boolean }>({
         name: 'useRouting',
         type: 'confirm',
         message:
           "Would you like to add Angular's default routing to the project?",
         default: true,
       })
+    } else {
+      return {
+        useRouting: routingIsPreselected,
+      }
     }
-
-    prompts$.complete()
-
-    return routingIsPreselected !== undefined
-      ? of<AngularExtensionOptions>({ useRouting: routingIsPreselected })
-      : answers$.pipe(
-          reduce<Answers, AngularExtensionOptions>(
-            (acc, answerObject) => {
-              const copy = { ...acc }
-
-              switch (answerObject.name) {
-                case 'useRouting':
-                  copy.useRouting = answerObject.answer
-                  break
-              }
-
-              return copy
-            },
-            {
-              useRouting: false,
-            },
-          ),
-        )
   },
   run: (rawOptions, otherInformation) => {
     // This ugly re-assignment is necessary for TypeScript reasons :/
