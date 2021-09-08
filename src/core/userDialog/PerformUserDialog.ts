@@ -85,9 +85,17 @@ export const getExtensionOptions = async (
     let chosenOptions: Record<string, unknown> | undefined
 
     if (extension.promptOptions) {
-      chosenOptions = await lastValueFrom(
-        extension.promptOptions(customPrompts$, customAnswers$, cliArgs),
+      const promptResult = extension.promptOptions(
+        customPrompts$,
+        customAnswers$,
+        cliArgs,
       )
+
+      if (promptResult instanceof Promise) {
+        chosenOptions = await promptResult
+      } else {
+        chosenOptions = await lastValueFrom(promptResult)
+      }
 
       // Add an empty line to console output if at least one question was asked
       const numberOfQuestionsAsked = await lastValueFrom(actualCount$)
