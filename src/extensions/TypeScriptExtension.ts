@@ -1,7 +1,6 @@
 import type { Extension } from '../core/Extension'
 import { ExtensionCategory } from '../core/Extension'
 import type { DistinctQuestion } from 'inquirer'
-import inquirer from 'inquirer'
 
 export type TypeScriptExtensionOptions = {
   enableStrictMode: boolean
@@ -17,7 +16,7 @@ export const TypeScriptExtension: Extension = {
     program.option('--ts-strict-mode', 'Install TypeScript in strict mode')
     program.option('--no-ts-strict-mode')
   },
-  promptOptions: async (prompts$, answers$, cliOptions) => {
+  promptOptions: async (prompt, cliOptions) => {
     const strictModeIsPreEnabled = cliOptions.tsStrictMode as
       | boolean
       | undefined
@@ -34,10 +33,7 @@ export const TypeScriptExtension: Extension = {
       })
     }
 
-    const answers = await inquirer.prompt<{ typescriptStrictMode?: boolean }>(
-      questions,
-    )
-    prompts$.complete()
+    const answers = await prompt<{ typescriptStrictMode?: boolean }>(questions)
 
     return {
       enableStrictMode:

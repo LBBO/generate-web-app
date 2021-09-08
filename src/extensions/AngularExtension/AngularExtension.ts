@@ -10,7 +10,6 @@ import {
   getScssExtension,
   getTypeScriptExtension,
 } from '../Getters'
-import inquirer from 'inquirer'
 
 export type AngularExtensionOptions = {
   useRouting: boolean
@@ -28,21 +27,21 @@ export const AngularExtension: Extension = {
     program.option('--angular-routing', 'Add default routing to Angular')
     program.option('--no-angular-routing')
   },
-  promptOptions: async (prompts$, answers$, cliOptions) => {
+  promptOptions: async (prompt, cliOptions) => {
     const routingIsPreselected = cliOptions.angularRouting as
       | boolean
       | undefined
 
-    prompts$.complete()
-
     if (routingIsPreselected === undefined) {
-      return inquirer.prompt<{ useRouting: boolean }>({
-        name: 'useRouting',
-        type: 'confirm',
-        message:
-          "Would you like to add Angular's default routing to the project?",
-        default: true,
-      })
+      return prompt<{ useRouting: boolean }>([
+        {
+          name: 'useRouting',
+          type: 'confirm',
+          message:
+            "Would you like to add Angular's default routing to the project?",
+          default: true,
+        },
+      ])
     } else {
       return {
         useRouting: routingIsPreselected,
