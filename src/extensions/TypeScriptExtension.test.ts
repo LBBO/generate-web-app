@@ -3,64 +3,54 @@ import { TypeScriptExtension } from './TypeScriptExtension'
 import { AngularExtension } from './AngularExtension/AngularExtension'
 import { generateMockExtension } from './MockExtension'
 import { generateMockProjectMetadata } from './MockOtherExtensionInformation'
-import { lastValueFrom, Subject, throwError } from 'rxjs'
+import { Subject } from 'rxjs'
 import type { Answers, DistinctQuestion } from 'inquirer'
 import { getArgsAndOptionsFromCliArgs } from '../core/TestingUtils'
 
 describe('promptOptions', () => {
   let prompts$: Subject<DistinctQuestion>
   let answers$: Subject<Answers>
+  let promptSpy: jest.SpyInstance
+  // This is just another pointer to promptSpy, but with another type so TypeScript accepts that it's callable
+  let callablePromptSpy: <T = unknown>(questions: Array<DistinctQuestion>) => T
 
   beforeEach(() => {
     prompts$ = new Subject()
     answers$ = new Subject()
+    promptSpy = jest.fn().mockResolvedValue({})
+    callablePromptSpy = promptSpy as unknown as typeof callablePromptSpy
   })
 
-  it('should ask about routing if neither --ts-strict-mode nor --no-ts-strict-mode are specified', (done) => {
-    const onPrompt = jest.fn()
+  it('should ask about routing if neither --ts-strict-mode nor --no-ts-strict-mode are specified', async () => {
     const { options } = getArgsAndOptionsFromCliArgs('--typescript')
 
-    const onComplete = () => {
-      expect(onPrompt).toHaveBeenCalledTimes(1)
-      expect(onPrompt.mock.calls[0][0]).toHaveProperty(
-        'name',
-        'typescriptStrictMode',
-      )
-      done()
-    }
+    await TypeScriptExtension.promptOptions?.(callablePromptSpy, options)
 
-    prompts$.subscribe({ next: onPrompt, complete: onComplete })
-    TypeScriptExtension.promptOptions?.(prompts$, answers$, options)
+    expect(promptSpy).toHaveBeenCalledTimes(1)
+    expect(promptSpy.mock.calls[0][0][0]).toHaveProperty(
+      'name',
+      'typescriptStrictMode',
+    )
   })
 
-  it('should NOT ask about routing if --ts-strict-mode are specified', (done) => {
-    const onPrompt = jest.fn()
+  it('should NOT ask about routing if --ts-strict-mode are specified', async () => {
     const { options } = getArgsAndOptionsFromCliArgs(
       '--typescript --ts-strict-mode',
     )
 
-    const onComplete = () => {
-      expect(onPrompt).not.toHaveBeenCalled()
-      done()
-    }
+    await TypeScriptExtension.promptOptions?.(callablePromptSpy, options)
 
-    prompts$.subscribe({ next: onPrompt, complete: onComplete })
-    TypeScriptExtension.promptOptions?.(prompts$, answers$, options)
+    expect(promptSpy).not.toHaveBeenCalled()
   })
 
-  it('should NOT ask about routing if --no-ts-strict-mode are specified', (done) => {
-    const onPrompt = jest.fn()
+  it('should NOT ask about routing if --no-ts-strict-mode are specified', async () => {
     const { options } = getArgsAndOptionsFromCliArgs(
       '--typescript --no-ts-strict-mode',
     )
 
-    const onComplete = () => {
-      expect(onPrompt).not.toHaveBeenCalled()
-      done()
-    }
+    await TypeScriptExtension.promptOptions?.(callablePromptSpy, options)
 
-    prompts$.subscribe({ next: onPrompt, complete: onComplete })
-    TypeScriptExtension.promptOptions?.(prompts$, answers$, options)
+    expect(promptSpy).not.toHaveBeenCalled()
   })
 
   it('should return { enableStrictMode: true } if --ts-strict-mode is used', async () => {
@@ -68,11 +58,9 @@ describe('promptOptions', () => {
       '--typescript --ts-strict-mode',
     )
 
-    const result = await lastValueFrom(
-      TypeScriptExtension.promptOptions?.(prompts$, answers$, options) ??
-        throwError(
-          () => "TypeScriptExtension.promptOptions didn't return a promise",
-        ),
+    const result = await TypeScriptExtension.promptOptions?.(
+      callablePromptSpy,
+      options,
     )
 
     expect(result).toHaveProperty('enableStrictMode', true)
@@ -83,11 +71,9 @@ describe('promptOptions', () => {
       '--typescript --no-ts-strict-mode',
     )
 
-    const result = await lastValueFrom(
-      TypeScriptExtension.promptOptions?.(prompts$, answers$, options) ??
-        throwError(
-          () => "TypeScriptExtension.promptOptions didn't return a promise",
-        ),
+    const result = await TypeScriptExtension.promptOptions?.(
+      callablePromptSpy,
+      options,
     )
 
     expect(result).toHaveProperty('enableStrictMode', false)

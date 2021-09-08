@@ -1,6 +1,5 @@
 import type { Extension } from '../core/Extension'
 import { ExtensionCategory } from '../core/Extension'
-import type { DistinctQuestion } from 'inquirer'
 
 export type TypeScriptExtensionOptions = {
   enableStrictMode: boolean
@@ -21,23 +20,23 @@ export const TypeScriptExtension: Extension = {
       | boolean
       | undefined
 
-    const questions: Array<DistinctQuestion> = []
-
     if (strictModeIsPreEnabled === undefined) {
-      questions.push({
-        name: 'typescriptStrictMode',
-        type: 'confirm',
-        message:
-          'Would you like to enable the TypeScript strict mode? More info: https://www.typescriptlang.org/tsconfig#strict',
-        default: true,
-      })
-    }
-
-    const answers = await prompt<{ typescriptStrictMode?: boolean }>(questions)
-
-    return {
-      enableStrictMode:
-        answers.typescriptStrictMode ?? strictModeIsPreEnabled ?? true,
+      const answers = await prompt<{ typescriptStrictMode: boolean }>([
+        {
+          name: 'typescriptStrictMode',
+          type: 'confirm',
+          message:
+            'Would you like to enable the TypeScript strict mode? More info: https://www.typescriptlang.org/tsconfig#strict',
+          default: true,
+        },
+      ])
+      return {
+        enableStrictMode: answers.typescriptStrictMode,
+      }
+    } else {
+      return {
+        enableStrictMode: strictModeIsPreEnabled,
+      }
     }
   },
   canBeSkipped: (options, otherInformation) => {
