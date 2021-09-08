@@ -7,10 +7,10 @@ import {
 } from './PerformUserDialog'
 import * as SelectExtensions from './SelectExtensions'
 import * as ChoosePackageManager from '../packageManagers/PackageManagerDetectors'
-import { count, filter, Observable, Subject } from 'rxjs'
+import { filter, Subject } from 'rxjs'
 import type { Extension } from '../Extension'
 import type { Answers, DistinctQuestion, ListQuestion } from 'inquirer'
-import { generateMockExtension } from '../../extensions/MockExtension'
+import inquirer from 'inquirer'
 import { PackageManagerNames } from '../packageManagers/PackageManagerStrategy'
 import { generateMockProjectMetadata } from '../../extensions/MockOtherExtensionInformation'
 import { allExtensions } from '../../extensions/allExtensions'
@@ -35,6 +35,15 @@ describe('promptMetadata', () => {
 
     respondToAllMetaDataQuestions(allAnswers$)
   }
+
+  let promptSpy: jest.SpyInstance
+
+  beforeEach(() => {
+    promptSpy = jest.spyOn(inquirer, 'prompt').mockResolvedValue({
+      name: 'some package name',
+      packageManager: PackageManagerNames.NPM,
+    })
+  })
 
   describe('choose package manager', () => {
     let isNpmInstalledSpy: jest.SpyInstance
@@ -65,161 +74,100 @@ describe('promptMetadata', () => {
       isYarnInstalledSpy.mockRestore()
     })
 
-    it(`should ask for the user's choice even if there is only one installed package manager`, () => {
+    it(`should ask for the user's choice even if there is only one installed package manager`, async () => {
       isNpmInstalledSpy.mockReturnValueOnce(false)
       isYarnInstalledSpy.mockReturnValueOnce(true)
 
-      let packageManagerQuestionAppeared = false
-      prompt$.subscribe((question) => {
-        if (question.name === 'packageManager') {
-          packageManagerQuestionAppeared = true
-        }
-      })
+      await promptMetadata(partialMetaDataFromCliArgs)
 
-      const testIsFinishedPromise = promptMetadata(
-        prompt$,
-        answers$,
-        partialMetaDataFromCliArgs,
-      ).then(() => {
-        expect(packageManagerQuestionAppeared).toBe(true)
-      })
+      expect(promptSpy).toHaveBeenCalledTimes(1)
 
-      // This causes the promptMetadata promise to resolve
-      respondToAllMetaDataQuestions(answers$)
+      const questions: Array<DistinctQuestion> = promptSpy.mock.calls[0][0]
 
-      return testIsFinishedPromise
+      expect(
+        questions.find((question) => question.name === 'packageManager'),
+      ).toBeDefined()
     })
 
-    it('should disable the npm choice if npm is not installed', (done) => {
+    it('should disable the npm choice if npm is not installed', async () => {
       isNpmInstalledSpy.mockReturnValueOnce(false)
       isYarnInstalledSpy.mockReturnValueOnce(true)
 
-      prompt$.subscribe((question) => {
-        // This if case is guaranteed to happen some time due to the previous test
-        if (question.name === 'packageManager') {
-          const specificQuestion = question as ListQuestion
-          const npmChoice = (specificQuestion.choices as Array<Choice>).find(
-            (choice) => choice.value === 'npm',
-          )
+      await promptMetadata(partialMetaDataFromCliArgs)
 
-          expect(npmChoice).toBeDefined()
-          expect(npmChoice?.disabled).toBe(true)
-          done()
-        }
-      })
+      const questions: Array<DistinctQuestion> = promptSpy.mock.calls[0][0]
+      const packageManagerQuestion = questions.find(
+        (question) => question.name === 'packageManager',
+      ) as ListQuestion
 
-      promptMetadata(prompt$, answers$, partialMetaDataFromCliArgs)
+      expect(packageManagerQuestion).toBeDefined()
+
+      const npmChoice = (packageManagerQuestion.choices as Array<Choice>).find(
+        (choice) => choice.value === 'npm',
+      )
+
+      expect(npmChoice).toBeDefined()
+      expect(npmChoice?.disabled).toBe(true)
     })
 
-    it('should disable the yarn choice if yarn is not installed', (done) => {
+    it('should disable the yarn choice if yarn is not installed', async () => {
       isNpmInstalledSpy.mockReturnValueOnce(true)
       isYarnInstalledSpy.mockReturnValueOnce(false)
 
-      prompt$.subscribe((question) => {
-        // This if case is guaranteed to happen some time due to the previous test
-        if (question.name === 'packageManager') {
-          const specificQuestion = question as ListQuestion
-          const yarnChoice = (specificQuestion.choices as Array<Choice>).find(
-            (choice) => choice.value === 'yarn',
-          )
+      await promptMetadata(partialMetaDataFromCliArgs)
 
-          expect(yarnChoice).toBeDefined()
-          expect(yarnChoice?.disabled).toBe(true)
-          done()
-        }
-      })
+      const questions: Array<DistinctQuestion> = promptSpy.mock.calls[0][0]
+      const packageManagerQuestion = questions.find(
+        (question) => question.name === 'packageManager',
+      ) as ListQuestion
 
-      promptMetadata(prompt$, answers$, partialMetaDataFromCliArgs)
-    })
+      expect(packageManagerQuestion).toBeDefined()
 
-    it('should return npm if npm is chosen', (done) => {
-      const metadataPromise = promptMetadata(
-        prompt$,
-        answers$,
-        partialMetaDataFromCliArgs,
+      const npmChoice = (packageManagerQuestion.choices as Array<Choice>).find(
+        (choice) => choice.value === 'yarn',
       )
 
-      respondToAllQuestionsExcept(answers$, 'packageManager')
-      answers$.next({ name: 'packageManager', answer: 'npm' })
-
-      metadataPromise.then((metaData) => {
-        expect(metaData?.chosenPackageManager).toBe(PackageManagerNames.NPM)
-        done()
-      })
+      expect(npmChoice).toBeDefined()
+      expect(npmChoice?.disabled).toBe(true)
     })
 
-    it('should return yarn if yarn is chosen', (done) => {
-      const metadataPromise = promptMetadata(
-        prompt$,
-        answers$,
-        partialMetaDataFromCliArgs,
-      )
-
-      respondToAllQuestionsExcept(answers$, 'packageManager')
-      answers$.next({ name: 'packageManager', answer: 'yarn' })
-
-      metadataPromise.then((metaData) => {
-        expect(metaData?.chosenPackageManager).toBe(PackageManagerNames.YARN)
-        done()
+    it('should return npm if npm is chosen', async () => {
+      promptSpy.mockResolvedValue({
+        name: 'some package name',
+        packageManager: PackageManagerNames.NPM,
       })
+
+      const metadata = await promptMetadata(partialMetaDataFromCliArgs)
+
+      expect(metadata?.chosenPackageManager).toBe(PackageManagerNames.NPM)
+    })
+
+    it('should return yarn if yarn is chosen', async () => {
+      promptSpy.mockResolvedValue({
+        name: 'some package name',
+        packageManager: PackageManagerNames.YARN,
+      })
+
+      const metadata = await promptMetadata(partialMetaDataFromCliArgs)
+
+      expect(metadata?.chosenPackageManager).toBe(PackageManagerNames.YARN)
     })
 
     it('should throw an error if no package manager is found', () => {
       isNpmInstalledSpy.mockReturnValueOnce(false)
       isYarnInstalledSpy.mockReturnValueOnce(false)
 
-      expect(
-        promptMetadata(prompt$, answers$, partialMetaDataFromCliArgs),
-      ).rejects.toBeInstanceOf(Error)
+      expect(promptMetadata(partialMetaDataFromCliArgs)).rejects.toBeInstanceOf(
+        Error,
+      )
     })
   })
-})
-
-describe('getExtensionOptions', () => {
-  let prompts$: Subject<DistinctQuestion>
-  let answers$: Subject<Answers>
-
-  beforeEach(() => {
-    prompts$ = new Subject()
-    answers$ = new Subject()
-  })
-
-  it(
-    'should forward the EXACT amount of answers to the extension as questions were asked and then complete' +
-      ' immediately',
-    (done) => {
-      const numberOfAskedQuestions = 3
-      const extension = generateMockExtension({
-        promptOptions: (prompts$, customAnswers$) => {
-          for (let i = 0; i < numberOfAskedQuestions; i++) {
-            prompts$.next({})
-          }
-          prompts$.complete()
-
-          customAnswers$.pipe(count()).subscribe((count) => {
-            expect(count).toBe(numberOfAskedQuestions)
-            done()
-          })
-
-          return new Observable()
-        },
-      })
-
-      getExtensionOptions([extension], {}, answers$, prompts$)
-
-      for (let i = 0; i < numberOfAskedQuestions; i++) {
-        answers$.next({ name: 'AWESOME TEST QUESTION', answer: i })
-      }
-    },
-  )
 })
 
 describe('performUserDialog', () => {
   let promptMetaDataSpy: jest.SpyInstance
   let getExtensionOptionsSpy: jest.SpyInstance
   let selectExtensionsSpy: jest.SpyInstance
-  let prompts$: Subject<DistinctQuestion>
-  let answers$: Subject<Answers>
 
   beforeEach(() => {
     promptMetaDataSpy = jest
@@ -232,49 +180,17 @@ describe('performUserDialog', () => {
     selectExtensionsSpy = jest
       .spyOn(SelectExtensions, 'selectExtensions')
       .mockResolvedValue([] as Array<Extension>)
-    prompts$ = new Subject<DistinctQuestion>()
-    answers$ = new Subject<Answers>()
+    jest.spyOn(console, 'log')
   })
 
-  it('should complete prompts$ even if one of the submethods fails', async () => {
-    const onCompletedSpy = jest.fn()
-    prompts$.subscribe({
-      complete: onCompletedSpy,
-    })
-    const extensions: Extension[] = []
-
-    getExtensionOptionsSpy.mockImplementationOnce(() =>
-      Promise.reject(new Error('Error in getExtensionOptions spy')),
-    )
-
-    expect(onCompletedSpy).not.toHaveBeenCalled()
-
-    try {
-      await performUserDialog(prompts$, answers$, extensions, {}, {})
-    } catch (e) {
-      // Error expected!
-    }
-
-    expect(onCompletedSpy).toHaveBeenCalled()
-  })
-
-  it('should NOTskip the extension selection if no extensions have been pre-chosen', async () => {
-    await performUserDialog(
-      prompts$,
-      answers$,
-      allExtensions,
-      {},
-      {},
-      undefined,
-    )
+  it('should NOT skip the extension selection if no extensions have been pre-chosen', async () => {
+    await performUserDialog(allExtensions, {}, {}, undefined)
 
     expect(selectExtensionsSpy).toHaveBeenCalled()
   })
 
   it('should skip the extension selection if extensions have been pre-chosen', async () => {
-    await performUserDialog(prompts$, answers$, allExtensions, {}, {}, [
-      ReactExtension,
-    ])
+    await performUserDialog(allExtensions, {}, {}, [ReactExtension])
 
     expect(selectExtensionsSpy).not.toHaveBeenCalled()
   })
