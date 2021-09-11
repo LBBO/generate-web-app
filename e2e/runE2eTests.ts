@@ -1,11 +1,12 @@
 import * as child_process from 'child_process'
 import chalk from 'chalk'
-import { PackageManagerNames } from '../src/core/packageManagers/PackageManagerStrategy'
+import type { PackageManagerNames } from '../src/core/packageManagers/PackageManagerStrategy'
 import {
   asyncRunCommand,
   buildDockerImage,
   runInsideDockerContainer,
 } from './DockerHelper'
+import { configurationsToTest } from './ConfigurationsToTest'
 
 const startContainer = async (imageName: string) => {
   const result = child_process
@@ -23,7 +24,7 @@ const stopContainer = async (containerID: string) => {
 
 const statusUpdate = chalk.white.inverse
 
-type ConfigForInstallation = {
+export type ConfigForInstallation = {
   projectName: string
   packageManager: PackageManagerNames
   extensionOptions: string
@@ -80,28 +81,16 @@ const runDockerTests = async () => {
   console.log(statusUpdate('Building image'))
   await buildDockerImage()
 
-  const configurations: Array<ConfigForInstallation> = [
-    {
-      projectName: 'bare-bone-react',
-      packageManager: PackageManagerNames.NPM,
-      extensionOptions: '--react --eslint',
-    },
-    {
-      projectName: 'angular-scss-redux-eslint',
-      packageManager: PackageManagerNames.YARN,
-      extensionOptions: [
-        '--typescript --no-ts-strict-mode',
-        '--angular --no-angular-routing',
-        '--scss',
-        '--redux',
-        '--eslint',
-      ].join(' '),
-    },
-  ]
-
   const failedConfigurations: Array<ConfigForInstallation> = []
 
-  for (const configuration of configurations) {
+  for (let i = 0; i < configurationsToTest.length; i++) {
+    const configuration = configurationsToTest[i]
+    console.log(
+      statusUpdate(
+        `Installing setup ${i + 1} / ${configurationsToTest.length}`,
+      ),
+    )
+
     const wasSuccessful = await installAndBuildConfigInsideNewDockerContainer(
       configuration,
     )
