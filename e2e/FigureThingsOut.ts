@@ -70,10 +70,13 @@ const stopContainer = async (containerID: string) => {
 const statusUpdate = chalk.white.inverse
 
 const testShit = async () => {
+  console.log(statusUpdate('Building image'))
+  await buildDockerImage()
+
   console.log(statusUpdate('Starting container'))
   const containerID = await startContainer('generate-web-app')
   try {
-    console.log(statusUpdate('Generating app'))
+    console.log(statusUpdate(`Generating app inside container ${containerID}`))
     await runInsideDockerContainer(
       containerID,
       [
@@ -92,19 +95,13 @@ const testShit = async () => {
       'npm run build',
       '/usr/src/generated/new-angular-scss-redux-eslint',
     )
-    // console.log(statusUpdate('Running tests'))
-    // await runInsideDockerContainer(
-    //   containerID,
-    //   'npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI',
-    //   '/usr/src/generated/new-angular-scss-redux-eslint',
-    // )
     console.log(statusUpdate('Success'))
+  } catch (err) {
+    console.error(chalk.inverse.red('Error: '), err)
   } finally {
-    console.log(statusUpdate('Stopping (and deleting) container'))
+    console.log(statusUpdate('Stopping (which triggers deleting) container'))
     await stopContainer(containerID)
   }
-  // console.log(chalk.inverse('Removing container'))
-  // await asyncRunCommand(['docker container rm', 'test-gwa'].join(' '))
 }
 
 testShit()
