@@ -12,6 +12,7 @@
     "watch": "tsc --watch",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:e2e": "ts-node e2e/runE2eTests.ts",
     "prettier": "prettier -w src",
     "lint": "eslint src",
     "prepublishOnly": "npm run build",
