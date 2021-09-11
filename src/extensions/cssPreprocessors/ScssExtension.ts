@@ -1,9 +1,13 @@
 import type { Extension } from '../../core/Extension'
 import { ExtensionCategory } from '../../core/Extension'
 import { ReactExtension } from '../ReactExtension/ReactExtension'
-import { copyFile, rm } from 'fs/promises'
+import { copyFile, readFile, rm, writeFile } from 'fs/promises'
 import * as path from 'path'
-import { getAngularExtension, getReactExtension } from '../Getters'
+import {
+  getAngularExtension,
+  getReactExtension,
+  getTypeScriptExtension,
+} from '../Getters'
 
 export type ScssExtensionOptions = Record<string, never>
 
@@ -53,17 +57,33 @@ export const ScssExtension: Extension = {
         'react',
       )
 
+      // Replace index.css with index.scss
       await rm(path.join(srcDir, 'index.css'))
       await copyFile(
         path.join(reactFileTemplatesDir, 'index.scss'),
         path.join(srcDir, 'index.scss'),
       )
 
+      // Replace App.css with App.scss
       await rm(path.join(srcDir, 'App.css'))
       await copyFile(
         path.join(reactFileTemplatesDir, 'App.scss'),
         path.join(srcDir, 'App.scss'),
       )
+
+      // Replace imports in index and App files
+      const fileExtension = getTypeScriptExtension(
+        otherInformation.chosenExtensions,
+      )
+        ? 'tsx'
+        : 'js'
+
+      for (const fileName of ['index', 'App']) {
+        const indexFilePath = path.join(srcDir, `${fileName}.${fileExtension}`)
+        const indexFileContent = (await readFile(indexFilePath)).toString()
+        const withReplacedImport = indexFileContent.replace('.css', '.scss')
+        await writeFile(indexFilePath, withReplacedImport)
+      }
     }
   },
 }
