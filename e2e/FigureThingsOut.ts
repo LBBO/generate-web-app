@@ -1,58 +1,11 @@
-// docker run --name test-gwa -w /usr/src/generated generate-web-app
-//gwa new-angular-scss-redux-eslint -p yarn --typescript --angular --scss --redux --eslint --no-ts-strict-mode
-// --no-angular-routing
-
 import * as child_process from 'child_process'
 import chalk from 'chalk'
 import { PackageManagerNames } from '../src/core/packageManagers/PackageManagerStrategy'
-
-const asyncRunCommand = (entireCommand: string): Promise<void> => {
-  return new Promise<void>((resolve, reject) => {
-    const [command, ...args] = entireCommand.split(' ')
-    const buildProcess = child_process.spawn(command, args, {
-      stdio: 'inherit',
-    })
-
-    buildProcess.on('close', (statusCode) => {
-      if (statusCode === 0) {
-        resolve()
-      } else {
-        reject()
-      }
-    })
-  })
-}
-
-const buildDockerImage = () =>
-  asyncRunCommand('docker build . -t generate-web-app')
-
-const createDockerContainerAndRun = (command: string) =>
-  asyncRunCommand(
-    'docker run ' +
-      // Give the resulting container the name 'test-gwa'
-      '--name test-gwa ' +
-      '-w /usr/src/generated ' +
-      // Create the container from the 'generate-web-app' image
-      'generate-web-app ' +
-      // Run this command
-      command,
-  )
-
-const runInsideDockerContainer = (
-  containerName: string,
-  command: string,
-  cwd = '/usr/src/generated',
-) => asyncRunCommand(`docker exec -w ${cwd} ${containerName} ${command}`)
-
-const generateSomeSetup = () =>
-  createDockerContainerAndRun(
-    'gwa new-angular-scss-redux-eslint -p yarn --typescript --angular --scss --redux --eslint --no-ts-strict-mode --no-angular-routing',
-  )
-
-// buildDockerImage().then(async () => {
-//   await generateSomeSetup()
-//   await runInsideDockerContainer('test-gwa', 'npm run build')
-// })
+import {
+  asyncRunCommand,
+  buildDockerImage,
+  runInsideDockerContainer,
+} from './DockerHelper'
 
 const startContainer = async (imageName: string) => {
   const result = child_process
