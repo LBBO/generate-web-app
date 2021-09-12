@@ -1,21 +1,5 @@
-import child_process from 'child_process'
+import { asyncRunCommand } from '../src/core/Utils'
 
-export const asyncRunCommand = (entireCommand: string): Promise<void> => {
-  return new Promise<void>((resolve, reject) => {
-    const [command, ...args] = entireCommand.split(' ')
-    const buildProcess = child_process.spawn(command, args, {
-      stdio: 'inherit',
-    })
-
-    buildProcess.on('close', (statusCode) => {
-      if (statusCode === 0) {
-        resolve()
-      } else {
-        reject()
-      }
-    })
-  })
-}
 export const buildDockerImage = (): Promise<void> =>
   asyncRunCommand('docker build . -t generate-web-app')
 

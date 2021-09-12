@@ -1,12 +1,9 @@
 import * as child_process from 'child_process'
 import chalk from 'chalk'
 import type { PackageManagerNames } from '../src/core/packageManagers/PackageManagerStrategy'
-import {
-  asyncRunCommand,
-  buildDockerImage,
-  runInsideDockerContainer,
-} from './DockerHelper'
+import { buildDockerImage, runInsideDockerContainer } from './DockerHelper'
 import { configurationsToTest } from './ConfigurationsToTest'
+import { asyncRunCommand } from '../src/core/Utils'
 
 const startContainer = async (imageName: string) => {
   const result = child_process

@@ -5,7 +5,7 @@ import type { SassExtensionOptions } from './cssPreprocessors/SassExtension'
 import type { ScssExtensionOptions } from './cssPreprocessors/ScssExtension'
 import type { ESLintExtensionOptions } from './ESLintExtension'
 import type { ReactExtensionOptions } from './ReactExtension/ReactExtension'
-import type { TypeScriptExtensionOptions } from './TypeScriptExtension'
+import type { TypeScriptExtensionOptions } from './TypeScriptExtension/TypeScriptExtension'
 import type { ReduxExtensionOptions } from './ReduxExtension'
 
 const createExtensionGetter =

@@ -7,7 +7,7 @@ import * as NpmPackageManagerStrategy from './packageManagers/NpmPackageManagerS
 import * as YarnPackageManagerStrategy from './packageManagers/YarnPackageManagerStrategy'
 import { ReactExtension } from '../extensions/ReactExtension/ReactExtension'
 import { ESLintExtension } from '../extensions/ESLintExtension'
-import { TypeScriptExtension } from '../extensions/TypeScriptExtension'
+import { TypeScriptExtension } from '../extensions/TypeScriptExtension/TypeScriptExtension'
 import * as DependencyChecks from './DependencyChecks'
 import * as ExclusivityChecks from './ExclusivityChecks'
 import { getArgsAndOptionsFromCliArgs } from './TestingUtils'
@@ -167,8 +167,8 @@ describe('parseChosenExtensions', () => {
     )
 
     expect(parseChosenExtensions(args, options, allExtensions)).toEqual([
-      TypeScriptExtension,
       ReactExtension,
+      TypeScriptExtension,
       ESLintExtension,
     ])
   })
@@ -179,18 +179,18 @@ describe('parseChosenExtensions', () => {
     )
 
     expect(parseChosenExtensions(args, options, allExtensions)).toEqual([
-      TypeScriptExtension,
       ReactExtension,
+      TypeScriptExtension,
       ESLintExtension,
     ])
   })
 
   it('should match the order that the items appear in in allExtensions', () => {
     // Guarantee test is actually correct
-    expect(allExtensions.indexOf(TypeScriptExtension)).toBeLessThan(
-      allExtensions.indexOf(ReactExtension),
-    )
     expect(allExtensions.indexOf(ReactExtension)).toBeLessThan(
+      allExtensions.indexOf(TypeScriptExtension),
+    )
+    expect(allExtensions.indexOf(TypeScriptExtension)).toBeLessThan(
       allExtensions.indexOf(ESLintExtension),
     )
 
@@ -200,8 +200,8 @@ describe('parseChosenExtensions', () => {
     )
 
     expect(parseChosenExtensions(args, options, allExtensions)).toEqual([
-      TypeScriptExtension,
       ReactExtension,
+      TypeScriptExtension,
       ESLintExtension,
     ])
   })

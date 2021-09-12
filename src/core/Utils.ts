@@ -1,4 +1,5 @@
 import type { Extension } from './Extension'
+import child_process from 'child_process'
 
 export const getDeepDependencies = (extension: Extension): Array<Extension> => {
   const dependencies = extension.dependsOn ?? []
@@ -31,3 +32,25 @@ export const sortAlphabetically =
       return 0
     }
   }
+
+export const asyncRunCommand = (
+  entireCommand: string,
+  optionOverrides?: child_process.SpawnOptions,
+): Promise<void> => {
+  return new Promise<void>((resolve, reject) => {
+    const [command, ...args] = entireCommand.split(' ')
+    const process = child_process.spawn(command, args, {
+      stdio: 'inherit',
+      shell: true,
+      ...optionOverrides,
+    })
+
+    process.on('close', (statusCode) => {
+      if (statusCode === 0) {
+        resolve()
+      } else {
+        reject()
+      }
+    })
+  })
+}

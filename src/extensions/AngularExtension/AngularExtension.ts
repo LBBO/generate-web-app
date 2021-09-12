@@ -1,6 +1,6 @@
 import type { Extension } from '../../core/Extension'
 import { ExtensionCategory } from '../../core/Extension'
-import { TypeScriptExtension } from '../TypeScriptExtension'
+import { TypeScriptExtension } from '../TypeScriptExtension/TypeScriptExtension'
 import { ReactExtension } from '../ReactExtension/ReactExtension'
 import { spawn } from 'child_process'
 import { PackageManagerNames } from '../../core/packageManagers/PackageManagerStrategy'
