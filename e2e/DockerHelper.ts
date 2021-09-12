@@ -9,3 +9,15 @@ export const runInsideDockerContainer = (
   cwd = '/usr/src/generated',
 ): Promise<void> =>
   asyncRunCommand(`docker exec -w ${cwd} ${containerName} ${command}`)
+
+export const createDockerImageFromContainer = (
+  containerName: string,
+  imageName: string,
+  folderName: string,
+  port?: number | string,
+): Promise<void> =>
+  asyncRunCommand(
+    `docker commit --change="ENTRYPOINT cd /usr/src/generated/${folderName} && npm start"${
+      port === undefined ? '' : ` -c "EXPOSE ${port}"`
+    } ${containerName} ${imageName}`,
+  )

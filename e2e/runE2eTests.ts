@@ -1,7 +1,11 @@
 import * as child_process from 'child_process'
 import chalk from 'chalk'
 import type { PackageManagerNames } from '../src/core/packageManagers/PackageManagerStrategy'
-import { buildDockerImage, runInsideDockerContainer } from './DockerHelper'
+import {
+  buildDockerImage,
+  createDockerImageFromContainer,
+  runInsideDockerContainer,
+} from './DockerHelper'
 import { configurationsToTest } from './ConfigurationsToTest'
 import { asyncRunCommand } from '../src/core/Utils'
 
@@ -26,6 +30,8 @@ export type ConfigForInstallation = {
   packageManager: PackageManagerNames
   extensionOptions: string
 }
+
+const saveContainersToImages = Boolean('truthy')
 
 /**
  * Creates a new Docker container from the GWA image, attempts to install the given setup and tries to run `npm
@@ -67,6 +73,19 @@ const installAndBuildConfigInsideNewDockerContainer = async (
     )
     installationWasSuccessful = false
   } finally {
+    if (saveContainersToImages) {
+      const imageName = `gwa-test:${config.projectName}`
+      console.log(
+        statusUpdate(`Saving container ${containerID} to image "${imageName}"`),
+      )
+      await createDockerImageFromContainer(
+        containerID,
+        imageName,
+        config.projectName,
+        config.extensionOptions.includes('--angular') ? '4200' : '3000',
+      )
+    }
+
     console.log(statusUpdate('Stopping (which triggers deleting) container'))
     await stopContainer(containerID)
   }
