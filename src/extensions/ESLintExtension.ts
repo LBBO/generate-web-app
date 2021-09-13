@@ -61,9 +61,14 @@ async function installESLintForOtherFrameworks(
 ) {
   const packagesToBeInstalled: string[] = []
 
-  // React already installs eslint. However, some additional config should be installed
-  if (!getReactExtension(otherInformation.chosenExtensions)) {
-    packagesToBeInstalled.push('eslint', 'eslint-config-react-app')
+  if (getReactExtension(otherInformation.chosenExtensions)) {
+    // This is usually installed by CRA, but yarn apparently messes the installation up [1] and so it can get lost when
+    // other ESLint plugins are installed
+    // [1]https://github.com/eslint/eslint/issues/13283
+    packagesToBeInstalled.push('eslint-config-react-app')
+  } else {
+    // React already installs eslint, so it must only be installed for all other frameworks.
+    packagesToBeInstalled.push('eslint')
   }
 
   if (getTypeScriptExtension(otherInformation.chosenExtensions)) {

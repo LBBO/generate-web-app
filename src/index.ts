@@ -56,4 +56,7 @@ const run = async () => {
   }
 }
 
-run().catch(chalk.bold.red)
+run().catch((err: unknown) => {
+  console.log(chalk.red(err))
+  process.exit(1)
+})

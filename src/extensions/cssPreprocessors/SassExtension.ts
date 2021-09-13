@@ -2,8 +2,12 @@ import type { Extension } from '../../core/Extension'
 import { ExtensionCategory } from '../../core/Extension'
 import { ReactExtension } from '../ReactExtension/ReactExtension'
 import path from 'path'
-import { copyFile, rm } from 'fs/promises'
-import { getAngularExtension, getReactExtension } from '../Getters'
+import { copyFile, readFile, rm, writeFile } from 'fs/promises'
+import {
+  getAngularExtension,
+  getReactExtension,
+  getTypeScriptExtension,
+} from '../Getters'
 
 export type SassExtensionOptions = Record<string, never>
 
@@ -52,17 +56,33 @@ export const SassExtension: Extension = {
         'react',
       )
 
+      // Replace index.css with index.sass
       await rm(path.join(srcDir, 'index.css'))
       await copyFile(
         path.join(reactFileTemplatesDir, 'index.sass'),
         path.join(srcDir, 'index.sass'),
       )
 
+      // Replace App.css with App.sass
       await rm(path.join(srcDir, 'App.css'))
       await copyFile(
         path.join(reactFileTemplatesDir, 'App.sass'),
         path.join(srcDir, 'App.sass'),
       )
+
+      // Replace imports in index and App files
+      const fileExtension = getTypeScriptExtension(
+        otherInformation.chosenExtensions,
+      )
+        ? 'tsx'
+        : 'js'
+
+      for (const fileName of ['index', 'App']) {
+        const indexFilePath = path.join(srcDir, `${fileName}.${fileExtension}`)
+        const indexFileContent = (await readFile(indexFilePath)).toString()
+        const withReplacedImport = indexFileContent.replace('.css', '.sass')
+        await writeFile(indexFilePath, withReplacedImport)
+      }
     }
   },
 }

@@ -15,7 +15,7 @@ import { SassExtension } from './cssPreprocessors/SassExtension'
 import { ScssExtension } from './cssPreprocessors/ScssExtension'
 import { ESLintExtension } from './ESLintExtension'
 import { ReactExtension } from './ReactExtension/ReactExtension'
-import { TypeScriptExtension } from './TypeScriptExtension'
+import { TypeScriptExtension } from './TypeScriptExtension/TypeScriptExtension'
 import { ReduxExtension } from './ReduxExtension'
 
 const getters = [
