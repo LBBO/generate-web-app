@@ -83,6 +83,9 @@ const installAndBuildConfigInsideNewDockerContainer = async (
         imageName,
         config.projectName,
         config.extensionOptions.includes('--angular') ? '4200' : '3000',
+        config.extensionOptions.includes('--angular')
+          ? '-- --host 0.0.0.0'
+          : undefined,
       )
     }
 

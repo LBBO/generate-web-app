@@ -15,9 +15,12 @@ export const createDockerImageFromContainer = (
   imageName: string,
   folderName: string,
   port?: number | string,
+  npmStartArgs?: string,
 ): Promise<void> =>
   asyncRunCommand(
-    `docker commit --change="ENTRYPOINT cd /usr/src/generated/${folderName} && npm start"${
+    `docker commit --change="ENTRYPOINT cd /usr/src/generated/${folderName} && npm start ${
+      npmStartArgs ?? ''
+    }"${
       port === undefined ? '' : ` -c "EXPOSE ${port}"`
     } ${containerName} ${imageName}`,
   )
