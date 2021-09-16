@@ -27,3 +27,9 @@ export const getArgsAndOptionsFromCliArgs = (
     options: program.opts(),
   }
 }
+export const setIndexes = (extensions: Array<Extension>): Array<Extension> => {
+  extensions.forEach((extension, index) => {
+    extension.index = index
+  })
+  return extensions
+}

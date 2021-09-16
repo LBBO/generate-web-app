@@ -8,6 +8,19 @@ import type { ReactExtensionOptions } from './ReactExtension/ReactExtension'
 import type { TypeScriptExtensionOptions } from './TypeScriptExtension/TypeScriptExtension'
 import type { ReduxExtensionOptions } from './ReduxExtension'
 
+// This enum should reflect the order of the extensions in the `allExtensions` array.
+// However, it must be defined in a different file due to import issues.
+export enum ExtensionIndexes {
+  REACT,
+  ANGULAR,
+  TYPESCRIPT,
+  SCSS,
+  SASS,
+  LESS,
+  REDUX,
+  ESLINT,
+}
+
 const createExtensionGetter =
   <ExtensionOptions extends Record<string, unknown>>(extensionName: string) =>
   (

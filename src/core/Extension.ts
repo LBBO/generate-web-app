@@ -20,6 +20,7 @@ export type AdditionalInformationForExtensions = {
 
 export type Extension = {
   name: string
+  index: number
   description: string
   linkToDocumentation: URL
   category: ExtensionCategory

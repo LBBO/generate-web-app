@@ -3,12 +3,13 @@ import { ExtensionCategory } from '../../core/Extension'
 import { spawn } from 'child_process'
 import { PackageManagerNames } from '../../core/packageManagers/PackageManagerStrategy'
 import { ESLintExtension } from '../ESLintExtension'
-import { getTypeScriptExtension } from '../Getters'
+import { ExtensionIndexes, getTypeScriptExtension } from '../Getters'
 
 export type ReactExtensionOptions = Record<string, never>
 
 export const ReactExtension: Extension = {
   name: 'React',
+  index: ExtensionIndexes.REACT,
   description: 'A JavaScript library for building user interfaces.',
   linkToDocumentation: new URL('https://reactjs.org/'),
   // Exclusiveness to Angular is declared in Angular plugin

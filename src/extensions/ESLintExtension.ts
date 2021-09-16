@@ -7,6 +7,7 @@ import { formatWithPrettier } from '../core/FormatCode'
 import type * as ESLint from 'eslint'
 import { addSchematic } from './AngularExtension/AngularSchematics'
 import {
+  ExtensionIndexes,
   getAngularExtension,
   getReactExtension,
   getTypeScriptExtension,
@@ -108,6 +109,7 @@ async function installESLintForOtherFrameworks(
 
 export const ESLintExtension: Extension = {
   name: 'ESLint',
+  index: ExtensionIndexes.ESLINT,
   description: 'Static code analyzer that also fixes some problems it finds.',
   linkToDocumentation: new URL('https://eslint.org/'),
   category: ExtensionCategory.LINTER_OR_FORMATTER,

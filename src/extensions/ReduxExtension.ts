@@ -1,6 +1,7 @@
 import type { Extension } from '../core/Extension'
 import { ExtensionCategory } from '../core/Extension'
 import {
+  ExtensionIndexes,
   getAngularExtension,
   getReactExtension,
   getTypeScriptExtension,
@@ -26,6 +27,7 @@ export type ReduxExtensionOptions = Record<string, unknown>
 
 export const ReduxExtension: Extension = {
   name: 'Redux',
+  index: ExtensionIndexes.REDUX,
   description:
     'A state management library that makes your application logic easier to test and that comes with' +
     ' useful features like undo/redo, state persistence, and "time-travel debugging".',

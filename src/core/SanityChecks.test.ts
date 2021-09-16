@@ -2,6 +2,7 @@ import * as SanityChecks from './SanityChecks'
 import {
   ensureAllDependenciesAndExclusivitiesAreDefined,
   ensureAllExtensionsHaveUniqueNames,
+  ensureAllIndexesAreCorrect,
   ensureDependantsAreNotExclusiveToEachOther,
   performSanityChecksOnExtensions,
 } from './SanityChecks'
@@ -151,6 +152,34 @@ describe('ensureAllDependenciesAndExclusivitiesAreDefined', () => {
       dependsOn: [undefined],
     })
     expect(() => ensureAllDependenciesAndExclusivitiesAreDefined([a])).toThrow()
+  })
+})
+
+describe('ensureAllIndexesAreCorrect', () => {
+  it('should not throw an error if all indexes match', () => {
+    const extensions = Array(10)
+      .fill(1)
+      .map((_, index) =>
+        generateMockExtension({
+          index,
+        }),
+      )
+
+    expect(() => ensureAllIndexesAreCorrect(extensions)).not.toThrow()
+  })
+
+  it("should throw an error if an index doesn't match", () => {
+    const extensions = Array(10)
+      .fill(1)
+      .map((_, index) =>
+        generateMockExtension({
+          index,
+        }),
+      )
+
+    extensions[3].index = 10
+
+    expect(() => ensureAllIndexesAreCorrect(extensions)).toThrow()
   })
 })
 

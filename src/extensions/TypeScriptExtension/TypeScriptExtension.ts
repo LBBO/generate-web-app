@@ -1,6 +1,10 @@
 import type { Extension } from '../../core/Extension'
 import { ExtensionCategory } from '../../core/Extension'
-import { getAngularExtension, getReactExtension } from '../Getters'
+import {
+  ExtensionIndexes,
+  getAngularExtension,
+  getReactExtension,
+} from '../Getters'
 import { asyncRunCommand } from '../../core/Utils'
 import { readFile, writeFile } from 'fs/promises'
 import path from 'path'
@@ -11,6 +15,7 @@ export type TypeScriptExtensionOptions = {
 
 export const TypeScriptExtension: Extension = {
   name: 'TypeScript',
+  index: ExtensionIndexes.TYPESCRIPT,
   description:
     'An open-source language which builds on JavaScript by adding static type definitions.',
   linkToDocumentation: new URL('https://www.typescriptlang.org/'),

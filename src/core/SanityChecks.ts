@@ -61,10 +61,23 @@ export const ensureAllDependenciesAndExclusivitiesAreDefined = (
   })
 }
 
+export const ensureAllIndexesAreCorrect = (
+  extensions: Array<Extension>,
+): void => {
+  for (let i = 0; i < extensions.length; i++) {
+    if (extensions[i].index !== i) {
+      throw new Error(
+        `${extensions[i].name} extension doesn't have the correct index! Defined index is ${extensions[i].index}, but actual index in array of all extensions is ${i}.`,
+      )
+    }
+  }
+}
+
 export const performSanityChecksOnExtensions = (
   extensions: Array<Extension>,
 ): void => {
   ensureAllDependenciesAndExclusivitiesAreDefined(extensions)
   ensureAllExtensionsHaveUniqueNames(extensions)
   ensureDependantsAreNotExclusiveToEachOther(extensions)
+  ensureAllIndexesAreCorrect(extensions)
 }

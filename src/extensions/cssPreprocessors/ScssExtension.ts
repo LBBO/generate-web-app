@@ -4,6 +4,7 @@ import { ReactExtension } from '../ReactExtension/ReactExtension'
 import { copyFile, readFile, rm, writeFile } from 'fs/promises'
 import * as path from 'path'
 import {
+  ExtensionIndexes,
   getAngularExtension,
   getReactExtension,
   getTypeScriptExtension,
@@ -13,6 +14,7 @@ export type ScssExtensionOptions = Record<string, never>
 
 export const ScssExtension: Extension = {
   name: 'SCSS',
+  index: ExtensionIndexes.SCSS,
   description:
     'Close to a superset of CSS, but with additional features and syntax.',
   linkToDocumentation: new URL(
