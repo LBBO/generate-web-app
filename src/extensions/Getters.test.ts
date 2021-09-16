@@ -1,4 +1,5 @@
 import {
+  createExtensionGetter,
   getAngularExtension,
   getESLintExtension,
   getLessExtension,
@@ -17,6 +18,8 @@ import { ESLintExtension } from './ESLintExtension'
 import { ReactExtension } from './ReactExtension/ReactExtension'
 import { TypeScriptExtension } from './TypeScriptExtension/TypeScriptExtension'
 import { ReduxExtension } from './ReduxExtension'
+import { setIndexes } from '../core/TestingUtils'
+import { generateMockExtension } from './MockExtension'
 
 const getters = [
   [getTypeScriptExtension, TypeScriptExtension, 'TypeScriptExtension'],
@@ -31,6 +34,22 @@ const getters = [
 
 it('should have one getter per extension', () => {
   expect(getters.length).toBe(allExtensions.length)
+})
+
+it('should use an O(n) fallback if the index is incorrect', () => {
+  const extensions = setIndexes([
+    generateMockExtension({ name: 'extension 0' }),
+    generateMockExtension({ name: 'extension 1' }),
+    generateMockExtension({ name: 'extension 2' }),
+    generateMockExtension({ name: 'extension 3' }),
+  ])
+
+  const actualIndex = 3
+  const expectedExtension = extensions[actualIndex]
+  expectedExtension.index = 5
+  const getter = createExtensionGetter(expectedExtension.name, actualIndex)
+
+  expect(getter(extensions)).toBe(expectedExtension)
 })
 
 getters.forEach(([getter, extension, extensionName]) => {
