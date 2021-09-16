@@ -52,6 +52,6 @@ export class StoreService implements OnDestroy {
   dispatch = this._store.dispatch.bind(this._store)
 
   get state$(): Observable<RootState> {
-    return this._state$
+    return this._state$.asObservable()
   }
 }
