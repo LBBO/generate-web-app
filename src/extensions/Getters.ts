@@ -32,10 +32,9 @@ export const createExtensionGetter =
     const extensionAtIndex = extensions[extensionIndex]
 
     // If the index is correct, this allows O(1).
-    // However, in some unit tests, the index will be wrong. In those cases,
-    // a fallback should be used, which runs in O(n).
-    // This fallback is never necessary in production, as guaranteed by
-    // the sanity checks!
+    // However, this is only the case when called with `allExtension`.
+    // The fallback allows these getters to be used with other arrays, as well.
+    // In those cases, the runtime is O(n).
     if (extensionAtIndex?.name === extensionName) {
       return extensionAtIndex as ExtensionWithSpecificOptions<ExtensionOptions>
     } else {
