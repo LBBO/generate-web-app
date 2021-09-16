@@ -238,8 +238,6 @@ describe('parseChosenExtensions', () => {
   it('should return undefined if no extensions were chosen per CLI arg', () => {
     const { args, options } = getArgsAndOptionsFromCliArgs('-p yarn')
 
-    expect(parseChosenExtensions(args, options, allExtensions)).toEqual(
-      allExtensions.map(() => undefined),
-    )
+    expect(parseChosenExtensions(args, options, allExtensions)).toBe(undefined)
   })
 })

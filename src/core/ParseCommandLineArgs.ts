@@ -150,7 +150,9 @@ export const parseChosenExtensions = (
     chosenExtensionInOrderOfCliArg.includes(extension) ? extension : undefined,
   )
 
-  return chosenExtensionsInCorrectOrder.length
+  return chosenExtensionsInCorrectOrder.filter(
+    (extension) => extension !== undefined,
+  ).length
     ? chosenExtensionsInCorrectOrder
     : undefined
 }
