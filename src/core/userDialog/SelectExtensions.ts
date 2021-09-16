@@ -5,6 +5,7 @@ import chalk from 'chalk'
 import { checkDependencies } from '../DependencyChecks'
 import { checkExclusivities } from '../ExclusivityChecks'
 import Separator from 'inquirer/lib/objects/separator'
+import { allExtensions } from '../../extensions/allExtensions'
 
 export const extensionCategoryTitles: Record<ExtensionCategory, string> = {
   [ExtensionCategory.CSS_PREPROCESSOR]: 'CSS pre-processors',
@@ -18,7 +19,7 @@ export const extensionCategoryTitles: Record<ExtensionCategory, string> = {
 
 export const selectExtensions = async (
   extensions: Array<Extension>,
-): Promise<Array<Extension>> => {
+): Promise<Array<Extension | undefined>> => {
   const answer = await inquirer.prompt<{ chosenExtensions: Array<Extension> }>([
     {
       type: 'checkbox',
@@ -110,5 +111,7 @@ export const selectExtensions = async (
     },
   ])
 
-  return answer.chosenExtensions
+  return allExtensions.map((extension) =>
+    answer.chosenExtensions.includes(extension) ? extension : undefined,
+  )
 }

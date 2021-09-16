@@ -27,7 +27,7 @@ export const createExtensionGetter =
     extensionIndex: number,
   ) =>
   (
-    extensions: Array<Extension>,
+    extensions: Array<Extension | undefined>,
   ): ExtensionWithSpecificOptions<ExtensionOptions> | undefined => {
     const extensionAtIndex = extensions[extensionIndex]
 
@@ -39,7 +39,7 @@ export const createExtensionGetter =
       return extensionAtIndex as ExtensionWithSpecificOptions<ExtensionOptions>
     } else {
       return extensions.find(
-        (extension) => extension.name === extensionName,
+        (extension) => extension?.name === extensionName,
       ) as ExtensionWithSpecificOptions<ExtensionOptions> | undefined
     }
   }

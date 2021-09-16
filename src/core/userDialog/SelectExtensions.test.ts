@@ -30,7 +30,9 @@ type Separator = { line: string; type: 'separator' }
 let promptSpy: jest.SpyInstance
 
 beforeEach(() => {
-  promptSpy = jest.spyOn(inquirer, 'prompt').mockResolvedValue({})
+  promptSpy = jest.spyOn(inquirer, 'prompt').mockResolvedValue({
+    chosenExtensions: [],
+  })
 })
 
 it(

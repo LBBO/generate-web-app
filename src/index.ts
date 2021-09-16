@@ -4,6 +4,7 @@ import chalk from 'chalk'
 import { allExtensions } from './extensions/allExtensions'
 import { Command } from 'commander'
 import { parseCommandLineArgs } from './core/ParseCommandLineArgs'
+import type { AdditionalInformationForExtensions } from './core/Extension'
 
 const program = new Command()
 program.description(
@@ -26,7 +27,7 @@ const run = async () => {
     program.opts(),
     preChosenExtensions,
   )
-  const projectInformation = {
+  const projectInformation: AdditionalInformationForExtensions = {
     projectMetadata,
     chosenExtensions: extensionsWithOptions,
   }
@@ -42,7 +43,10 @@ const run = async () => {
   // Install extensions
   for (const extension of extensionsWithOptions) {
     // Only run extension if there is no canBeSkipped method or it cannot be skipped
-    if (!extension?.canBeSkipped?.(extension.options, projectInformation)) {
+    if (
+      extension &&
+      !extension?.canBeSkipped?.(extension.options, projectInformation)
+    ) {
       console.log(chalk.inverse.whiteBright(`Installing ${extension.name}`))
       await extension.run(extension.options, projectInformation)
       console.log()
@@ -52,7 +56,7 @@ const run = async () => {
 
   // Print additional useful information
   for (const extension of extensionsWithOptions) {
-    extension.printUsefulInformation?.(extension.options, projectInformation)
+    extension?.printUsefulInformation?.(extension.options, projectInformation)
   }
 }
 

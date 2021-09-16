@@ -14,44 +14,48 @@ import { generateNpmPackageManagerStrategy } from '../packageManagers/NpmPackage
 import { generateYarnPackageManagerStrategy } from '../packageManagers/YarnPackageManagerStrategy'
 
 export const getExtensionOptions = async (
-  chosenExtensions: Array<Extension>,
+  chosenExtensions: Array<Extension | undefined>,
   cliArgs: Record<string, unknown>,
-): Promise<Array<Extension>> => {
-  const extensionsWithOptions: Array<Extension> = []
+): Promise<Array<Extension | undefined>> => {
+  const extensionsWithOptions: Array<Extension | undefined> = []
 
   for (const extension of chosenExtensions) {
-    let chosenOptions: Record<string, unknown> | undefined
+    if (extension) {
+      let chosenOptions: Record<string, unknown> | undefined
 
-    if (extension.promptOptions) {
-      let numberOfQuestionsAsked = 0
+      if (extension.promptOptions) {
+        let numberOfQuestionsAsked = 0
 
-      const inquirerPromptWrapper = <T = unknown>(
-        questions: Array<DistinctQuestion>,
-      ) => {
-        numberOfQuestionsAsked = questions.length
+        const inquirerPromptWrapper = <T = unknown>(
+          questions: Array<DistinctQuestion>,
+        ) => {
+          numberOfQuestionsAsked = questions.length
 
-        if (numberOfQuestionsAsked > 0) {
-          console.log(chalk.bold.underline(extension.name))
+          if (numberOfQuestionsAsked > 0) {
+            console.log(chalk.bold.underline(extension.name))
+          }
+
+          return inquirer.prompt<T>(questions)
         }
 
-        return inquirer.prompt<T>(questions)
+        chosenOptions = await extension.promptOptions(
+          inquirerPromptWrapper,
+          cliArgs,
+        )
+
+        // Add an empty line to console output if at least one question was asked
+        if (numberOfQuestionsAsked > 0) {
+          console.log()
+        }
       }
 
-      chosenOptions = await extension.promptOptions(
-        inquirerPromptWrapper,
-        cliArgs,
-      )
+      const extensionWithOptions = extension
+      extensionWithOptions.options = chosenOptions
 
-      // Add an empty line to console output if at least one question was asked
-      if (numberOfQuestionsAsked > 0) {
-        console.log()
-      }
+      extensionsWithOptions.push(extensionWithOptions)
+    } else {
+      extensionsWithOptions.push(undefined)
     }
-
-    const extensionWithOptions = extension
-    extensionWithOptions.options = chosenOptions
-
-    extensionsWithOptions.push(extensionWithOptions)
   }
 
   return extensionsWithOptions
@@ -179,9 +183,9 @@ export const performUserDialog = async (
   extensions: Array<Extension>,
   metaDataFromCliArgs: Partial<ProjectMetaData>,
   cliArgs: Record<string, unknown>,
-  preChosenExtensions?: Array<Extension>,
+  preChosenExtensions?: Array<Extension | undefined>,
 ): Promise<{
-  extensionsWithOptions: Array<Extension>
+  extensionsWithOptions: Array<Extension | undefined>
   projectMetadata: ProjectMetaData
 }> => {
   const projectMetadata = await promptMetadata(metaDataFromCliArgs)

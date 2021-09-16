@@ -15,7 +15,7 @@ export enum ExtensionCategory {
 
 export type AdditionalInformationForExtensions = {
   projectMetadata: ProjectMetaData
-  chosenExtensions: Array<Extension>
+  chosenExtensions: Array<Extension | undefined>
 }
 
 export type Extension = {
