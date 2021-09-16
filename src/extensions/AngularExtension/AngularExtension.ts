@@ -5,6 +5,7 @@ import { ReactExtension } from '../ReactExtension/ReactExtension'
 import { spawn } from 'child_process'
 import { PackageManagerNames } from '../../core/packageManagers/PackageManagerStrategy'
 import {
+  ExtensionIndexes,
   getLessExtension,
   getSassExtension,
   getScssExtension,
@@ -17,6 +18,7 @@ export type AngularExtensionOptions = {
 
 export const AngularExtension: Extension = {
   name: 'Angular',
+  index: ExtensionIndexes.ANGULAR,
   description:
     'Angular is a TypeScript-based web application framework led by Google.',
   linkToDocumentation: new URL('https://angular.io/'),

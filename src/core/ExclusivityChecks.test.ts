@@ -2,6 +2,7 @@ import type { InvalidExclusivitiesResponse } from './ExclusivityChecks'
 import { checkExclusivities } from './ExclusivityChecks'
 import { generateMockExtension } from '../extensions/MockExtension'
 import { performSanityChecksOnExtensions } from './SanityChecks'
+import { setIndexes } from './TestingUtils'
 
 describe('checkExclusivities', () => {
   const extensionA = generateMockExtension({ name: 'Extension A' })
@@ -10,17 +11,19 @@ describe('checkExclusivities', () => {
 
   const exclusiveToA = generateMockExtension({
     name: 'Exclusive to A',
-    exclusiveTo: [extensionA],
+    exclusiveTo: setIndexes([extensionA]),
   })
   const exclusiveToABC = generateMockExtension({
     name: 'Exclusive to A, B, and C',
-    exclusiveTo: [extensionA, extensionB, extensionC],
+    exclusiveTo: setIndexes([extensionA, extensionB, extensionC]),
   })
 
   describe('mock data', () => {
     it('should be valid', () => {
       expect(() =>
-        performSanityChecksOnExtensions([extensionA, extensionB, extensionC]),
+        performSanityChecksOnExtensions(
+          setIndexes([extensionA, extensionB, extensionC]),
+        ),
       ).not.toThrow()
     })
   })
@@ -31,32 +34,31 @@ describe('checkExclusivities', () => {
 
   it('should accept a list of extensions without exclusivities', () => {
     expect(
-      checkExclusivities([extensionA, extensionB, extensionC])
+      checkExclusivities(setIndexes([extensionA, extensionB, extensionC]))
         .isValidConfiguration,
     ).toBe(true)
   })
 
   it('should NOT accept a list of extensions where one is exclusive to one of the others', () => {
     expect(
-      checkExclusivities([extensionA, extensionB, extensionC, exclusiveToA])
-        .isValidConfiguration,
+      checkExclusivities(
+        setIndexes([extensionA, extensionB, extensionC, exclusiveToA]),
+      ).isValidConfiguration,
     ).toBe(false)
   })
 
   it('should NOT accept a list of extensions where one is exclusive to multiple of the others', () => {
     expect(
-      checkExclusivities([extensionA, extensionB, extensionC, exclusiveToABC])
-        .isValidConfiguration,
+      checkExclusivities(
+        setIndexes([extensionA, extensionB, extensionC, exclusiveToABC]),
+      ).isValidConfiguration,
     ).toBe(false)
   })
 
   it('should include the names of all forbidden extensions as well as its own name in the error message', () => {
-    const result = checkExclusivities([
-      extensionA,
-      extensionB,
-      extensionC,
-      exclusiveToABC,
-    ]) as InvalidExclusivitiesResponse
+    const result = checkExclusivities(
+      setIndexes([extensionA, extensionB, extensionC, exclusiveToABC]),
+    ) as InvalidExclusivitiesResponse
 
     expect(result.isValidConfiguration).toBe(false)
     expect(result.errorMessages[0]).toMatch(exclusiveToABC.name)

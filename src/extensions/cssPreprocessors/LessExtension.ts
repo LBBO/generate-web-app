@@ -1,12 +1,13 @@
 import type { Extension } from '../../core/Extension'
 import { ExtensionCategory } from '../../core/Extension'
 import { ReactExtension } from '../ReactExtension/ReactExtension'
-import { getAngularExtension } from '../Getters'
+import { ExtensionIndexes, getAngularExtension } from '../Getters'
 
 export type LessExtensionOptions = Record<string, never>
 
 export const LessExtension: Extension = {
   name: 'Less',
+  index: ExtensionIndexes.LESS,
   description:
     'Similarly to SCSS, superset of CSS with additional features and syntax.',
   linkToDocumentation: new URL('https://lesscss.org/'),

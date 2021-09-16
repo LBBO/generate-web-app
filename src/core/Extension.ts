@@ -15,11 +15,12 @@ export enum ExtensionCategory {
 
 export type AdditionalInformationForExtensions = {
   projectMetadata: ProjectMetaData
-  chosenExtensions: Array<Extension>
+  chosenExtensions: Array<Extension | undefined>
 }
 
 export type Extension = {
   name: string
+  index: number
   description: string
   linkToDocumentation: URL
   category: ExtensionCategory

@@ -4,6 +4,7 @@ import { ReactExtension } from '../ReactExtension/ReactExtension'
 import path from 'path'
 import { copyFile, readFile, rm, writeFile } from 'fs/promises'
 import {
+  ExtensionIndexes,
   getAngularExtension,
   getReactExtension,
   getTypeScriptExtension,
@@ -13,6 +14,7 @@ export type SassExtensionOptions = Record<string, never>
 
 export const SassExtension: Extension = {
   name: 'Sass',
+  index: ExtensionIndexes.SASS,
   description:
     'A CSS pre-processor with the same features as SCSS, but a different syntax. Valid CSS is not valid Sass.',
   linkToDocumentation: new URL(

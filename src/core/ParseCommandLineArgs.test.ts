@@ -11,6 +11,8 @@ import { TypeScriptExtension } from '../extensions/TypeScriptExtension/TypeScrip
 import * as DependencyChecks from './DependencyChecks'
 import * as ExclusivityChecks from './ExclusivityChecks'
 import { getArgsAndOptionsFromCliArgs } from './TestingUtils'
+import { ExtensionIndexes } from '../extensions/Getters'
+import type { Extension } from './Extension'
 
 it.todo('should ensure all short-hand option names are unique')
 
@@ -146,6 +148,12 @@ describe('parseChosenExtensions', () => {
   let consoleErrorSpy: jest.SpyInstance
   let checkDependenciesSpy: jest.SpyInstance
   let checkExclusivitiesSpy: jest.SpyInstance
+  const expectedResult: Array<Extension | undefined> = allExtensions.map(
+    () => undefined,
+  )
+  expectedResult[ExtensionIndexes.TYPESCRIPT] = TypeScriptExtension
+  expectedResult[ExtensionIndexes.REACT] = ReactExtension
+  expectedResult[ExtensionIndexes.ESLINT] = ESLintExtension
 
   beforeEach(() => {
     consoleErrorSpy = jest.spyOn(console, 'error').mockReturnValue()
@@ -166,11 +174,9 @@ describe('parseChosenExtensions', () => {
       '--react --eslint --typescript',
     )
 
-    expect(parseChosenExtensions(args, options, allExtensions)).toEqual([
-      ReactExtension,
-      TypeScriptExtension,
-      ESLintExtension,
-    ])
+    expect(parseChosenExtensions(args, options, allExtensions)).toEqual(
+      expectedResult,
+    )
   })
 
   it('should not be confused by other options', () => {
@@ -178,11 +184,9 @@ describe('parseChosenExtensions', () => {
       '--react --eslint -p yarn --typescript --ts-strict-mode',
     )
 
-    expect(parseChosenExtensions(args, options, allExtensions)).toEqual([
-      ReactExtension,
-      TypeScriptExtension,
-      ESLintExtension,
-    ])
+    expect(parseChosenExtensions(args, options, allExtensions)).toEqual(
+      expectedResult,
+    )
   })
 
   it('should match the order that the items appear in in allExtensions', () => {
@@ -199,11 +203,9 @@ describe('parseChosenExtensions', () => {
       '--eslint -p yarn --typescript --ts-strict-mode --react',
     )
 
-    expect(parseChosenExtensions(args, options, allExtensions)).toEqual([
-      ReactExtension,
-      TypeScriptExtension,
-      ESLintExtension,
-    ])
+    expect(parseChosenExtensions(args, options, allExtensions)).toEqual(
+      expectedResult,
+    )
   })
 
   it('should log all errors thrown by checkDependencies and checkExclusivities and throw an error', () => {
@@ -236,6 +238,8 @@ describe('parseChosenExtensions', () => {
   it('should return undefined if no extensions were chosen per CLI arg', () => {
     const { args, options } = getArgsAndOptionsFromCliArgs('-p yarn')
 
-    expect(parseChosenExtensions(args, options, allExtensions)).toBe(undefined)
+    expect(parseChosenExtensions(args, options, allExtensions)).toEqual(
+      allExtensions.map(() => undefined),
+    )
   })
 })
