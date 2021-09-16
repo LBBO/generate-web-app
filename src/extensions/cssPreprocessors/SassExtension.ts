@@ -2,13 +2,17 @@ import type { Extension } from '../../core/Extension'
 import { ExtensionCategory } from '../../core/Extension'
 import { ReactExtension } from '../ReactExtension/ReactExtension'
 import path from 'path'
-import { copyFile, readFile, rm, writeFile } from 'fs/promises'
+import { copyFile, rm } from 'fs/promises'
 import {
   ExtensionIndexes,
   getAngularExtension,
   getReactExtension,
   getTypeScriptExtension,
 } from '../Getters'
+import {
+  addImportToJsOrTsFile,
+  removeImportFromJsOrTsFile,
+} from '../../core/CodeGeneration'
 
 export type SassExtensionOptions = Record<string, never>
 
@@ -80,10 +84,13 @@ export const SassExtension: Extension = {
         : 'js'
 
       for (const fileName of ['index', 'App']) {
-        const indexFilePath = path.join(srcDir, `${fileName}.${fileExtension}`)
-        const indexFileContent = (await readFile(indexFilePath)).toString()
-        const withReplacedImport = indexFileContent.replace('.css', '.sass')
-        await writeFile(indexFilePath, withReplacedImport)
+        const filePath = path.join(srcDir, `${fileName}.${fileExtension}`)
+        await removeImportFromJsOrTsFile(filePath, {
+          sourcePath: `./${fileName}.css`,
+        })
+        await addImportToJsOrTsFile(filePath, {
+          sourcePath: `./${fileName}.sass`,
+        })
       }
     }
   },
