@@ -10,6 +10,7 @@ import * as GeneralCodeGeneration from '../core/CodeGeneration'
 import { AngularExtension } from './AngularExtension/AngularExtension'
 import { ESLintExtension } from './ESLintExtension'
 import * as AngularCodeGeneration from './AngularExtension/AngularCodeGeneration'
+import { formatWithPrettier } from '../core/FormatCode'
 
 describe('run', () => {
   let otherInformation: AdditionalInformationForExtensions
@@ -119,9 +120,12 @@ describe('run', () => {
       )
 
       for (const relativeFilePath of filePaths) {
-        const fileContent = (
-          await readFile(path.join(pathToTemplateFolder, relativeFilePath))
-        ).toString()
+        const fileContent = formatWithPrettier(
+          (
+            await readFile(path.join(pathToTemplateFolder, relativeFilePath))
+          ).toString(),
+          relativeFilePath,
+        )
 
         expect(writeFileMock).toHaveBeenCalledWith(
           path.join(
