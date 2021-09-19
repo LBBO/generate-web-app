@@ -1,59 +1,43 @@
-import { lastValueFrom, Subject, throwError } from 'rxjs'
-import type { Answers, DistinctQuestion } from 'inquirer'
+import type { DistinctQuestion } from 'inquirer'
 import { getArgsAndOptionsFromCliArgs } from '../../core/TestingUtils'
 import { AngularExtension } from './AngularExtension'
 
 describe('promptOptions', () => {
-  let prompts$: Subject<DistinctQuestion>
-  let answers$: Subject<Answers>
+  let promptSpy: jest.SpyInstance
+  // This is just another pointer to promptSpy, but with another type so TypeScript accepts that it's callable
+  let callablePromptSpy: <T = unknown>(questions: Array<DistinctQuestion>) => T
 
   beforeEach(() => {
-    prompts$ = new Subject()
-    answers$ = new Subject()
+    promptSpy = jest.fn().mockResolvedValue({})
+    callablePromptSpy = promptSpy as unknown as typeof callablePromptSpy
   })
 
-  it('should ask about routing if neither --angular-routing nor --no-angular-routing are specified', (done) => {
-    const onPrompt = jest.fn()
+  it('should ask about routing if neither --angular-routing nor --no-angular-routing are specified', async () => {
     const { options } = getArgsAndOptionsFromCliArgs('--angular --typescript')
 
-    const onComplete = () => {
-      expect(onPrompt).toHaveBeenCalledTimes(1)
-      expect(onPrompt.mock.calls[0][0]).toHaveProperty('name', 'useRouting')
-      done()
-    }
+    await AngularExtension.promptOptions?.(callablePromptSpy, options)
 
-    prompts$.subscribe({ next: onPrompt, complete: onComplete })
-    AngularExtension.promptOptions?.(prompts$, answers$, options)
+    expect(promptSpy).toHaveBeenCalledTimes(1)
+    expect(promptSpy.mock.calls[0][0][0]).toHaveProperty('name', 'useRouting')
   })
 
-  it('should NOT ask about routing if --angular-routing are specified', (done) => {
-    const onPrompt = jest.fn()
+  it('should NOT ask about routing if --angular-routing are specified', async () => {
     const { options } = getArgsAndOptionsFromCliArgs(
       '--angular --typescript --angular-routing',
     )
 
-    const onComplete = () => {
-      expect(onPrompt).not.toHaveBeenCalled()
-      done()
-    }
+    await AngularExtension.promptOptions?.(callablePromptSpy, options)
 
-    prompts$.subscribe({ next: onPrompt, complete: onComplete })
-    AngularExtension.promptOptions?.(prompts$, answers$, options)
+    expect(promptSpy).not.toHaveBeenCalled()
   })
 
-  it('should NOT ask about routing if --no-angular-routing are specified', (done) => {
-    const onPrompt = jest.fn()
+  it('should NOT ask about routing if --no-angular-routing are specified', async () => {
     const { options } = getArgsAndOptionsFromCliArgs(
       '--angular --typescript --no-angular-routing',
     )
 
-    const onComplete = () => {
-      expect(onPrompt).not.toHaveBeenCalled()
-      done()
-    }
-
-    prompts$.subscribe({ next: onPrompt, complete: onComplete })
-    AngularExtension.promptOptions?.(prompts$, answers$, options)
+    await AngularExtension.promptOptions?.(callablePromptSpy, options)
+    expect(promptSpy).not.toHaveBeenCalled()
   })
 
   it('should return { useRouting: true } if --angular-routing is used', async () => {
@@ -61,11 +45,9 @@ describe('promptOptions', () => {
       '--angular --typescript --angular-routing',
     )
 
-    const result = await lastValueFrom(
-      AngularExtension.promptOptions?.(prompts$, answers$, options) ??
-        throwError(
-          () => "AngularExtension.promptOptions didn't return a promise",
-        ),
+    const result = await AngularExtension.promptOptions?.(
+      callablePromptSpy,
+      options,
     )
 
     expect(result).toHaveProperty('useRouting', true)
@@ -76,11 +58,9 @@ describe('promptOptions', () => {
       '--angular --typescript --no-angular-routing',
     )
 
-    const result = await lastValueFrom(
-      AngularExtension.promptOptions?.(prompts$, answers$, options) ??
-        throwError(
-          () => "AngularExtension.promptOptions didn't return a promise",
-        ),
+    const result = await AngularExtension.promptOptions?.(
+      callablePromptSpy,
+      options,
     )
 
     expect(result).toHaveProperty('useRouting', false)

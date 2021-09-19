@@ -3,12 +3,22 @@ import { ExtensionCategory } from '../../core/Extension'
 import { ReactExtension } from '../ReactExtension/ReactExtension'
 import path from 'path'
 import { copyFile, rm } from 'fs/promises'
-import { getAngularExtension, getReactExtension } from '../Getters'
+import {
+  ExtensionIndexes,
+  getAngularExtension,
+  getReactExtension,
+  getTypeScriptExtension,
+} from '../Getters'
+import {
+  addImportToJsOrTsFile,
+  removeImportFromJsOrTsFile,
+} from '../../core/CodeGeneration'
 
 export type SassExtensionOptions = Record<string, never>
 
 export const SassExtension: Extension = {
   name: 'Sass',
+  index: ExtensionIndexes.SASS,
   description:
     'A CSS pre-processor with the same features as SCSS, but a different syntax. Valid CSS is not valid Sass.',
   linkToDocumentation: new URL(
@@ -52,17 +62,36 @@ export const SassExtension: Extension = {
         'react',
       )
 
+      // Replace index.css with index.sass
       await rm(path.join(srcDir, 'index.css'))
       await copyFile(
         path.join(reactFileTemplatesDir, 'index.sass'),
         path.join(srcDir, 'index.sass'),
       )
 
+      // Replace App.css with App.sass
       await rm(path.join(srcDir, 'App.css'))
       await copyFile(
         path.join(reactFileTemplatesDir, 'App.sass'),
         path.join(srcDir, 'App.sass'),
       )
+
+      // Replace imports in index and App files
+      const fileExtension = getTypeScriptExtension(
+        otherInformation.chosenExtensions,
+      )
+        ? 'tsx'
+        : 'js'
+
+      for (const fileName of ['index', 'App']) {
+        const filePath = path.join(srcDir, `${fileName}.${fileExtension}`)
+        await removeImportFromJsOrTsFile(filePath, {
+          sourcePath: `./${fileName}.css`,
+        })
+        await addImportToJsOrTsFile(filePath, {
+          sourcePath: `./${fileName}.sass`,
+        })
+      }
     }
   },
 }

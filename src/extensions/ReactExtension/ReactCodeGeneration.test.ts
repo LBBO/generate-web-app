@@ -7,7 +7,7 @@ import { generateMockOtherExtensionInformation } from '../MockOtherExtensionInfo
 import type { AdditionalInformationForExtensions } from '../../core/Extension'
 import path from 'path'
 import { ReactExtension } from './ReactExtension'
-import { TypeScriptExtension } from '../TypeScriptExtension'
+import { TypeScriptExtension } from '../TypeScriptExtension/TypeScriptExtension'
 import * as GeneralCodeGeneration from '../../core/CodeGeneration'
 import {
   appTsxWithAdditionalComponents,

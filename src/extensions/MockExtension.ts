@@ -6,6 +6,7 @@ export const generateMockExtension = (
 ): Extension => {
   return {
     name: 'Mock extension',
+    index: -1,
     description:
       'An extension created just for testing. ⚠ DO NOT USE IN PRODUCTION!!!',
     run: jest.fn(),

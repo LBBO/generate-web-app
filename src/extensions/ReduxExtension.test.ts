@@ -2,7 +2,7 @@ import type { AdditionalInformationForExtensions } from '../core/Extension'
 import { generateMockOtherExtensionInformation } from './MockOtherExtensionInformation'
 import { ReduxExtension } from './ReduxExtension'
 import { ReactExtension } from './ReactExtension/ReactExtension'
-import { TypeScriptExtension } from './TypeScriptExtension'
+import { TypeScriptExtension } from './TypeScriptExtension/TypeScriptExtension'
 import fs, { readFile } from 'fs/promises'
 import path from 'path'
 import * as ReactCodeGeneration from './ReactExtension/ReactCodeGeneration'
@@ -10,6 +10,7 @@ import * as GeneralCodeGeneration from '../core/CodeGeneration'
 import { AngularExtension } from './AngularExtension/AngularExtension'
 import { ESLintExtension } from './ESLintExtension'
 import * as AngularCodeGeneration from './AngularExtension/AngularCodeGeneration'
+import { formatWithPrettier } from '../core/FormatCode'
 
 describe('run', () => {
   let otherInformation: AdditionalInformationForExtensions
@@ -119,9 +120,12 @@ describe('run', () => {
       )
 
       for (const relativeFilePath of filePaths) {
-        const fileContent = (
-          await readFile(path.join(pathToTemplateFolder, relativeFilePath))
-        ).toString()
+        const fileContent = formatWithPrettier(
+          (
+            await readFile(path.join(pathToTemplateFolder, relativeFilePath))
+          ).toString(),
+          relativeFilePath,
+        )
 
         expect(writeFileMock).toHaveBeenCalledWith(
           path.join(

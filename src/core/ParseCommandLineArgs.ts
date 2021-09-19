@@ -105,7 +105,7 @@ export const parseChosenExtensions = (
   args: string[],
   options: OptionValues,
   allExtensions: Array<Extension>,
-): Array<Extension> | undefined => {
+): Array<Extension | undefined> | undefined => {
   const chosenExtensionInOrderOfCliArg = Object.entries(options)
     // Remove options that were explicitly disabled
     .filter(([, optionValue]) => Boolean(optionValue))
@@ -146,11 +146,13 @@ export const parseChosenExtensions = (
     )
   }
 
-  const chosenExtensionsInCorrectOrder = allExtensions.filter((extension) =>
-    chosenExtensionInOrderOfCliArg.includes(extension),
+  const chosenExtensionsInCorrectOrder = allExtensions.map((extension) =>
+    chosenExtensionInOrderOfCliArg.includes(extension) ? extension : undefined,
   )
 
-  return chosenExtensionsInCorrectOrder.length
+  return chosenExtensionsInCorrectOrder.filter(
+    (extension) => extension !== undefined,
+  ).length
     ? chosenExtensionsInCorrectOrder
     : undefined
 }
@@ -158,7 +160,10 @@ export const parseChosenExtensions = (
 export const parseCommandLineArgs = (
   program: Command,
   allExtensions: Array<Extension>,
-) => {
+): {
+  metaData: Partial<ProjectMetaData>
+  chosenExtensions: Array<Extension | undefined> | undefined
+} => {
   declareArgsAndOptions(program, allExtensions)
 
   program.parse(process.argv)

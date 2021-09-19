@@ -3,7 +3,8 @@
     "**/*.test.ts",
     "./dist/**/*",
     "./*.config.ts",
-    "fileTemplates/**/*"
+    "fileTemplates/**/*",
+    "./e2e/**/*"
   ],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */

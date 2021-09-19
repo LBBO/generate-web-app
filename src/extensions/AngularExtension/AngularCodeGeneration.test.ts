@@ -14,7 +14,7 @@ import {
   defaultAppModule,
 } from './AngularCodeGenerationMockData'
 import { generateMockOtherExtensionInformation } from '../MockOtherExtensionInformation'
-import { TypeScriptExtension } from '../TypeScriptExtension'
+import { TypeScriptExtension } from '../TypeScriptExtension/TypeScriptExtension'
 import { AngularExtension } from './AngularExtension'
 
 const defaultPathToAppModule = path.join(__dirname, 'app.module.ts')

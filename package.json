@@ -1,6 +1,6 @@
 {
   "name": "generate-web-app",
-  "version": "1.3.8",
+  "version": "1.3.12",
   "description": "",
   "bin": {
     "generate-web-app": "./dist/index.js",
@@ -12,6 +12,7 @@
     "watch": "tsc --watch",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:e2e": "ts-node e2e/runE2eTests.ts",
     "prettier": "prettier -w src",
     "lint": "eslint src",
     "prepublishOnly": "npm run build",
@@ -28,6 +29,9 @@
     "url": "https://github.com/LBBO/generate-web-app/issues"
   },
   "homepage": "https://github.com/LBBO/generate-web-app#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "devDependencies": {
     "@types/diff": "^5.0.1",
     "@types/eslint": "^7.28.0",
@@ -57,7 +61,6 @@
     "diff": "^5.0.0",
     "inquirer": "^8.1.2",
     "prettier": "^2.3.2",
-    "rxjs": "^7.3.0",
     "typescript": "^4.3.5"
   }
 }

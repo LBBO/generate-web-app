@@ -65,3 +65,19 @@ import ${valuesToImport ? valuesToImport + ' from' : ''} '${
     await writeFile(filePath, formatWithPrettier(newFileContent, filePath))
   }
 }
+
+export const removeImportFromJsOrTsFile = async (
+  filePath: string,
+  importData: JsOrTsImportData,
+): Promise<void> => {
+  const fileContent = (await readFile(filePath)).toString()
+  const fileContentWithoutImport = fileContent
+    .split(
+      new RegExp(`\\s*import[^'"\`]*?['"\`]${importData.sourcePath}['"\`]`),
+    )
+    .join('')
+  await writeFile(
+    filePath,
+    formatWithPrettier(fileContentWithoutImport, filePath),
+  )
+}

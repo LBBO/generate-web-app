@@ -1,17 +1,11 @@
 #!/usr/bin/env node
-import { Subject } from 'rxjs'
-import type { DistinctQuestion } from 'inquirer'
-import inquirer from 'inquirer'
-import type { ProjectMetaData } from './core/userDialog/PerformUserDialog'
 import { performUserDialog } from './core/userDialog/PerformUserDialog'
 import chalk from 'chalk'
 import { allExtensions } from './extensions/allExtensions'
 import { Command } from 'commander'
 import { parseCommandLineArgs } from './core/ParseCommandLineArgs'
-import type { Extension } from './core/Extension'
+import type { AdditionalInformationForExtensions } from './core/Extension'
 
-const prompts$ = new Subject<DistinctQuestion>()
-const answers$ = inquirer.prompt(prompts$).ui.process
 const program = new Command()
 program.description(
   'Allows you to interactively configure a new web app project. When called without any options concerning tools to' +
@@ -23,27 +17,17 @@ program.description(
 program.helpOption('-h, --help', 'Display help for generate-web-app')
 
 const run = async () => {
-  let partialMetaData: Partial<ProjectMetaData>
-  let preChosenExtensions: Array<Extension> | undefined
-  try {
-    const cliArgsParsingResult = parseCommandLineArgs(program, allExtensions)
-    partialMetaData = cliArgsParsingResult.metaData
-    preChosenExtensions = cliArgsParsingResult.chosenExtensions
-  } catch (e) {
-    // Close prompts so the task isn't kept running
-    prompts$.complete()
-    throw e
-  }
+  const cliArgsParsingResult = parseCommandLineArgs(program, allExtensions)
+  const partialMetaData = cliArgsParsingResult.metaData
+  const preChosenExtensions = cliArgsParsingResult.chosenExtensions
 
   const { extensionsWithOptions, projectMetadata } = await performUserDialog(
-    prompts$,
-    answers$,
     allExtensions,
     partialMetaData,
     program.opts(),
     preChosenExtensions,
   )
-  const projectInformation = {
+  const projectInformation: AdditionalInformationForExtensions = {
     projectMetadata,
     chosenExtensions: extensionsWithOptions,
   }
@@ -59,7 +43,10 @@ const run = async () => {
   // Install extensions
   for (const extension of extensionsWithOptions) {
     // Only run extension if there is no canBeSkipped method or it cannot be skipped
-    if (!extension?.canBeSkipped?.(extension.options, projectInformation)) {
+    if (
+      extension &&
+      !extension?.canBeSkipped?.(extension.options, projectInformation)
+    ) {
       console.log(chalk.inverse.whiteBright(`Installing ${extension.name}`))
       await extension.run(extension.options, projectInformation)
       console.log()
@@ -69,8 +56,11 @@ const run = async () => {
 
   // Print additional useful information
   for (const extension of extensionsWithOptions) {
-    extension.printUsefulInformation?.(extension.options, projectInformation)
+    extension?.printUsefulInformation?.(extension.options, projectInformation)
   }
 }
 
-run()
+run().catch((err: unknown) => {
+  console.log(chalk.red(err))
+  process.exit(1)
+})

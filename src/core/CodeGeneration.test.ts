@@ -1,14 +1,16 @@
 import fs from 'fs/promises'
 import path from 'path'
-import { addImportToJsOrTsFile } from './CodeGeneration'
+import {
+  addImportToJsOrTsFile,
+  removeImportFromJsOrTsFile,
+} from './CodeGeneration'
 
 // gotten from some index.tsx in a react project
 const defaultFileContent = `import React from 'react'
 import { readFile } from 'fs/promises'
 
 const someFunc = async () => {
-  const { join } = await import('path')
-  return join
+  return await fetch('https://google.com')
 }
 `
 
@@ -33,8 +35,7 @@ import { readFile } from 'fs/promises'
 import './index.css'
 
 const someFunc = async () => {
-  const { join } = await import('path')
-  return join
+  return await fetch('https://google.com')
 }
 `)
   })
@@ -84,8 +85,7 @@ import { readFile } from 'fs/promises'
 import App from './App'
 
 const someFunc = async () => {
-  const { join } = await import('path')
-  return join
+  return await fetch('https://google.com')
 }
 `)
   })
@@ -102,8 +102,7 @@ import { readFile } from 'fs/promises'
 import { About, somethingElse } from './pages/About'
 
 const someFunc = async () => {
-  const { join } = await import('path')
-  return join
+  return await fetch('https://google.com')
 }
 `)
   })
@@ -121,8 +120,7 @@ import { readFile } from 'fs/promises'
 import rxjs, { of, pipe } from 'rxjs'
 
 const someFunc = async () => {
-  const { join } = await import('path')
-  return join
+  return await fetch('https://google.com')
 }
 `)
   })
@@ -139,8 +137,7 @@ import { readFile } from 'fs/promises'
 import * as path from 'path'
 
 const someFunc = async () => {
-  const { join } = await import('path')
-  return join
+  return await fetch('https://google.com')
 }
 `)
   })
@@ -157,8 +154,147 @@ import { readFile } from 'fs/promises'
 import { a, b, c } from './someFile'
 
 const someFunc = async () => {
-  const { join } = await import('path')
-  return join
+  return await fetch('https://google.com')
+}
+`)
+  })
+})
+
+describe('removeImportFromJsOrTsFile', () => {
+  let readFileMock: jest.SpyInstance
+  let writeFileMock: jest.SpyInstance
+  const defaultFilePath = path.join(__dirname, 'test.ts')
+  const defaultFileContent = `import React from 'react'
+import { readFile } from 'fs/promises'
+import path, { join } from 'path'
+import * as something from 'wherever'
+import './style.css'
+
+const someFunc = async () => {
+  return await fetch('https://google.com')
+}
+`
+
+  beforeEach(() => {
+    readFileMock = jest
+      .spyOn(fs, 'readFile')
+      .mockResolvedValue(defaultFileContent)
+    writeFileMock = jest.spyOn(fs, 'writeFile').mockResolvedValue()
+  })
+
+  it('should be able to deal with single quotation marks', async () => {
+    await removeImportFromJsOrTsFile(defaultFilePath, {
+      sourcePath: 'fs/promises',
+    })
+
+    expect(writeFileMock).toHaveBeenCalledTimes(1)
+    expect(writeFileMock.mock.calls[0][0]).toBe(defaultFilePath)
+    expect(writeFileMock.mock.calls[0][1]).toBe(`import React from 'react'
+import path, { join } from 'path'
+import * as something from 'wherever'
+import './style.css'
+
+const someFunc = async () => {
+  return await fetch('https://google.com')
+}
+`)
+  })
+
+  it('should be able to deal with double quotation marks', async () => {
+    readFileMock.mockResolvedValue(defaultFileContent.split(`'`).join(`"`))
+
+    await removeImportFromJsOrTsFile(defaultFilePath, {
+      sourcePath: 'fs/promises',
+    })
+
+    expect(writeFileMock).toHaveBeenCalledTimes(1)
+    expect(writeFileMock.mock.calls[0][0]).toBe(defaultFilePath)
+    expect(writeFileMock.mock.calls[0][1]).toBe(`import React from 'react'
+import path, { join } from 'path'
+import * as something from 'wherever'
+import './style.css'
+
+const someFunc = async () => {
+  return await fetch('https://google.com')
+}
+`)
+  })
+
+  it('should be able to deal with backticks', async () => {
+    readFileMock.mockResolvedValue(
+      defaultFileContent
+        .split("import { readFile } from 'fs/promises'")
+        .join('import { readFile } from `fs/promises`'),
+    )
+
+    await removeImportFromJsOrTsFile(defaultFilePath, {
+      sourcePath: 'fs/promises',
+    })
+
+    expect(writeFileMock).toHaveBeenCalledTimes(1)
+    expect(writeFileMock.mock.calls[0][0]).toBe(defaultFilePath)
+    expect(writeFileMock.mock.calls[0][1]).toBe(`import React from 'react'
+import path, { join } from 'path'
+import * as something from 'wherever'
+import './style.css'
+
+const someFunc = async () => {
+  return await fetch('https://google.com')
+}
+`)
+  })
+
+  it('should be able to deal with file imports', async () => {
+    await removeImportFromJsOrTsFile(defaultFilePath, {
+      sourcePath: './style.css',
+    })
+
+    expect(writeFileMock).toHaveBeenCalledTimes(1)
+    expect(writeFileMock.mock.calls[0][0]).toBe(defaultFilePath)
+    expect(writeFileMock.mock.calls[0][1]).toBe(`import React from 'react'
+import { readFile } from 'fs/promises'
+import path, { join } from 'path'
+import * as something from 'wherever'
+
+const someFunc = async () => {
+  return await fetch('https://google.com')
+}
+`)
+  })
+
+  it('should be able to deal with default imports', async () => {
+    await removeImportFromJsOrTsFile(defaultFilePath, {
+      sourcePath: 'react',
+    })
+
+    expect(writeFileMock).toHaveBeenCalledTimes(1)
+    expect(writeFileMock.mock.calls[0][0]).toBe(defaultFilePath)
+    expect(writeFileMock.mock.calls[0][1])
+      .toBe(`import { readFile } from 'fs/promises'
+import path, { join } from 'path'
+import * as something from 'wherever'
+import './style.css'
+
+const someFunc = async () => {
+  return await fetch('https://google.com')
+}
+`)
+  })
+
+  it('should be able to deal with mixed imports', async () => {
+    await removeImportFromJsOrTsFile(defaultFilePath, {
+      sourcePath: 'path',
+    })
+
+    expect(writeFileMock).toHaveBeenCalledTimes(1)
+    expect(writeFileMock.mock.calls[0][0]).toBe(defaultFilePath)
+    expect(writeFileMock.mock.calls[0][1]).toBe(`import React from 'react'
+import { readFile } from 'fs/promises'
+import * as something from 'wherever'
+import './style.css'
+
+const someFunc = async () => {
+  return await fetch('https://google.com')
 }
 `)
   })

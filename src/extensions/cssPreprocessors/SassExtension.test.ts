@@ -33,6 +33,8 @@ describe('run', () => {
   beforeEach(() => {
     jest.spyOn(fs, 'rm').mockResolvedValue(undefined)
     jest.spyOn(fs, 'copyFile').mockResolvedValue(undefined)
+    jest.spyOn(fs, 'readFile').mockResolvedValue('')
+    jest.spyOn(fs, 'writeFile').mockResolvedValue(undefined)
   })
 
   it('should install the latest version as a dev dependency if React has not been chosen', async () => {

@@ -3,12 +3,22 @@ import { ExtensionCategory } from '../../core/Extension'
 import { ReactExtension } from '../ReactExtension/ReactExtension'
 import { copyFile, rm } from 'fs/promises'
 import * as path from 'path'
-import { getAngularExtension, getReactExtension } from '../Getters'
+import {
+  ExtensionIndexes,
+  getAngularExtension,
+  getReactExtension,
+  getTypeScriptExtension,
+} from '../Getters'
+import {
+  addImportToJsOrTsFile,
+  removeImportFromJsOrTsFile,
+} from '../../core/CodeGeneration'
 
 export type ScssExtensionOptions = Record<string, never>
 
 export const ScssExtension: Extension = {
   name: 'SCSS',
+  index: ExtensionIndexes.SCSS,
   description:
     'Close to a superset of CSS, but with additional features and syntax.',
   linkToDocumentation: new URL(
@@ -53,17 +63,36 @@ export const ScssExtension: Extension = {
         'react',
       )
 
+      // Replace index.css with index.scss
       await rm(path.join(srcDir, 'index.css'))
       await copyFile(
         path.join(reactFileTemplatesDir, 'index.scss'),
         path.join(srcDir, 'index.scss'),
       )
 
+      // Replace App.css with App.scss
       await rm(path.join(srcDir, 'App.css'))
       await copyFile(
         path.join(reactFileTemplatesDir, 'App.scss'),
         path.join(srcDir, 'App.scss'),
       )
+
+      // Replace imports in index and App files
+      const fileExtension = getTypeScriptExtension(
+        otherInformation.chosenExtensions,
+      )
+        ? 'tsx'
+        : 'js'
+
+      for (const fileName of ['index', 'App']) {
+        const filePath = path.join(srcDir, `${fileName}.${fileExtension}`)
+        await removeImportFromJsOrTsFile(filePath, {
+          sourcePath: `./${fileName}.css`,
+        })
+        await addImportToJsOrTsFile(filePath, {
+          sourcePath: `./${fileName}.scss`,
+        })
+      }
     }
   },
 }
