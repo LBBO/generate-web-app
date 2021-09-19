@@ -168,7 +168,8 @@ describe('run', () => {
         const correspondingCall = writeFileMock.mock.calls.find(
           (call) => call[0] === targetFilePath,
         )
-        expect(correspondingCall).toMatchSnapshot()
+        const [, ...restOfCall] = correspondingCall
+        expect(restOfCall).toMatchSnapshot()
       }
     })
 
