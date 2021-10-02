@@ -1,0 +1,15 @@
+name: Run unit tests
+
+on:
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v2
+      - name: Install NPM packages
+        run: npm ci
+      - name: Run tests
+        run: npm test
