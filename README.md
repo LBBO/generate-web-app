@@ -1,30 +1,45 @@
-# generate-web-app - A CLI to help you get started
+# Welcome to generate-web-app 👋
 
-## Usage
+[![Version](https://img.shields.io/npm/v/generate-web-app.svg)](https://www.npmjs.com/package/generate-web-app)
+![Prerequisite](https://img.shields.io/badge/node-%3E%3D14.0.0-blue.svg)
+[![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](https://github.com/LBBO/generate-web-app#readme)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/LBBO/generate-web-app/graphs/commit-activity)
+[![License: MIT](https://img.shields.io/github/license/LBBO/generate-web-app)](https://github.com/LBBO/generate-web-app/blob/main/LICENSE)
+[![Twitter: LBBO_](https://img.shields.io/twitter/follow/LBBO_.svg?style=social)](https://twitter.com/LBBO_)
 
-### Via `npm`
+> A CLI to help you get started with your web project
 
-You can either install the CLI globally or use it via `npx`. The latter is recommended as you'll always be using the
-latest version without having to constantly re-install `generate-web-app`.
+## Prerequisites
 
-```
+- node >=14.0.0
+
+## 🚀 Usage
+
+The fastest and recommended way to use GWA is by running the following command:
+
+```sh
 npx generate-web-app
 ```
 
-In order to install the package globally, run
+You can also install GWA permanently on your computer by running
 
-```
+```sh
 npm i -g generate-web-app
 ```
 
-You'll then be able to execute `generate-web-app` as a normal command in your terminal.
+Afterwards, GWA can be executed with one of the two following commands:
 
-### Via a local setup
-
-It's a bit more work, but you can also run the CLI completely locally. This is definitely recommended for development.
-To get started, clone this repository:
-
+```sh
+generate-web-app
+# or
+gwa
 ```
+
+## Install
+
+To set up GWA locally, first clone this git repository:
+
+```sh
 git clone https://github.com/LBBO/generate-web-app.git
 cd generate-web-app
 npm install
@@ -32,41 +47,42 @@ npm install
 
 Next, you'll need to build the current version by running
 
-```
+```sh
 npm run build
 ```
 
 You can now either run the script directly via
 
-```
-node dist/index.js`
+```sh
+node dist/index.js
 ```
 
 or you link the package. This tells npm to look for `generate-web-app` on your computer instead of in its registry. This
 will allow you to use the normal `npx generate-web-app` command for testing. To do this, simply run
 
-```
+```sh
 npm link
 ```
 
 ⚠️ Attention: you'll have to undo this if you want to use the registry's version again! This can be done via
 
-```
+```sh
 npm unlink
 ```
 
-## Testing, linting etc.
+## 🧪 Run tests, linter, etc.
 
-This project uses jest for testing. To start jest in its interactive mode, simply run
+There are multiple different tools you can run to aid your development process. First of all, you can execute the jest
+unit tests by running
 
-```
-npm test
+```sh
+npm run test
 ```
 
 Linting and Code style enforcement is taken care of by eslint and prettier. Both should be executed automatically before
 each commit, but you can also run them manually:
 
-```
+```sh
 npm run lint # Doesn't overwrite files
 npm run prettier # ⚠️ Overwrites files!
 ```
@@ -100,3 +116,36 @@ Saving these images allows you to perform manual tests with these configurations
 again. To do so, simply run `docker run -it --rm <image-name>`, where `<image-name>` should be replaced
 with the exact name of the image you would like to test (in the above example, you would replace `<image-name>` with
 `gwa-test:react-no-ts`).
+
+## ℹ More information
+
+Originally, GWA was the product of my bachelor's thesis. Sadly, the thesis is in German, but if you would like to
+read it, you can find it [here](https://lbbo.github.io/bachelor-thesis/thesis.pdf).
+
+## Author
+
+👤 **Michael David Kuckuk**
+
+- Website: http://michaelkuckuk.com
+- Twitter: [@LBBO\_](https://twitter.com/LBBO_)
+- Github: [@LBBO](https://github.com/LBBO)
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!
+
+Feel free to check [issues page](https://github.com/LBBO/generate-web-app/issues).
+
+## Show your support
+
+Give a ⭐️ if this project helped you!
+
+## 📝 License
+
+Copyright © 2021 [Michael David Kuckuk](https://github.com/LBBO).
+
+This project is [MIT](https://github.com/LBBO/generate-web-app/blob/master/LICENSE) licensed.
+
+---
+
+_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
